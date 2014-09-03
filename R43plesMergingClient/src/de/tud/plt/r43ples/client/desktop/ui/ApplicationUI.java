@@ -24,6 +24,7 @@ import javax.swing.JMenuItem;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 
 /**
  * The application UI of the merging client.
@@ -66,7 +67,12 @@ public class ApplicationUI {
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
 			public void actionPerformed(ActionEvent arg0) {
-				Controller.showStartMergingDialog();
+				try {
+					Controller.showStartMergingDialog();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		mnMenu.add(mntmNewMerge);

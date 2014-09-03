@@ -32,8 +32,8 @@ public class R43plesMergingClient {
 			public void run() {
 				try {
 					UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-					ApplicationUI window = new ApplicationUI();
-					window.frmRplesMergingClient.setVisible(true);
+					new ApplicationUI();
+					ApplicationUI.frmRplesMergingClient.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

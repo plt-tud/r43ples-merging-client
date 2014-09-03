@@ -11,10 +11,10 @@ import org.apache.commons.configuration.PropertiesConfiguration;
  */
 public class Config {
 	
-	/** The R43ples server port. **/
-	public static int r43plesServerPort;
-	/** The R43ples server URI. **/
-	public static String r43plesServerUri;
+	/** The R43ples SPARQL endpoint. **/
+	public static String r43ples_sparql_endpoint;
+	/** The R43ples revision graph. **/
+	public static String r43ples_revision_graph;
 	
 	/**
 	 * Read the configuration information from local file
@@ -25,8 +25,8 @@ public class Config {
 	public static void readConfig(final String configFilePath) throws ConfigurationException{
 		
 		PropertiesConfiguration config = new PropertiesConfiguration(configFilePath);
-		r43plesServerPort = config.getInt("r43ples.server.port");
-		r43plesServerUri = config.getString("r43ples.server.uri");
+		r43ples_sparql_endpoint = config.getString("r43ples.sparql.endpoint");
+		r43ples_revision_graph = config.getString("r43ples.revision.graph");
 		
 	}
 

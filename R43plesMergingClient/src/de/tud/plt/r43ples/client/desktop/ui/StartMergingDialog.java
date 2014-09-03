@@ -3,6 +3,7 @@ package de.tud.plt.r43ples.client.desktop.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -19,6 +20,12 @@ import java.awt.GridLayout;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
+import de.tud.plt.r43ples.client.desktop.control.Controller;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.io.IOException;
+
 /**
  * The start merging dialog. Creates the MERGE query.
  * 
@@ -33,19 +40,20 @@ public class StartMergingDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	/** The button group of the radio buttons for selection of the merging method. **/
 	private final ButtonGroup buttonGroupMergingMethod = new ButtonGroup();
-
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		try {
-//			StartMergingDialog dialog = new StartMergingDialog();
-//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//			dialog.setVisible(true);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+	/** The radio button of merging method AUTO. **/
+	private JRadioButton rdbtnMergingMethodAUTO;
+	/** The radio button of merging method MANUAL. **/
+	private JRadioButton rdbtnMergingMethodMANUAL;
+	/** The radio button of merging method COMMON. **/
+	private JRadioButton rdbtnMergingMethodCOMMON;
+	
+	/** The combo box model of the graph names. **/
+	private static DefaultComboBoxModel<String> cBModelGraph = new DefaultComboBoxModel<String>();
+	/** The combo box model of the possible revision numbers for A. **/
+	private static DefaultComboBoxModel<String> cBModelRevisionA = new DefaultComboBoxModel<String>();
+	/** The combo box model of the possible revision numbers for B. **/
+	private static DefaultComboBoxModel<String> cBModelRevisionB = new DefaultComboBoxModel<String>();
+	
 
 	/**
 	 * Create the dialog.
@@ -64,17 +72,17 @@ public class StartMergingDialog extends JDialog {
 		contentPanel.add(panel);
 		panel.setLayout(new GridLayout(0, 3, 0, 0));
 		
-		JRadioButton rdbtnMergingMethodAUTO = new JRadioButton("AUTO");
+		rdbtnMergingMethodAUTO = new JRadioButton("AUTO");
 		buttonGroupMergingMethod.add(rdbtnMergingMethodAUTO);
 		rdbtnMergingMethodAUTO.setSelected(true);
 		panel.add(rdbtnMergingMethodAUTO);
 		
-		JRadioButton rdbtnMergingMethodMANUAL = new JRadioButton("MANUAL");
+		rdbtnMergingMethodMANUAL = new JRadioButton("MANUAL");
 		rdbtnMergingMethodMANUAL.setEnabled(false);
 		buttonGroupMergingMethod.add(rdbtnMergingMethodMANUAL);
 		panel.add(rdbtnMergingMethodMANUAL);
 		
-		JRadioButton rdbtnMergingMethodCOMMON = new JRadioButton("Common");
+		rdbtnMergingMethodCOMMON = new JRadioButton("Common");
 		buttonGroupMergingMethod.add(rdbtnMergingMethodCOMMON);
 		panel.add(rdbtnMergingMethodCOMMON);
 		
@@ -83,7 +91,21 @@ public class StartMergingDialog extends JDialog {
 		contentPanel.add(lblSelectGraph);
 		
 		JComboBox<String> cBGraph = new JComboBox<String>();
+		cBGraph.addActionListener(new ActionListener() {
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Controller.updateRevisionComboBoxes();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		cBGraph.setBounds(119, 72, 305, 20);
+		cBGraph.setModel(cBModelGraph);
 		contentPanel.add(cBGraph);
 		
 		JLabel lblMerge = new JLabel("MERGE");
@@ -92,6 +114,7 @@ public class StartMergingDialog extends JDialog {
 		
 		JComboBox<String> comboBoxRevisionA = new JComboBox<String>();
 		comboBoxRevisionA.setBounds(119, 103, 110, 20);
+		comboBoxRevisionA.setModel(cBModelRevisionA);
 		contentPanel.add(comboBoxRevisionA);
 		
 		JLabel lblInto = new JLabel("INTO");
@@ -101,6 +124,7 @@ public class StartMergingDialog extends JDialog {
 		
 		JComboBox<String> comboBoxRevisionB = new JComboBox<String>();
 		comboBoxRevisionB.setBounds(314, 103, 110, 20);
+		comboBoxRevisionB.setModel(cBModelRevisionB);
 		contentPanel.add(comboBoxRevisionB);
 		{
 			JPanel buttonPane = new JPanel();
@@ -108,15 +132,96 @@ public class StartMergingDialog extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+					/* (non-Javadoc)
+					 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+					 */
+					public void actionPerformed(ActionEvent arg0) {
+						Controller.startNewMergeProcess();
+					}
+				});
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					/* (non-Javadoc)
+					 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+					 */
+					public void actionPerformed(ActionEvent e) {
+						setVisible(false);
+					}
+				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
+	}
+	
+	
+	public static DefaultComboBoxModel<String> getcBModelGraph() {
+		return cBModelGraph;
+	}
+
+
+
+	public static void setcBModelGraph(DefaultComboBoxModel<String> cBModelGraph) {
+		StartMergingDialog.cBModelGraph = cBModelGraph;
+	}
+
+
+
+	public static DefaultComboBoxModel<String> getcBModelRevisionA() {
+		return cBModelRevisionA;
+	}
+
+
+
+	public static void setcBModelRevisionA(DefaultComboBoxModel<String> cBModelRevisionA) {
+		StartMergingDialog.cBModelRevisionA = cBModelRevisionA;
+	}
+
+
+
+	public static DefaultComboBoxModel<String> getcBModelRevisionB() {
+		return cBModelRevisionB;
+	}
+
+
+
+	public static void setcBModelRevisionB(DefaultComboBoxModel<String> cBModelRevisionB) {
+		StartMergingDialog.cBModelRevisionB = cBModelRevisionB;
+	}
+
+
+	public JRadioButton getRdbtnMergingMethodAUTO() {
+		return rdbtnMergingMethodAUTO;
+	}
+
+
+	public void setRdbtnMergingMethodAUTO(JRadioButton rdbtnMergingMethodAUTO) {
+		this.rdbtnMergingMethodAUTO = rdbtnMergingMethodAUTO;
+	}
+
+
+	public JRadioButton getRdbtnMergingMethodMANUAL() {
+		return rdbtnMergingMethodMANUAL;
+	}
+
+
+	public void setRdbtnMergingMethodMANUAL(JRadioButton rdbtnMergingMethodMANUAL) {
+		this.rdbtnMergingMethodMANUAL = rdbtnMergingMethodMANUAL;
+	}
+
+
+	public JRadioButton getRdbtnMergingMethodCOMMON() {
+		return rdbtnMergingMethodCOMMON;
+	}
+
+
+	public void setRdbtnMergingMethodCOMMON(JRadioButton rdbtnMergingMethodCOMMON) {
+		this.rdbtnMergingMethodCOMMON = rdbtnMergingMethodCOMMON;
 	}
 }

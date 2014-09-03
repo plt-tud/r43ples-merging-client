@@ -20,7 +20,7 @@ public class TripleStoreInterface {
 	/** The logger. */
 	private static Logger logger = Logger.getLogger(TripleStoreInterface.class);
 	/** The endpoint to use. **/
-	private static String endpoint = Config.r43plesServerUri + ":" + Config.r43plesServerPort;
+	private static String endpoint = Config.r43ples_sparql_endpoint;
 
 	
 	/**
@@ -34,7 +34,33 @@ public class TripleStoreInterface {
 	public static String executeQueryWithoutAuthorization(String query, String format) throws IOException {
 		URL url = null;
 		
-		url = new URL(endpoint + "?query=" + URLEncoder.encode(query, "UTF-8") + "&format=" + URLEncoder.encode(format, "UTF-8") + "&timeout=0");
+		url = new URL(endpoint + "/r43ples/sparql?query=" + URLEncoder.encode(query, "UTF-8") + "&format=" + URLEncoder.encode(format, "UTF-8") + "&timeout=0");
+		logger.debug(url.toString());
+
+		URLConnection con = null;
+		InputStream in = null;
+		con = url.openConnection();
+		in = con.getInputStream();
+	
+		String encoding = con.getContentEncoding();
+		encoding = (encoding == null) ? "UTF-8" : encoding;
+		String body = IOUtils.toString(in, encoding);
+		return body;
+		
+	}
+	
+	
+	/**
+	 * Executes a HTTP-GET.
+	 * 
+	 * @param path the path
+	 * @return the result of the query
+	 * @throws IOException 
+	 */
+	public static String executeHttpGet(String path) throws IOException {
+		URL url = null;
+		
+		url = new URL(endpoint + path);
 		logger.debug(url.toString());
 
 		URLConnection con = null;
