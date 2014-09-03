@@ -103,4 +103,24 @@ public class Management {
 		return list;
 	}
 	
+	
+	
+	/**
+	 * Execute each kind of MERGE query.
+	 * 
+	 * @param graphName the graph name
+	 * @param type the merge query type
+	 * @param branchNameA the branch name A
+	 * @param branchNameB the branch name B
+	 * @param triples the triples which should be in the WITH part
+	 * @return the query result
+	 */
+	public static String executeMergeQuery(String graphName, MergeQueryTypeEnum type, String branchNameA, String branchNameB, String triples) {
+		
+		
+		
+		
+		return null;
+	}
+	
 }
