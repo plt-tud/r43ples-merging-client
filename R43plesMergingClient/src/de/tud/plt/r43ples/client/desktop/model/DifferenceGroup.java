@@ -2,6 +2,8 @@ package de.tud.plt.r43ples.client.desktop.model;
 
 import java.util.HashMap;
 
+import de.tud.plt.r43ples.client.desktop.control.SDDTripleStateEnum;
+
 /**
  * Stores all information of a difference group.
  * 
@@ -10,17 +12,114 @@ import java.util.HashMap;
  */
 public class DifferenceGroup {
 
+	/** The triple state in A. **/
+	private SDDTripleStateEnum tripleStateA;
+	/** The triple state in B. **/
+	private SDDTripleStateEnum tripleStateB;
+	/** The automatic resolution state. **/
+	private SDDTripleStateEnum automaticResolutionState;
+	/** The conflicting property. Specifies if this difference is a conflict or not. **/
+	private boolean conflicting;
 	/** The array list which contains all differences. **/
 	private HashMap<String, Difference> differences;
 	
 	
 	/**
 	 * The constructor.
+	 * 
+	 * @param tripleStateA the triple state in A
+	 * @param tripleStateB the triple state in B
+	 * @param automaticResolutionState the automatic resolution state
+	 * @param conflicting is conflicting
 	 */
-	public DifferenceGroup() {
+	public DifferenceGroup(SDDTripleStateEnum tripleStateA, SDDTripleStateEnum tripleStateB, SDDTripleStateEnum automaticResolutionState, boolean conflicting) {
+		this.tripleStateA = tripleStateA;
+		this.tripleStateB = tripleStateB;
+		this.automaticResolutionState = automaticResolutionState;
+		this.conflicting = conflicting;
 		setDifferences(new HashMap<String, Difference>());
 	}
 
+	
+	/**
+	 * Get the triple state in A.
+	 * 
+	 * @return the triple state
+	 */
+	public SDDTripleStateEnum getTripleStateA() {
+		return tripleStateA;
+	}
+
+	
+	/**
+	 * Set the triple state of A.
+	 * 
+	 * @param tripleStateA the triple state in A
+	 */
+	public void setTripleStateA(SDDTripleStateEnum tripleStateA) {
+		this.tripleStateA = tripleStateA;
+	}
+
+
+	/**
+	 * Get the triple state in B.
+	 * 
+	 * @return the triple state
+	 */
+	public SDDTripleStateEnum getTripleStateB() {
+		return tripleStateB;
+	}
+
+
+	/**
+	 * Set the triple state of B.
+	 * 
+	 * @param tripleStateA the triple state in B
+	 */
+	public void setTripleStateB(SDDTripleStateEnum tripleStateB) {
+		this.tripleStateB = tripleStateB;
+	}
+
+
+	/**
+	 * Get the automatic resolution state.
+	 * 
+	 * @return the automatic resolution state
+	 */
+	public SDDTripleStateEnum getAutomaticResolutionState() {
+		return automaticResolutionState;
+	}
+
+
+	/**
+	 * Set the automatic resolution state.
+	 * 
+	 * @param automaticResolutionState the automatic resolution state
+	 */
+	public void setAutomaticResolutionState(SDDTripleStateEnum automaticResolutionState) {
+		this.automaticResolutionState = automaticResolutionState;
+	}
+
+
+	/**
+	 * Is this difference group a conflicting group.
+	 * 
+	 * @return the is conflicting property
+	 */
+	public boolean isConflicting() {
+		return conflicting;
+	}
+
+
+	/**
+	 * Set the conflicting property
+	 * 
+	 * @param conflicting the conflicting property
+	 */
+	public void setConflicting(boolean conflicting) {
+		this.conflicting = conflicting;
+	}
+	
 
 	/**
 	 * Get the differences.

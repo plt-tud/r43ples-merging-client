@@ -1,12 +1,12 @@
 package de.tud.plt.r43ples.client.desktop.control;
 
 /**
- * The SDD triple state.
+ * The SDD triple state enum.
  * 
  * @author Stephan Hensel
  *
  */
-public enum SDDTripleState {
+public enum SDDTripleStateEnum {
 	ADDED("http://eatld.et.tu-dresden.de/sddo#Added", "http://eatld.et.tu-dresden.de/rpo#added"),
 	DELETED("http://eatld.et.tu-dresden.de/sddo#Deleted", "http://eatld.et.tu-dresden.de/rpo#removed"),
 	ORIGINAL("http://eatld.et.tu-dresden.de/sddo#Original", "http://eatld.et.tu-dresden.de/rpo#original"),
@@ -24,7 +24,7 @@ public enum SDDTripleState {
 	 * @param sddRepresentation the SDD representation
 	 * @param rpoRepresentation the RPO representation
 	 */
-	private SDDTripleState(String sddRepresentation, String rpoRepresentation) {
+	private SDDTripleStateEnum(String sddRepresentation, String rpoRepresentation) {
 		this.sddRepresentation = sddRepresentation;
 		this.rpoRepresentation = rpoRepresentation;
 	}
