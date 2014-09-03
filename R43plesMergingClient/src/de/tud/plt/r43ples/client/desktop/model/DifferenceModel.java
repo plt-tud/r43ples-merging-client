@@ -3,12 +3,12 @@ package de.tud.plt.r43ples.client.desktop.model;
 import java.util.HashMap;
 
 /**
- * The difference model structure provides the structure for storing the returned difference model after a MERGE query.
+ * The difference model provides the structure for storing the returned difference model after a MERGE query.
  * 
  * @author Stephan Hensel
  *
  */
-public class DifferenceModelStructure {
+public class DifferenceModel {
 
 	/** The array list which contains all difference groups. **/
 	private HashMap<String, DifferenceGroup> differenceGroups;
@@ -17,7 +17,7 @@ public class DifferenceModelStructure {
 	/**
 	 * The constructor.
 	 */
-	public DifferenceModelStructure() {
+	public DifferenceModel() {
 		setDifferenceGroups(new HashMap<String, DifferenceGroup>());
 	}
 

@@ -25,6 +25,8 @@ import de.tud.plt.r43ples.client.desktop.control.Controller;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 /**
  * The start merging dialog. Creates the MERGE query.
@@ -41,11 +43,16 @@ public class StartMergingDialog extends JDialog {
 	/** The button group of the radio buttons for selection of the merging method. **/
 	private final ButtonGroup buttonGroupMergingMethod = new ButtonGroup();
 	/** The radio button of merging method AUTO. **/
-	private JRadioButton rdbtnMergingMethodAUTO;
+	private static JRadioButton rdbtnMergingMethodAUTO;
 	/** The radio button of merging method MANUAL. **/
-	private JRadioButton rdbtnMergingMethodMANUAL;
+	private static JRadioButton rdbtnMergingMethodMANUAL;
 	/** The radio button of merging method COMMON. **/
-	private JRadioButton rdbtnMergingMethodCOMMON;
+	private static JRadioButton rdbtnMergingMethodCOMMON;
+	/** The user text field. **/
+	private static JTextField tfUser;
+	/** The commit message text area. **/
+	private static JTextArea textAreaMessage;
+	
 	
 	/** The combo box model of the graph names. **/
 	private static DefaultComboBoxModel<String> cBModelGraph = new DefaultComboBoxModel<String>();
@@ -60,31 +67,31 @@ public class StartMergingDialog extends JDialog {
 	 */
 	public StartMergingDialog() {
 		setTitle("Start Merging");
-		setBounds(100, 100, 450, 220);
+		setBounds(100, 100, 450, 355);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		
-		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Select the merging method", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel.setBounds(10, 11, 414, 50);
-		contentPanel.add(panel);
-		panel.setLayout(new GridLayout(0, 3, 0, 0));
+		JPanel panelMergingMethod = new JPanel();
+		panelMergingMethod.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Select the merging method", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelMergingMethod.setBounds(10, 11, 414, 50);
+		contentPanel.add(panelMergingMethod);
+		panelMergingMethod.setLayout(new GridLayout(0, 3, 0, 0));
 		
 		rdbtnMergingMethodAUTO = new JRadioButton("AUTO");
 		buttonGroupMergingMethod.add(rdbtnMergingMethodAUTO);
 		rdbtnMergingMethodAUTO.setSelected(true);
-		panel.add(rdbtnMergingMethodAUTO);
+		panelMergingMethod.add(rdbtnMergingMethodAUTO);
 		
 		rdbtnMergingMethodMANUAL = new JRadioButton("MANUAL");
 		rdbtnMergingMethodMANUAL.setEnabled(false);
 		buttonGroupMergingMethod.add(rdbtnMergingMethodMANUAL);
-		panel.add(rdbtnMergingMethodMANUAL);
+		panelMergingMethod.add(rdbtnMergingMethodMANUAL);
 		
 		rdbtnMergingMethodCOMMON = new JRadioButton("Common");
 		buttonGroupMergingMethod.add(rdbtnMergingMethodCOMMON);
-		panel.add(rdbtnMergingMethodCOMMON);
+		panelMergingMethod.add(rdbtnMergingMethodCOMMON);
 		
 		JLabel lblSelectGraph = new JLabel("Select the graph");
 		lblSelectGraph.setBounds(13, 72, 96, 20);
@@ -126,6 +133,23 @@ public class StartMergingDialog extends JDialog {
 		comboBoxRevisionB.setBounds(314, 103, 110, 20);
 		comboBoxRevisionB.setModel(cBModelRevisionB);
 		contentPanel.add(comboBoxRevisionB);
+		
+		JLabel lblUser = new JLabel("USER");
+		lblUser.setBounds(13, 134, 60, 20);
+		contentPanel.add(lblUser);
+		
+		tfUser = new JTextField();
+		tfUser.setBounds(119, 134, 305, 20);
+		contentPanel.add(tfUser);
+		tfUser.setColumns(10);
+		
+		JLabel lblMessage = new JLabel("MESSAGE");
+		lblMessage.setBounds(13, 165, 60, 20);
+		contentPanel.add(lblMessage);
+		
+		textAreaMessage = new JTextArea();
+		textAreaMessage.setBounds(119, 165, 305, 100);
+		contentPanel.add(textAreaMessage);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -137,7 +161,12 @@ public class StartMergingDialog extends JDialog {
 					 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 					 */
 					public void actionPerformed(ActionEvent arg0) {
-						Controller.startNewMergeProcess();
+						try {
+							Controller.startNewMergeProcess();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -196,32 +225,52 @@ public class StartMergingDialog extends JDialog {
 	}
 
 
-	public JRadioButton getRdbtnMergingMethodAUTO() {
+	public static JRadioButton getRdbtnMergingMethodAUTO() {
 		return rdbtnMergingMethodAUTO;
 	}
 
 
-	public void setRdbtnMergingMethodAUTO(JRadioButton rdbtnMergingMethodAUTO) {
-		this.rdbtnMergingMethodAUTO = rdbtnMergingMethodAUTO;
+	public static void setRdbtnMergingMethodAUTO(JRadioButton rdbtnMergingMethodAUTO) {
+		StartMergingDialog.rdbtnMergingMethodAUTO = rdbtnMergingMethodAUTO;
 	}
 
 
-	public JRadioButton getRdbtnMergingMethodMANUAL() {
+	public static JRadioButton getRdbtnMergingMethodMANUAL() {
 		return rdbtnMergingMethodMANUAL;
 	}
 
 
-	public void setRdbtnMergingMethodMANUAL(JRadioButton rdbtnMergingMethodMANUAL) {
-		this.rdbtnMergingMethodMANUAL = rdbtnMergingMethodMANUAL;
+	public static void setRdbtnMergingMethodMANUAL(JRadioButton rdbtnMergingMethodMANUAL) {
+		StartMergingDialog.rdbtnMergingMethodMANUAL = rdbtnMergingMethodMANUAL;
 	}
 
 
-	public JRadioButton getRdbtnMergingMethodCOMMON() {
+	public static JRadioButton getRdbtnMergingMethodCOMMON() {
 		return rdbtnMergingMethodCOMMON;
 	}
 
 
-	public void setRdbtnMergingMethodCOMMON(JRadioButton rdbtnMergingMethodCOMMON) {
-		this.rdbtnMergingMethodCOMMON = rdbtnMergingMethodCOMMON;
+	public static void setRdbtnMergingMethodCOMMON(JRadioButton rdbtnMergingMethodCOMMON) {
+		StartMergingDialog.rdbtnMergingMethodCOMMON = rdbtnMergingMethodCOMMON;
+	}
+
+
+	public static JTextField getTfUser() {
+		return tfUser;
+	}
+
+
+	public static void setTfUser(JTextField tfUser) {
+		StartMergingDialog.tfUser = tfUser;
+	}
+
+
+	public static JTextArea getTextAreaMessage() {
+		return textAreaMessage;
+	}
+
+
+	public static void setTextAreaMessage(JTextArea textAreaMessage) {
+		StartMergingDialog.textAreaMessage = textAreaMessage;
 	}
 }

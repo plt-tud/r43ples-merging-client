@@ -1,6 +1,6 @@
 package de.tud.plt.r43ples.client.desktop.model;
 
-import de.tud.plt.r43ples.client.desktop.control.TripleObjectTypeEnum;
+import de.tud.plt.r43ples.client.desktop.control.enums.TripleObjectTypeEnum;
 
 /**
  * Stores one triple.

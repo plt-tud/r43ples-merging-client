@@ -2,7 +2,7 @@ package de.tud.plt.r43ples.client.desktop.model;
 
 import java.util.HashMap;
 
-import de.tud.plt.r43ples.client.desktop.control.SDDTripleStateEnum;
+import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 
 /**
  * Stores all information of a difference group.
