@@ -13,7 +13,9 @@ public class TreeNodeObject {
 	/** The text to display. **/
 	private String text;
 	/** The resolution state of the node. **/
-	private ResolutionState resolutionState;	
+	private ResolutionState resolutionState;
+	/** The object which stores all information. **/
+	private Object object;
 	
 	
 	/**
@@ -21,10 +23,12 @@ public class TreeNodeObject {
 	 * 
 	 * @param text the text
 	 * @param resolutionState the resolution state
+	 * @param object the object
 	 */
-	public TreeNodeObject(String text, ResolutionState resolutionState) {
+	public TreeNodeObject(String text, ResolutionState resolutionState, Object object) {
 		this.setText(text);
 		this.setResolutionState(resolutionState);
+		this.object = object;
 	}
 
 
@@ -65,6 +69,26 @@ public class TreeNodeObject {
 	 */
 	public void setResolutionState(ResolutionState resolutionState) {
 		this.resolutionState = resolutionState;
+	}
+
+
+	/**
+	 * Get the object.
+	 * 
+	 * @return the object
+	 */
+	public Object getObject() {
+		return object;
+	}
+
+
+	/**
+	 * Set the object.
+	 * 
+	 * @param object the object
+	 */
+	public void setObject(Object object) {
+		this.object = object;
 	}
 	
 }

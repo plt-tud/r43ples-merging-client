@@ -16,20 +16,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.jidesoft.swing.CheckBoxTree;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
-import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 
 /**
  * The application UI of the merging client.
@@ -45,6 +44,10 @@ public class ApplicationUI {
 	private static JTree treeDifferencesDivision;
 	/** The differences tree model (division). **/
 	private static DefaultTreeModel treeModelDifferencesDivision = new DefaultTreeModel(null);
+	/** The resolution triples table. **/
+	private static JTable tableResolutionTriples;
+	/** The resolution triples table model. **/
+	private static DefaultTableModel tableModelResolutionTriples = new DefaultTableModel();
 	
 
 	/**
@@ -93,7 +96,7 @@ public class ApplicationUI {
 		toolBar.add(btnNewMerge);
 		
 		JSplitPane splitPaneApplication = new JSplitPane();
-		splitPaneApplication.setResizeWeight(0.2);
+		splitPaneApplication.setResizeWeight(0.3);
 		frmRplesMergingClient.getContentPane().add(splitPaneApplication, BorderLayout.CENTER);
 		
 		JSplitPane splitPanePreferences = new JSplitPane();
@@ -145,7 +148,7 @@ public class ApplicationUI {
 		panelDifferencesDivision.add(scrollPaneDifferencesDivision, BorderLayout.CENTER);
 		
 		treeDifferencesDivision = new JTree();
-		treeDifferencesDivision.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		treeDifferencesDivision.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		treeDifferencesDivision.setModel(treeModelDifferencesDivision);
 		treeDifferencesDivision.setCellRenderer(new TreeCellRendererDifferences());
 		treeDifferencesDivision.addTreeSelectionListener(new TreeSelectionListener() {
@@ -154,10 +157,12 @@ public class ApplicationUI {
 			 */
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
-				// TODO Auto-generated method stub
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-						treeDifferencesDivision.getLastSelectedPathComponent();
-				System.out.println("SELECTED: " + ((TreeNodeObject) node.getUserObject()).getText());
+				try {
+					Controller.selectionChangedDifferencesTree();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});	
 		scrollPaneDifferencesDivision.setViewportView(treeDifferencesDivision);
@@ -166,7 +171,7 @@ public class ApplicationUI {
 		tabbedPaneDifferences.addTab("Triples", null, panelDifferencesTriples, null);
 		
 		JSplitPane splitPaneResolution = new JSplitPane();
-		splitPaneResolution.setResizeWeight(0.3);
+		splitPaneResolution.setResizeWeight(0.5);
 		splitPaneResolution.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPaneApplication.setRightComponent(splitPaneResolution);
 		
@@ -187,6 +192,15 @@ public class ApplicationUI {
 		
 		JPanel panelResolutionTriples = new JPanel();
 		tabbedPaneResolution.addTab("Triples", null, panelResolutionTriples, null);
+		panelResolutionTriples.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPaneResolutionTriples = new JScrollPane();
+		panelResolutionTriples.add(scrollPaneResolutionTriples, BorderLayout.CENTER);
+		
+		tableResolutionTriples = new JTable();
+		tableResolutionTriples.setModel(tableModelResolutionTriples);
+		scrollPaneResolutionTriples.setViewportView(tableResolutionTriples);
+		Controller.initializeTableResolutionTriples();
 		
 		JPanel panelResolutionSemanticEnrichment = new JPanel();
 		tabbedPaneResolution.addTab("Semantic Enrichment", null, panelResolutionSemanticEnrichment, null);
@@ -223,6 +237,27 @@ public class ApplicationUI {
 	public static void setTreeModelDifferencesDivision(
 			DefaultTreeModel treeModelDifferencesDivision) {
 		ApplicationUI.treeModelDifferencesDivision = treeModelDifferencesDivision;
+	}
+
+
+	public static JTable getTableResolutionTriples() {
+		return tableResolutionTriples;
+	}
+
+
+	public static void setTableResolutionTriples(JTable tableResolutionTriples) {
+		ApplicationUI.tableResolutionTriples = tableResolutionTriples;
+	}
+
+
+	public static DefaultTableModel getTableModelResolutionTriples() {
+		return tableModelResolutionTriples;
+	}
+
+
+	public static void setTableModelResolutionTriples(
+			DefaultTableModel tableModelResolutionTriples) {
+		ApplicationUI.tableModelResolutionTriples = tableModelResolutionTriples;
 	}
 
 }

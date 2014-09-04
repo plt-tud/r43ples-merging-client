@@ -104,7 +104,7 @@ public class Management {
 		if (graphName != null) {
 						
 			String query = prefixes + String.format(
-					  "SELECT DISTINCT  ?label %n"
+					  "SELECT DISTINCT ?label %n"
 					+ "FROM <%s> %n"
 					+ "WHERE { %n"
 					+ "	?branch a rmo:Branch ; %n"
@@ -259,12 +259,12 @@ public class Management {
 		    	Triple triple = new Triple(subject, predicate, object, objectType);
 		    	
 		    	String referencedRevisionA = null;
-		    	if (qsDifferences.getResource("?tripleStateA") != null) {
-		    		referencedRevisionA = qsDifferences.getResource("?tripleStateA").toString();
+		    	if (qsDifferences.getResource("?referencedRevisionA") != null) {
+		    		referencedRevisionA = qsDifferences.getResource("?referencedRevisionA").toString();
 		    	}
 		    	String referencedRevisionB = null;
-		    	if (qsDifferences.getResource("?tripleStateB") != null) {
-		    		referencedRevisionB = qsDifferences.getResource("?tripleStateB").toString();
+		    	if (qsDifferences.getResource("?referencedRevisionB") != null) {
+		    		referencedRevisionB = qsDifferences.getResource("?referencedRevisionB").toString();
 		    	}
 		    	
 		    	Difference difference = new Difference(triple, referencedRevisionA, referencedRevisionB);
@@ -401,10 +401,10 @@ public class Management {
 	public static DefaultMutableTreeNode createDifferencesTree(DifferenceModel differenceModel) {
 		
 		// Create the root node
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeNodeObject("root", ResolutionState.CONFLICT));		
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeNodeObject("All", ResolutionState.CONFLICT, null));		
 		
 		// Create group of conflicting difference groups
-		DefaultMutableTreeNode conflictsNode = new DefaultMutableTreeNode(new TreeNodeObject("Conflicts", ResolutionState.CONFLICT));
+		DefaultMutableTreeNode conflictsNode = new DefaultMutableTreeNode(new TreeNodeObject("Conflicts", ResolutionState.CONFLICT, null));
 		
 		ArrayList<DifferenceGroup> conflicting = getAllConflictingDifferenceGroups(differenceModel);
 		
@@ -412,14 +412,14 @@ public class Management {
 		while (iteConflicting.hasNext()) {
 			DifferenceGroup differenceGroup = iteConflicting.next();
 			
-			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.CONFLICT));
+			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.CONFLICT, differenceGroup));
 			
 			// Add all differences
 			Iterator<Difference> iteDifferences = differenceGroup.getDifferences().values().iterator();
 			while (iteDifferences.hasNext()) {
 				Difference difference = iteDifferences.next();
 				
-				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.CONFLICT));
+				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.CONFLICT, difference));
 				differenceGroupNode.add(differenceNode);
 			}
 			
@@ -430,7 +430,7 @@ public class Management {
 		root.add(conflictsNode);
 		
 		// Create group of non conflicting difference groups
-		DefaultMutableTreeNode differencesNode = new DefaultMutableTreeNode(new TreeNodeObject("Differences", ResolutionState.DIFFERENCE));
+		DefaultMutableTreeNode differencesNode = new DefaultMutableTreeNode(new TreeNodeObject("Differences", ResolutionState.DIFFERENCE, null));
 		
 		ArrayList<DifferenceGroup> nonConflicting = getAllNonConflictingDifferenceGroups(differenceModel);
 		
@@ -438,14 +438,14 @@ public class Management {
 		while (iteNonConflicting.hasNext()) {
 			DifferenceGroup differenceGroup = iteNonConflicting.next();
 			
-			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.DIFFERENCE));
+			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.DIFFERENCE, differenceGroup));
 			
 			// Add all differences
 			Iterator<Difference> iteDifferences = differenceGroup.getDifferences().values().iterator();
 			while (iteDifferences.hasNext()) {
 				Difference difference = iteDifferences.next();
 				
-				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.DIFFERENCE));
+				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.DIFFERENCE, difference));
 				differenceGroupNode.add(differenceNode);
 			}
 			
@@ -483,6 +483,115 @@ public class Management {
 		} else {
 			return ((TreeNodeObject) rootNode.getUserObject()).getResolutionState();
 		}
+		
+	}
+	
+	
+	/**
+	 * Get the difference group of difference.
+	 * 
+	 * @param difference the difference
+	 * @param differenceModel the difference model
+	 * @return the difference group
+	 */
+	public static DifferenceGroup getDifferenceGroupOfDifference(Difference difference, DifferenceModel differenceModel) {
+		
+		for (DifferenceGroup differenceGroup : differenceModel.getDifferenceGroups().values()) {
+			if (differenceGroup.getDifferences().containsKey(tripleToString(difference.getTriple()))) {
+				return differenceGroup;
+			}
+		}
+				
+		return null;
+		
+	}
+
+
+	/**
+	 * Create the row data for resolution triples.
+	 * 
+	 * @param resolutionState the resolution state
+	 * @param difference the difference
+	 * @param differenceGroup the difference group
+	 * @throws IOException 
+	 */
+	public static Object[] createRowDataResolutionTriples(ResolutionState resolutionState, Difference difference, DifferenceGroup differenceGroup) throws IOException {
+		Object[] rowData = new Object[6];
+		rowData[0] = "<" + difference.getTriple().getSubject() + ">";
+		rowData[1] = "<" + difference.getTriple().getPredicate() + ">";
+		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
+			rowData[2] = "\"" + difference.getTriple().getObject() + "\"";
+		} else {
+			rowData[2] = "<" + difference.getTriple().getObject() + ">";
+		}
+		
+		// Get the revision number if available
+		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
+			String query = prefixes + String.format(
+					  "SELECT ?rev %n"
+					+ "FROM <%s> %n"
+					+ "WHERE { %n"
+					+ "	<%s> a rmo:Revision ; %n"
+					+ "		rmo:revisionNumber ?rev . %n"
+					+ "}", Config.r43ples_revision_graph, difference.getReferencedRevisionA());
+			
+			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+			logger.debug(result);
+			
+			ResultSet resultSet = ResultSetFactory.fromXML(result);
+			if (resultSet.hasNext()) {
+				QuerySolution qs = resultSet.next();
+				rowData[3] = differenceGroup.getTripleStateA() + " (" + qs.getLiteral("?rev").toString() + ")";
+				rowData[4] = differenceGroup.getTripleStateB();
+			}
+		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
+			String query = prefixes + String.format(
+					  "SELECT ?rev %n"
+					+ "FROM <%s> %n"
+					+ "WHERE { %n"
+					+ "	<%s> a rmo:Revision ; %n"
+					+ "		rmo:revisionNumber ?rev . %n"
+					+ "}", Config.r43ples_revision_graph, difference.getReferencedRevisionB());
+			
+			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+			logger.debug(result);
+			
+			// Iterate over all labels
+			ResultSet resultSet = ResultSetFactory.fromXML(result);
+			if (resultSet.hasNext()) {
+				QuerySolution qs = resultSet.next();
+				rowData[3] = differenceGroup.getTripleStateA();
+				rowData[4] = differenceGroup.getTripleStateB() + " (" + qs.getLiteral("?rev").toString() + ")";
+			}
+		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
+			String query = prefixes + String.format(
+					  "SELECT ?revA ?revB %n"
+					+ "FROM <%s> %n"
+					+ "WHERE { %n"
+					+ "	<%s> a rmo:Revision ; %n"
+					+ "		rmo:revisionNumber ?revA . %n"
+					+ "	<%s> a rmo:Revision ; %n"
+					+ "		rmo:revisionNumber ?revB . %n"
+					+ "}", Config.r43ples_revision_graph, difference.getReferencedRevisionA(), difference.getReferencedRevisionB());
+			
+			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+			logger.debug(result);
+			
+			// Iterate over all labels
+			ResultSet resultSet = ResultSetFactory.fromXML(result);
+			if (resultSet.hasNext()) {
+				QuerySolution qs = resultSet.next();
+				rowData[3] = differenceGroup.getTripleStateA() + " (" + qs.getLiteral("?revA").toString() + ")";
+				rowData[4] = differenceGroup.getTripleStateB() + " (" + qs.getLiteral("?revB").toString() + ")";
+			}
+		} else {
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB();
+		}
+
+		rowData[5] = "TEST";
+		
+		return rowData;
 		
 	}
 	
