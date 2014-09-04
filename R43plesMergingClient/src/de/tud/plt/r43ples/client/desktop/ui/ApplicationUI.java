@@ -2,12 +2,16 @@ package de.tud.plt.r43ples.client.desktop.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -15,18 +19,17 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.LineBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.jidesoft.swing.CheckBoxTree;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
-
-import javax.swing.JMenuItem;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
+import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 
 /**
  * The application UI of the merging client.
@@ -42,7 +45,7 @@ public class ApplicationUI {
 	private static JTree treeDifferencesDivision;
 	/** The differences tree model (division). **/
 	private static DefaultTreeModel treeModelDifferencesDivision = new DefaultTreeModel(null);
-
+	
 
 	/**
 	 * Create the application.
@@ -145,6 +148,18 @@ public class ApplicationUI {
 		treeDifferencesDivision.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		treeDifferencesDivision.setModel(treeModelDifferencesDivision);
 		treeDifferencesDivision.setCellRenderer(new TreeCellRendererDifferences());
+		treeDifferencesDivision.addTreeSelectionListener(new TreeSelectionListener() {
+			/* (non-Javadoc)
+			 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
+			 */
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				// TODO Auto-generated method stub
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+						treeDifferencesDivision.getLastSelectedPathComponent();
+				System.out.println("SELECTED: " + ((TreeNodeObject) node.getUserObject()).getText());
+			}
+		});	
 		scrollPaneDifferencesDivision.setViewportView(treeDifferencesDivision);
 		
 		JPanel panelDifferencesTriples = new JPanel();

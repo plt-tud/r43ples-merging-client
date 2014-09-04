@@ -11,14 +11,23 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 
+/**
+ * The tree cell renderer for difference tree (division).
+ * 
+ * @author Stephan Hensel
+ *
+ */
 public class TreeCellRendererDifferences extends DefaultTreeCellRenderer {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 
 	
-	
+	/* (non-Javadoc)
+	 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+	 */
 	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+		super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus); 
 		
 		// Get the tree node object
 		TreeNodeObject treeNodeObject = (TreeNodeObject) ((DefaultMutableTreeNode) value).getUserObject();
@@ -35,13 +44,9 @@ public class TreeCellRendererDifferences extends DefaultTreeCellRenderer {
 		}
 		
 		setText(treeNodeObject.getText());
-		
-
-//		if (selected) {
-//			setBackground(Color.BLUE);
-//		}
+		setBackground(Color.black);
 
 		return this;
 	}
-	
+
 }
