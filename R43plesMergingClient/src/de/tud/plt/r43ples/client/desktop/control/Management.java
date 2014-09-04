@@ -267,7 +267,7 @@ public class Management {
 		    		referencedRevisionB = qsDifferences.getResource("?referencedRevisionB").toString();
 		    	}
 		    	
-		    	Difference difference = new Difference(triple, referencedRevisionA, referencedRevisionB);
+		    	Difference difference = new Difference(triple, referencedRevisionA, referencedRevisionB, automaticResolutionState);
 		    	differenceGroup.addDifference(tripleToString(triple), difference);
 		    }
 	    	differenceModel.addDifferenceGroup(differenceGroup.getTripleStateA().toString() + "-" + differenceGroup.getTripleStateB().toString(), differenceGroup);
@@ -589,7 +589,7 @@ public class Management {
 			rowData[4] = differenceGroup.getTripleStateB();
 		}
 
-		rowData[5] = "TEST";
+		rowData[5] = new Boolean(true);
 		
 		return rowData;
 		

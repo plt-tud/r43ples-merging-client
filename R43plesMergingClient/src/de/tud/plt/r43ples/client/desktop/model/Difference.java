@@ -1,5 +1,7 @@
 package de.tud.plt.r43ples.client.desktop.model;
 
+import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
+
 /**
  * Stores all information of a difference.
  * 
@@ -14,6 +16,8 @@ public class Difference {
 	private String referencedRevisionA;
 	/** The referenced revision URI in B. Characterizes in which revision the difference . **/
 	private String referencedRevisionB;
+	/** The resolution state. **/
+	private SDDTripleStateEnum resolutionState;
 	
 	
 	/**
@@ -22,11 +26,13 @@ public class Difference {
 	 * @param triple the triple
 	 * @param referencedRevisionA the referenced revision in A
 	 * @param referencedRevisionB the referenced revision in B
+	 * @param resolutionState the resolution state
 	 */
-	public Difference(Triple triple, String referencedRevisionA, String referencedRevisionB) {
+	public Difference(Triple triple, String referencedRevisionA, String referencedRevisionB, SDDTripleStateEnum resolutionState) {
 		this.triple = triple;
 		this.referencedRevisionA = referencedRevisionA;
 		this.referencedRevisionB = referencedRevisionB;
+		this.setResolutionState(resolutionState);
 	}
 
 
@@ -87,6 +93,26 @@ public class Difference {
 	 */
 	public void setReferencedRevisionB(String referencedRevisionB) {
 		this.referencedRevisionB = referencedRevisionB;
+	}
+
+
+	/**
+	 * Get the resolution state.
+	 * 
+	 * @return the resolution state
+	 */
+	public SDDTripleStateEnum getResolutionState() {
+		return resolutionState;
+	}
+
+
+	/**
+	 * Set the resolution state.
+	 * 
+	 * @param resolutionState the resolution state
+	 */
+	public void setResolutionState(SDDTripleStateEnum resolutionState) {
+		this.resolutionState = resolutionState;
 	}
 	
 }

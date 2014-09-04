@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,13 +23,13 @@ import javax.swing.JTree;
 import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.jidesoft.swing.CheckBoxTree;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
+import de.tud.plt.r43ples.client.desktop.model.TableEntry;
 
 /**
  * The application UI of the merging client.
@@ -47,7 +48,7 @@ public class ApplicationUI {
 	/** The resolution triples table. **/
 	private static JTable tableResolutionTriples;
 	/** The resolution triples table model. **/
-	private static DefaultTableModel tableModelResolutionTriples = new DefaultTableModel();
+	private static TableModelResolutionTriples tableModelResolutionTriples = new TableModelResolutionTriples(new ArrayList<TableEntry>());
 	
 
 	/**
@@ -93,7 +94,23 @@ public class ApplicationUI {
 		frmRplesMergingClient.getContentPane().add(toolBar, BorderLayout.NORTH);
 		
 		JButton btnNewMerge = new JButton("New MERGE");
+		btnNewMerge.addActionListener(new ActionListener() {
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Controller.showStartMergingDialog();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 		toolBar.add(btnNewMerge);
+		
+		JButton btnAutoResolve = new JButton("AUTO Resolve");
+		toolBar.add(btnAutoResolve);
 		
 		JSplitPane splitPaneApplication = new JSplitPane();
 		splitPaneApplication.setResizeWeight(0.3);
@@ -200,7 +217,20 @@ public class ApplicationUI {
 		tableResolutionTriples = new JTable();
 		tableResolutionTriples.setModel(tableModelResolutionTriples);
 		scrollPaneResolutionTriples.setViewportView(tableResolutionTriples);
-		Controller.initializeTableResolutionTriples();
+		
+		JToolBar toolBarResolutionTriples = new JToolBar();
+		panelResolutionTriples.add(toolBarResolutionTriples, BorderLayout.NORTH);
+		
+		JButton btnResolutionTriplesApproveSelected = new JButton("Approve selected");
+		btnResolutionTriplesApproveSelected.addActionListener(new ActionListener() {
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.approveSelectedEntriesResolutionTriples();
+			}
+		});
+		toolBarResolutionTriples.add(btnResolutionTriplesApproveSelected);
 		
 		JPanel panelResolutionSemanticEnrichment = new JPanel();
 		tabbedPaneResolution.addTab("Semantic Enrichment", null, panelResolutionSemanticEnrichment, null);
@@ -250,13 +280,13 @@ public class ApplicationUI {
 	}
 
 
-	public static DefaultTableModel getTableModelResolutionTriples() {
+	public static TableModelResolutionTriples getTableModelResolutionTriples() {
 		return tableModelResolutionTriples;
 	}
 
 
 	public static void setTableModelResolutionTriples(
-			DefaultTableModel tableModelResolutionTriples) {
+			TableModelResolutionTriples tableModelResolutionTriples) {
 		ApplicationUI.tableModelResolutionTriples = tableModelResolutionTriples;
 	}
 

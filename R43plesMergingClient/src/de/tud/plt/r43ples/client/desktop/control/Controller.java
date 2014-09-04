@@ -6,17 +6,18 @@ import java.util.Iterator;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
+import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
+import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.Difference;
 import de.tud.plt.r43ples.client.desktop.model.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.DifferenceModel;
+import de.tud.plt.r43ples.client.desktop.model.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.ApplicationUI;
-import de.tud.plt.r43ples.client.desktop.ui.NonEditableCellEditor;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
 
 /**
@@ -144,6 +145,7 @@ public class Controller {
 
 	/**
 	 * Selection of differences tree was changed.
+	 * 
 	 * @throws IOException 
 	 */
 	public static void selectionChangedDifferencesTree() throws IOException {
@@ -153,10 +155,12 @@ public class Controller {
 		
 		// Get the selected nodes
 		TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
-		for (TreePath treePath : treePaths) {
-			DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
-			TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
-			list.add(treeNodeObject);
+		if (treePaths != null) {
+			for (TreePath treePath : treePaths) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+				TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
+				list.add(treeNodeObject);
+			}
 		}
 		
 		// Update the triple table
@@ -173,7 +177,7 @@ public class Controller {
 	 */
 	public static void updateTableResolutionTriples(ArrayList<TreeNodeObject> selectedElements) throws IOException {
 		// Remove the old rows
-		ApplicationUI.getTableModelResolutionTriples().getDataVector().removeAllElements();
+		ApplicationUI.getTableModelResolutionTriples().removeAllElements();
 		
 		for (TreeNodeObject nodeObject : selectedElements) {
 			// Contains the row data
@@ -193,33 +197,63 @@ public class Controller {
 					rowData = Management.createRowDataResolutionTriples(nodeObject.getResolutionState(), difference, differenceGroup);
 				}
 			}
-			ApplicationUI.getTableModelResolutionTriples().addRow(rowData);
-			ApplicationUI.getTableResolutionTriples().getColumn("Subject").setCellEditor(new NonEditableCellEditor(new JTextField()));
-			ApplicationUI.getTableResolutionTriples().getColumn("Predicate").setCellEditor(new NonEditableCellEditor(new JTextField()));
-			ApplicationUI.getTableResolutionTriples().getColumn("Object").setCellEditor(new NonEditableCellEditor(new JTextField()));
-			ApplicationUI.getTableResolutionTriples().getColumn("State A (Revision)").setCellEditor(new NonEditableCellEditor(new JTextField()));
-			ApplicationUI.getTableResolutionTriples().getColumn("State B (Revision)").setCellEditor(new NonEditableCellEditor(new JTextField()));
+
+			TableEntry entry = new TableEntry(nodeObject, rowData);
+			ApplicationUI.getTableModelResolutionTriples().addRow(entry);
 			
 		}
+		ApplicationUI.getTableResolutionTriples().updateUI();
 	}
-	
-	
+
+
 	/**
-	 * Initialize the resolution triples table.
+	 * Approve selected entries of resolution triples table.
 	 */
-	public static void initializeTableResolutionTriples() {
+	public static void approveSelectedEntriesResolutionTriples() {
 		
-		// Create the columns
-		ApplicationUI.getTableModelResolutionTriples().addColumn("Subject");
-		ApplicationUI.getTableModelResolutionTriples().addColumn("Predicate");
-		ApplicationUI.getTableModelResolutionTriples().addColumn("Object");
-		ApplicationUI.getTableModelResolutionTriples().addColumn("State A (Revision)");
-		ApplicationUI.getTableModelResolutionTriples().addColumn("State B (Revision)");
-		ApplicationUI.getTableModelResolutionTriples().addColumn("Resolution State");
+		int[] selectedRows = ApplicationUI.getTableResolutionTriples().getSelectedRows();
+		for (int i = 0; i<selectedRows.length; i++) {
+			ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getNodeObject().setResolutionState(ResolutionState.RESOLVED);
+			// Propagate changes to difference model
+			Boolean checkBoxStateBool = (Boolean) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getRowData()[5];
+			if (checkBoxStateBool.booleanValue()) {
+				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
+			} else {
+				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
+			}
+		}
+
+		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
+		ApplicationUI.getTreeDifferencesDivision().updateUI();
 		
 	}
 	
 	
-	
+//	TODO Maybe it is better to use a check box tree and not use selection of nodes
+//	/**
+//	 * Deselect approved entries of differences tree.
+//	 * 
+//	 * @throws IOException 
+//	 */
+//	public static void deselectApprovedEntriesOfDifferencesTree(List<Triple> tripleList) throws IOException {
+//		
+//		// Array list which stores all selected tree node objects
+//		ArrayList<TreeNodeObject> list = new ArrayList<TreeNodeObject>();
+//		
+//		// Get the selected nodes
+//		TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
+//		if (treePaths != null) {
+//			for (TreePath treePath : treePaths) {
+//				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+//				TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
+//				if (tripleList.contains(treeNodeObject.ge)
+//				list.add(treeNodeObject);
+//			}
+//		}
+//		
+//		// Update the triple table
+//		updateTableResolutionTriples(list);
+//		
+//	}
 
 }
