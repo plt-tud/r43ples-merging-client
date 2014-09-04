@@ -15,6 +15,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.LineBorder;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 
 import com.jidesoft.swing.CheckBoxTree;
 
@@ -36,6 +38,10 @@ public class ApplicationUI {
 
 	/** The application frame. **/
 	public static JFrame frmRplesMergingClient;
+	/** The differences tree (division). **/
+	private static JTree treeDifferencesDivision;
+	/** The differences tree model (division). **/
+	private static DefaultTreeModel treeModelDifferencesDivision = new DefaultTreeModel(null);
 
 
 	/**
@@ -135,7 +141,10 @@ public class ApplicationUI {
 		JScrollPane scrollPaneDifferencesDivision = new JScrollPane();
 		panelDifferencesDivision.add(scrollPaneDifferencesDivision, BorderLayout.CENTER);
 		
-		JTree treeDifferencesDivision = new JTree();
+		treeDifferencesDivision = new JTree();
+		treeDifferencesDivision.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		treeDifferencesDivision.setModel(treeModelDifferencesDivision);
+		treeDifferencesDivision.setCellRenderer(new TreeCellRendererDifferences());
 		scrollPaneDifferencesDivision.setViewportView(treeDifferencesDivision);
 		
 		JPanel panelDifferencesTriples = new JPanel();
@@ -178,6 +187,27 @@ public class ApplicationUI {
 		
 		JLabel lblRevisionGraphHeader = new JLabel(" Revision graph");
 		panelRevisionGraphHeader.add(lblRevisionGraphHeader);
+	}
+
+
+	public static JTree getTreeDifferencesDivision() {
+		return treeDifferencesDivision;
+	}
+
+
+	public static void setTreeDifferencesDivision(JTree treeDifferencesDivision) {
+		ApplicationUI.treeDifferencesDivision = treeDifferencesDivision;
+	}
+
+
+	public static DefaultTreeModel getTreeModelDifferencesDivision() {
+		return treeModelDifferencesDivision;
+	}
+
+
+	public static void setTreeModelDifferencesDivision(
+			DefaultTreeModel treeModelDifferencesDivision) {
+		ApplicationUI.treeModelDifferencesDivision = treeModelDifferencesDivision;
 	}
 
 }

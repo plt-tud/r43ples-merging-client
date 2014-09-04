@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.model.DifferenceModel;
@@ -23,7 +24,7 @@ public class Controller {
 	/** The start merging dialog instance. **/
 	private static StartMergingDialog dialog = new StartMergingDialog();
 	/** The difference model. **/
-	private static DifferenceModel differenceModel;
+	private static DifferenceModel differenceModel = new DifferenceModel();;
 	
 	
 	/**
@@ -75,6 +76,7 @@ public class Controller {
 
 	/**
 	 * Start new merge process when the selected branches are not equal.
+	 * 
 	 * @throws IOException 
 	 */
 	public static void startNewMergeProcess() throws IOException {
@@ -111,7 +113,28 @@ public class Controller {
 			Management.executeMergeQuery(graphName, user, commitMessage, type, branchNameA, branchNameB, null, differenceModel);
 			
 			// TODO close dialog after execution + error handling
+			
+			dialog.setVisible(false);
+			
+			// Update application UI
+			updateDifferencesTree();
+			
+			
+			
 		}
 	}
+	
+	
+	/**
+	 * Update the differences tree.
+	 */
+	public static void updateDifferencesTree() {
+		
+		DefaultMutableTreeNode rootNode = Management.createDifferencesTree(differenceModel);
+		ApplicationUI.getTreeModelDifferencesDivision().setRoot(rootNode);
+		
+	}
+	
+	
 
 }

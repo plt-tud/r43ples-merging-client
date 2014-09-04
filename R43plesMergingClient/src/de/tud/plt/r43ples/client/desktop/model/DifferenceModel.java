@@ -61,5 +61,13 @@ public class DifferenceModel {
 	public void removeDifferenceGroup(String identifier) {
 		this.differenceGroups.remove(identifier);
 	}
+	
+	
+	/**
+	 * Clear the difference model.
+	 */
+	public void clear() {
+		differenceGroups.clear();
+	}
 
 }

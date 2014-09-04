@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.log4j.Logger;
 
@@ -21,12 +24,14 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
+import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.TripleObjectTypeEnum;
 import de.tud.plt.r43ples.client.desktop.model.Difference;
 import de.tud.plt.r43ples.client.desktop.model.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.DifferenceModel;
 import de.tud.plt.r43ples.client.desktop.model.HttpResponse;
+import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.model.Triple;
 
 /**
@@ -153,7 +158,7 @@ public class Management {
 				// There was a conflict
 				logger.info("Merge query produced conflicts.");
 				// Read the difference model to java model
-				differenceModel = readDifferenceModel(response.getBody());
+				readDifferenceModel(response.getBody(), differenceModel);
 				// TODO
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				// There was no conflict merged revision was created
@@ -177,12 +182,13 @@ public class Management {
 	 * Read difference model to java representation.
 	 * 
 	 * @param differenceModelToRead the difference model to read
+	 * @param differenceModel the difference model where the result should be stored
 	 * @return the difference model in java representation
 	 * @throws IOException 
 	 */
-	public static DifferenceModel readDifferenceModel(String differenceModelToRead) throws IOException {
+	public static void readDifferenceModel(String differenceModelToRead, DifferenceModel differenceModel) throws IOException {
 		logger.info("Start reading difference model.");
-		DifferenceModel differenceModel = new DifferenceModel();
+		differenceModel.clear();
 		
 		// Read difference model to read to jena model
 		Model model = readTurtleStringToJenaModel(differenceModelToRead);
@@ -209,7 +215,7 @@ public class Management {
 	    	SDDTripleStateEnum tripleStateA = convertSDDStringToSDDTripleState(qsDifferenceGroups.getResource("?tripleStateA").toString());
 	    	SDDTripleStateEnum tripleStateB = convertSDDStringToSDDTripleState(qsDifferenceGroups.getResource("?tripleStateB").toString());
 	    	SDDTripleStateEnum automaticResolutionState = convertSDDStringToSDDTripleState(qsDifferenceGroups.getResource("?automaticResolutionState").toString());
-	    	boolean conflicting = qsDifferenceGroups.getLiteral("?conflicting").equals("1^^http://www.w3.org/2001/XMLSchema#integer");   	
+	    	boolean conflicting = qsDifferenceGroups.getLiteral("?conflicting").toString().equals("1^^http://www.w3.org/2001/XMLSchema#integer");   	
 
 	    	DifferenceGroup differenceGroup = new DifferenceGroup(tripleStateA, tripleStateB, automaticResolutionState, conflicting);
 	    	
@@ -218,11 +224,11 @@ public class Management {
 					  "SELECT ?subject ?predicate ?object ?referencedRevisionA ?referencedRevisionB %n"
 					+ "WHERE { %n"
 					+ "	<%s> a rpo:DifferenceGroup ; %n"
-					+ "		rpo:hasDifference ?diffferenceUri . %n"
+					+ "		rpo:hasDifference ?differenceUri . %n"
 					+ "	?differenceUri a rpo:Difference ; %n"
-					+ "		rpo:hasTriple ?tripleUri ; %n"
-					+ "		rpo:referencesA ?referencedRevisionA ; %n"
-					+ "		rpo:referencesB ?referencedRevisionB . %n"
+					+ "		rpo:hasTriple ?tripleUri . %n"
+					+ "	OPTIONAL { ?differenceUri rpo:referencesA ?referencedRevisionA . } %n"
+					+ "	OPTIONAL { ?differenceUri rpo:referencesB ?referencedRevisionB . } %n"
 					+ "	?tripleUri rdf:subject ?subject ; %n"
 					+ "		rdf:predicate ?predicate ; %n"
 					+ "		rdf:object ?object . %n"
@@ -268,8 +274,6 @@ public class Management {
 	    }
 	    
 	    logger.info("Difference model successfully read.");
-	    
-		return differenceModel;
 		
 	}
 	
@@ -335,13 +339,151 @@ public class Management {
 	}
 	
 	
+	/**
+	 * Get all conflicting difference groups.
+	 * 
+	 * @param differenceModel the difference model to use
+	 * @return the array list of all conflicting difference groups
+	 */
+	public static ArrayList<DifferenceGroup> getAllConflictingDifferenceGroups(DifferenceModel differenceModel) {
+		
+		ArrayList<DifferenceGroup> result = new ArrayList<DifferenceGroup>();
+		
+		Iterator<String> iteDifferenceGroups = differenceModel.getDifferenceGroups().keySet().iterator();
+		
+		while (iteDifferenceGroups.hasNext()) {
+			String currentkey = iteDifferenceGroups.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(currentkey);
+			
+			if (differenceGroup.isConflicting()) {
+				logger.debug(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB());
+				result.add(differenceGroup);
+			}
+		}
+		
+		return result;
+		
+	}
 	
 	
+	/**
+	 * Get all non conflicting difference groups.
+	 * 
+	 * @param differenceModel the difference model to use
+	 * @return the array list of all non conflicting difference groups
+	 */
+	public static ArrayList<DifferenceGroup> getAllNonConflictingDifferenceGroups(DifferenceModel differenceModel) {
+		
+		ArrayList<DifferenceGroup> result = new ArrayList<DifferenceGroup>();
+		
+		Iterator<String> iteDifferenceGroups = differenceModel.getDifferenceGroups().keySet().iterator();
+		
+		while (iteDifferenceGroups.hasNext()) {
+			String currentkey = iteDifferenceGroups.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(currentkey);
+			
+			if (!differenceGroup.isConflicting()) {
+				result.add(differenceGroup);
+			}
+		}
+		
+		return result;
+		
+	}
 	
 	
+	/**
+	 * Create the differences tree root node.
+	 * 
+	 * @param differenceModel the differences model to use
+	 * @return the root node
+	 */
+	public static DefaultMutableTreeNode createDifferencesTree(DifferenceModel differenceModel) {
+		
+		// Create the root node
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeNodeObject("root", ResolutionState.CONFLICT));		
+		
+		// Create group of conflicting difference groups
+		DefaultMutableTreeNode conflictsNode = new DefaultMutableTreeNode(new TreeNodeObject("Conflicts", ResolutionState.CONFLICT));
+		
+		ArrayList<DifferenceGroup> conflicting = getAllConflictingDifferenceGroups(differenceModel);
+		
+		Iterator<DifferenceGroup> iteConflicting = conflicting.iterator();
+		while (iteConflicting.hasNext()) {
+			DifferenceGroup differenceGroup = iteConflicting.next();
+			
+			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.CONFLICT));
+			
+			// Add all differences
+			Iterator<Difference> iteDifferences = differenceGroup.getDifferences().values().iterator();
+			while (iteDifferences.hasNext()) {
+				Difference difference = iteDifferences.next();
+				
+				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.CONFLICT));
+				differenceGroupNode.add(differenceNode);
+			}
+			
+			conflictsNode.add(differenceGroupNode);
+
+		}
+		
+		root.add(conflictsNode);
+		
+		// Create group of non conflicting difference groups
+		DefaultMutableTreeNode differencesNode = new DefaultMutableTreeNode(new TreeNodeObject("Differences", ResolutionState.DIFFERENCE));
+		
+		ArrayList<DifferenceGroup> nonConflicting = getAllNonConflictingDifferenceGroups(differenceModel);
+		
+		Iterator<DifferenceGroup> iteNonConflicting = nonConflicting.iterator();
+		while (iteNonConflicting.hasNext()) {
+			DifferenceGroup differenceGroup = iteNonConflicting.next();
+			
+			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.DIFFERENCE));
+			
+			// Add all differences
+			Iterator<Difference> iteDifferences = differenceGroup.getDifferences().values().iterator();
+			while (iteDifferences.hasNext()) {
+				Difference difference = iteDifferences.next();
+				
+				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.DIFFERENCE));
+				differenceGroupNode.add(differenceNode);
+			}
+			
+			differencesNode.add(differenceGroupNode);
+
+		}
+		
+		root.add(differencesNode);
+		
+		refreshParentNodeStateDifferencesTree(root);
+		
+		return root;
+		
+	}
 	
 	
-	
-	
+	/**
+	 * Refresh the parent node states by current child states of the difference tree.
+	 * 
+	 * @param rootNode the root node of tree
+	 */
+	public static ResolutionState refreshParentNodeStateDifferencesTree(DefaultMutableTreeNode rootNode) {
+		
+		if (!rootNode.isLeaf()) {
+			ResolutionState rootNodeState = ResolutionState.RESOLVED;
+			
+			for (int i=0; i<rootNode.getChildCount(); i++) {
+				ResolutionState childState = refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) rootNode.getChildAt(i));
+				if (childState.compareTo(rootNodeState) > 0) {
+					rootNodeState = childState;
+				}
+			}
+			((TreeNodeObject) rootNode.getUserObject()).setResolutionState(rootNodeState);
+			return rootNodeState;
+		} else {
+			return ((TreeNodeObject) rootNode.getUserObject()).getResolutionState();
+		}
+		
+	}
 	
 }
