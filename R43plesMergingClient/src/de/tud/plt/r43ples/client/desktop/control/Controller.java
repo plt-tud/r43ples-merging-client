@@ -18,6 +18,7 @@ import de.tud.plt.r43ples.client.desktop.model.DifferenceModel;
 import de.tud.plt.r43ples.client.desktop.model.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.ApplicationUI;
+import de.tud.plt.r43ples.client.desktop.ui.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
 
 /**
@@ -32,6 +33,8 @@ public class Controller {
 	private static StartMergingDialog dialog = new StartMergingDialog();
 	/** The difference model. **/
 	private static DifferenceModel differenceModel = new DifferenceModel();;
+	/** The summary report dialog instance. **/
+	private static ReportDialog report = new ReportDialog();
 	
 	
 	/**
@@ -255,5 +258,38 @@ public class Controller {
 //		updateTableResolutionTriples(list);
 //		
 //	}
+	
+	
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		try {
+			ReportDialog dialog = new ReportDialog();
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	public static void executePush() {
+		// Set the texts
+		ReportDialog.getTfGraph().setText(StartMergingDialog.getcBModelGraph().getSelectedItem().toString());
+		ReportDialog.getTfRevisionA().setText(StartMergingDialog.getcBModelRevisionA().getSelectedItem().toString());
+		ReportDialog.getTfRevisionB().setText(StartMergingDialog.getcBModelRevisionB().getSelectedItem().toString());
+		ReportDialog.getTfUser().setText(StartMergingDialog.getTfUser().getText());
+		ReportDialog.getTextAreaMessage().setText(StartMergingDialog.getTextAreaMessage().getText());
+		
+		// TODO Create Table
+		
+		report.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		report.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
+		report.setModal(true);
+		report.setVisible(true);
+
+	}
 
 }

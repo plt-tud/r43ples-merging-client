@@ -30,6 +30,7 @@ import com.jidesoft.swing.CheckBoxTree;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.TableEntry;
+import java.awt.Dimension;
 
 /**
  * The application UI of the merging client.
@@ -112,6 +113,17 @@ public class ApplicationUI {
 		JButton btnAutoResolve = new JButton("AUTO Resolve");
 		toolBar.add(btnAutoResolve);
 		
+		JButton btnPush = new JButton("Push");
+		btnPush.addActionListener(new ActionListener() {
+			/**
+			 * @param arg0
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.executePush();
+			}
+		});
+		toolBar.add(btnPush);
+		
 		JSplitPane splitPaneApplication = new JSplitPane();
 		splitPaneApplication.setResizeWeight(0.3);
 		frmRplesMergingClient.getContentPane().add(splitPaneApplication, BorderLayout.CENTER);
@@ -165,6 +177,7 @@ public class ApplicationUI {
 		panelDifferencesDivision.add(scrollPaneDifferencesDivision, BorderLayout.CENTER);
 		
 		treeDifferencesDivision = new JTree();
+		treeDifferencesDivision.setMinimumSize(new Dimension(72, 64));
 		treeDifferencesDivision.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		treeDifferencesDivision.setModel(treeModelDifferencesDivision);
 		treeDifferencesDivision.setCellRenderer(new TreeCellRendererDifferences());
