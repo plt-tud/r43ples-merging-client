@@ -2,8 +2,6 @@ package de.tud.plt.r43ples.client.desktop.control;
 
 import java.awt.EventQueue;
 
-import javax.swing.UIManager;
-
 import org.apache.commons.configuration.ConfigurationException;
 
 import de.tud.plt.r43ples.client.desktop.ui.ApplicationUI;
@@ -31,7 +29,6 @@ public class R43plesMergingClient {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 					new ApplicationUI();
 					ApplicationUI.frmRplesMergingClient.setVisible(true);
 				} catch (Exception e) {
