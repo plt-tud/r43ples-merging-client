@@ -21,15 +21,20 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.jena.atlas.web.HttpException;
+
 import com.jidesoft.swing.CheckBoxTree;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.TableEntry;
+
 import java.awt.Dimension;
 
 /**
@@ -46,6 +51,10 @@ public class ApplicationUI {
 	private static JTree treeDifferencesDivision;
 	/** The differences tree model (division). **/
 	private static DefaultTreeModel treeModelDifferencesDivision = new DefaultTreeModel(null);
+	/** The graph scroll pane. **/
+	private static JScrollPane scrollPaneGraph;
+	/** The graph panel. **/
+	private static JPanel panelGraph;	
 	/** The resolution triples table. **/
 	private static JTable tableResolutionTriples;
 	/** The resolution triples table model. **/
@@ -115,14 +124,33 @@ public class ApplicationUI {
 		
 		JButton btnPush = new JButton("Push");
 		btnPush.addActionListener(new ActionListener() {
-			/**
-			 * @param arg0
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
 			public void actionPerformed(ActionEvent arg0) {
 				Controller.executePush();
 			}
 		});
 		toolBar.add(btnPush);
+		
+		JButton btGraph = new JButton("Graph");
+		btGraph.addActionListener(new ActionListener() {
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Controller.createGraph("http://exampleGraph");
+				} catch (HttpException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		toolBar.add(btGraph);
 		
 		JSplitPane splitPaneApplication = new JSplitPane();
 		splitPaneApplication.setResizeWeight(0.3);
@@ -149,9 +177,9 @@ public class ApplicationUI {
 		panelFilter.add(panelFilterContent, BorderLayout.CENTER);
 		panelFilterContent.setLayout(new BorderLayout(0, 0));
 		
-		CheckBoxTree tree = new CheckBoxTree();
-		panelFilterContent.add(tree);
-		tree.getCheckBoxTreeSelectionModel().setDigIn(true);
+//		CheckBoxTree tree = new CheckBoxTree();
+//		panelFilterContent.add(tree);
+//		tree.getCheckBoxTreeSelectionModel().setDigIn(true);
 		
 		JPanel panelDifferences = new JPanel();
 		splitPanePreferences.setLeftComponent(panelDifferences);
@@ -229,6 +257,16 @@ public class ApplicationUI {
 		
 		tableResolutionTriples = new JTable();
 		tableResolutionTriples.setModel(tableModelResolutionTriples);
+		tableResolutionTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+			 */
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				Controller.tableResolutionTriplesSelectionChanged();				
+			}
+		});
 		scrollPaneResolutionTriples.setViewportView(tableResolutionTriples);
 		
 		JToolBar toolBarResolutionTriples = new JToolBar();
@@ -259,6 +297,12 @@ public class ApplicationUI {
 		
 		JLabel lblRevisionGraphHeader = new JLabel(" Revision graph");
 		panelRevisionGraphHeader.add(lblRevisionGraphHeader);
+		
+		scrollPaneGraph = new JScrollPane();
+		panelRevisionGraph.add(scrollPaneGraph, BorderLayout.CENTER);
+		
+		panelGraph = new JPanel();
+		scrollPaneGraph.setViewportView(panelGraph);
 	}
 
 
@@ -301,6 +345,38 @@ public class ApplicationUI {
 	public static void setTableModelResolutionTriples(
 			TableModelResolutionTriples tableModelResolutionTriples) {
 		ApplicationUI.tableModelResolutionTriples = tableModelResolutionTriples;
+	}
+
+
+	/**
+	 * @return the scrollPaneGraph
+	 */
+	public static JScrollPane getScrollPaneGraph() {
+		return scrollPaneGraph;
+	}
+
+
+	/**
+	 * @param scrollPaneGraph the scrollPaneGraph to set
+	 */
+	public static void setScrollPaneGraph(JScrollPane scrollPaneGraph) {
+		ApplicationUI.scrollPaneGraph = scrollPaneGraph;
+	}
+
+
+	/**
+	 * @return the panelGraph
+	 */
+	public static JPanel getPanelGraph() {
+		return panelGraph;
+	}
+
+
+	/**
+	 * @param panelGraph the panelGraph to set
+	 */
+	public static void setPanelGraph(JPanel panelGraph) {
+		ApplicationUI.panelGraph = panelGraph;
 	}
 
 }

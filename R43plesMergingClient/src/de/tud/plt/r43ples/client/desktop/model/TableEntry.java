@@ -8,6 +8,8 @@ package de.tud.plt.r43ples.client.desktop.model;
  */
 public class TableEntry {
 
+	/** The difference. **/
+	private Difference difference;
 	/** The tree node object. **/
 	private TreeNodeObject nodeObject;
 	/** The row data. **/
@@ -20,9 +22,30 @@ public class TableEntry {
 	 * @param nodeObject the node object
 	 * @param rowData the row data
 	 */
-	public TableEntry(TreeNodeObject nodeObject, Object[] rowData) {
+	public TableEntry(Difference difference, TreeNodeObject nodeObject, Object[] rowData) {
+		this.setDifference(difference);
 		this.setNodeObject(nodeObject);
 		this.setRowData(rowData);
+	}
+
+
+	/**
+	 * Get the difference.
+	 * 
+	 * @return the difference
+	 */
+	public Difference getDifference() {
+		return difference;
+	}
+
+
+	/**
+	 * Set the difference.
+	 * 
+	 * @param difference the difference to set
+	 */
+	public void setDifference(Difference difference) {
+		this.difference = difference;
 	}
 
 

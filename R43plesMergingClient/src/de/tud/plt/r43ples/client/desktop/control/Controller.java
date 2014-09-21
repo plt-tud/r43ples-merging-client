@@ -1,6 +1,8 @@
 package de.tud.plt.r43ples.client.desktop.control;
 
+import java.awt.Color;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -9,6 +11,13 @@ import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.apache.jena.atlas.web.HttpException;
+import org.apache.log4j.Logger;
+
+import att.grappa.Graph;
+import att.grappa.GrappaAdapter;
+import att.grappa.GrappaPanel;
+import att.grappa.GrappaSupport;
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
@@ -29,12 +38,22 @@ import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
  */
 public class Controller {
 
+	/** The logger. */
+	private static Logger logger = Logger.getLogger(Controller.class);
 	/** The start merging dialog instance. **/
 	private static StartMergingDialog dialog = new StartMergingDialog();
 	/** The difference model. **/
 	private static DifferenceModel differenceModel = new DifferenceModel();;
 	/** The summary report dialog instance. **/
 	private static ReportDialog report = new ReportDialog();
+	/** The grappa graph which contains the revision tree. **/
+	private static Graph graph;
+	/** The grappa panel which holds the visualization of the graph. **/
+	private static GrappaPanel gp;
+	/** The currently highlighted node name A in the revision graph. **/
+	private static String highlightedNodeNameA = null;
+	/** The currently highlighted node name B in the revision graph. **/
+	private static String highlightedNodeNameB = null;
 	
 	
 	/**
@@ -129,7 +148,8 @@ public class Controller {
 			// Update application UI
 			updateDifferencesTree();
 			
-			
+			// Create the revision graph
+			createGraph(graphName);
 			
 		}
 	}
@@ -168,6 +188,7 @@ public class Controller {
 		
 		// Update the triple table
 		updateTableResolutionTriples(list);
+		tableResolutionTriplesSelectionChanged();
 		
 	}
 	
@@ -198,11 +219,14 @@ public class Controller {
 					DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
 					// Create the row data
 					rowData = Management.createRowDataResolutionTriples(nodeObject.getResolutionState(), difference, differenceGroup);
+					// Create the table entry
+					TableEntry entry = new TableEntry(difference, nodeObject, rowData);
+					ApplicationUI.getTableModelResolutionTriples().addRow(entry);
 				}
 			}
 
-			TableEntry entry = new TableEntry(nodeObject, rowData);
-			ApplicationUI.getTableModelResolutionTriples().addRow(entry);
+//			TableEntry entry = new TableEntry(difference, nodeObject, rowData);
+//			ApplicationUI.getTableModelResolutionTriples().addRow(entry);
 			
 		}
 		ApplicationUI.getTableResolutionTriples().updateUI();
@@ -260,21 +284,6 @@ public class Controller {
 //	}
 	
 	
-	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			ReportDialog dialog = new ReportDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-
 	public static void executePush() {
 		// Set the texts
 		ReportDialog.getTfGraph().setText(StartMergingDialog.getcBModelGraph().getSelectedItem().toString());
@@ -290,6 +299,72 @@ public class Controller {
 		report.setModal(true);
 		report.setVisible(true);
 
+	}
+	
+	
+	/**
+	 * The table resolution triples selection changed.
+	 * Update the revision graph. The referenced revisions of the selected table row will be highlighted in the graph.
+	 */
+	public static void tableResolutionTriplesSelectionChanged() {
+		int[] rows = ApplicationUI.getTableResolutionTriples().getSelectedRows();
+		if (rows.length == 1) {
+			int index = ApplicationUI.getTableResolutionTriples().convertRowIndexToModel(rows[0]);
+			TableEntry entry = ApplicationUI.getTableModelResolutionTriples().getTableEntry(index);
+			logger.debug("Selected Entry: A - " + entry.getDifference().getReferencedRevisionA());
+			logger.debug("Selected Entry: B - " + entry.getDifference().getReferencedRevisionB());
+			
+			// Remove highlighting of already highlighted nodes
+			Management.removeHighlighting(graph, highlightedNodeNameA);
+			Management.removeHighlighting(graph, highlightedNodeNameB);
+			
+			// Highlight the new currently selected nodes and save them to currently selected node name variables
+			highlightedNodeNameA = entry.getDifference().getReferencedRevisionA();
+			highlightedNodeNameB = entry.getDifference().getReferencedRevisionB();
+			
+			Color color = Color.RED;
+			DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(entry.getDifference(), differenceModel);
+			if (!differenceGroup.isConflicting()) {
+				color = Color.ORANGE;
+			}
+			
+			Management.highlightNode(graph, highlightedNodeNameA, color);
+			Management.highlightNode(graph, highlightedNodeNameB, color);
+			
+			gp.updateUI();
+		}
+	}
+
+	
+	/**
+	 * Create the revision graph.
+	 * 
+	 * @param graphName the graph name
+	 * @throws HttpException
+	 * @throws IOException
+	 */
+	public static void createGraph(String graphName) throws HttpException, IOException {
+		
+		graph = Management.getDotGraph(graphName);	
+
+		// Layout the graph
+		String [] processArgs = {"app/dot"};
+		Process formatProcess = Runtime.getRuntime().exec(processArgs, null, null);
+		System.out.println(GrappaSupport.filterGraph(graph, formatProcess));
+		formatProcess.getOutputStream().close();
+		
+		StringWriter sw = new StringWriter();
+		graph.printGraph(sw);
+		logger.debug(sw.toString());
+
+		// Create the grappa panel
+		gp = new GrappaPanel(graph);
+		gp.addGrappaListener(new GrappaAdapter());
+		gp.setScaleToFit(false);
+		
+		ApplicationUI.getScrollPaneGraph().setViewportView(gp);
+
+		gp.updateUI();
 	}
 
 }

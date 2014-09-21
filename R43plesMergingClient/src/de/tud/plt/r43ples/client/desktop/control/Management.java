@@ -1,5 +1,6 @@
 package de.tud.plt.r43ples.client.desktop.control;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +10,14 @@ import java.util.Iterator;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
+
+import att.grappa.Attribute;
+import att.grappa.Edge;
+import att.grappa.Graph;
+import att.grappa.Node;
+import att.grappa.Subgraph;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -594,5 +602,147 @@ public class Management {
 		return rowData;
 		
 	}
+	
+	
+	/**
+	 * Get the dot graph.
+	 * 
+	 * @param graphName the graph name 
+	 * @return the dot graph
+	 * @throws IOException
+	 * @throws HttpException
+	 */
+	public static Graph getDotGraph(String graphName) throws IOException, HttpException {
+		// Create a new graph
+		Graph graph =  new Graph("Revision graph of " + graphName);
+		graph.setAttribute(Attribute.RANKDIR_ATTR, "LR");
+		
+		String query_branches = prefixes + String.format(
+				  "SELECT ?branchURI ?branch %n"
+				+ "FROM <%s> %n"
+				+ "WHERE { %n"
+				+ "	?branchURI a rmo:Branch ; %n"
+				+ "		rdfs:label ?branch ; %n"
+				+ "		rmo:references ?revisionURI . %n"
+				+ "	?revisionURI a rmo:Revision ; %n"
+				+ "		rmo:revisionOf <%s> . %n"
+				+ "}", Config.r43ples_revision_graph, graphName);
+		
+		String result_branches = TripleStoreInterface.executeQueryWithoutAuthorization(query_branches, "text/xml");
+		ResultSet resultSet_brances = ResultSetFactory.fromXML(result_branches);
+		while (resultSet_brances.hasNext()) {
+			QuerySolution qs_branches = resultSet_brances.next();
+			String branchURI = qs_branches.getResource("branchURI").toString();
+			String branchName = qs_branches.getLiteral("branch").toString();
+			
+			// Create new sub graph
+			Subgraph subGraph = new Subgraph(graph, "Branch: " + branchName);
+			
+			// Get all nodes (revisions)
+			String query_nodes = prefixes + String.format(
+					  "SELECT DISTINCT ?revision ?number %n"
+					+ "FROM <%s> %n"
+					+ "WHERE { %n"
+					+ " ?revision a rmo:Revision ; %n"
+					+ "		rmo:revisionOf <%s> ; %n"
+					+ "		rmo:revisionOfBranch <%s> ; %n"
+					+ "		rmo:revisionNumber ?number . %n"
+					+ "}", Config.r43ples_revision_graph, graphName, branchURI);
+			
+			String result_nodes = TripleStoreInterface.executeQueryWithoutAuthorization(query_nodes, "text/xml");
+			ResultSet resultSet_nodes = ResultSetFactory.fromXML(result_nodes);
+			while (resultSet_nodes.hasNext()) {
+				QuerySolution qs_nodes = resultSet_nodes.next();
+				String rev = qs_nodes.getResource("revision").toString();
+				String name = qs_nodes.getLiteral("number").toString();
+				Node newNode = new Node(graph, rev);
+
+				// Check if revision is referenced
+				String query_reference = prefixes + String.format(
+						  "SELECT ?label %n"
+						+ "FROM <%s> %n"
+						+ "WHERE { %n"
+						+ "	?reference a rmo:Reference ; %n"
+						+ "		rmo:references <%s> ; %n"
+						+ "		rdfs:label ?label . %n"
+						+ "}", Config.r43ples_revision_graph, rev);
+				
+				String result_reference = TripleStoreInterface.executeQueryWithoutAuthorization(query_reference, "text/xml");
+				ResultSet resultSet_reference = ResultSetFactory.fromXML(result_reference);
+				if (resultSet_reference.hasNext()) {
+					QuerySolution qs = resultSet_reference.next();
+					String reference = qs.getLiteral("label").toString();
+					name = name + " | " + reference;					
+				}
+				
+				newNode.setAttribute(Attribute.LABEL_ATTR, name);
+				newNode.setAttribute(Attribute.SHAPE_ATTR, Attribute.RECORD_SHAPE);
+				subGraph.addNode(newNode);
+				
+			}
+		}
+		
+		// Create the directed edges between the revisions
+		String query_edges = prefixes + String.format(""
+				+ "SELECT DISTINCT ?revision ?next_revision "
+				+ "FROM <%s> "
+				+ "WHERE {"
+				+ " ?revision a rmo:Revision;"
+				+ "		rmo:revisionOf <%s>."
+				+ "	?next_revision a rmo:Revision;"
+				+ "		prov:wasDerivedFrom ?revision."
+				+ "}", Config.r43ples_revision_graph, graphName);
+		
+		String result_edges = TripleStoreInterface.executeQueryWithoutAuthorization(query_edges, "text/xml");
+		ResultSet resultSet_edges = ResultSetFactory.fromXML(result_edges);
+		while (resultSet_edges.hasNext()) {
+			QuerySolution qs_edges = resultSet_edges.next();
+			String rev = qs_edges.getResource("revision").toString();
+			String next = qs_edges.getResource("next_revision").toString();
+			Node newNode = graph.findNodeByName(rev);
+			Node nextNode = graph.findNodeByName(next);
+			graph.addEdge(new Edge(graph, newNode, nextNode));
+		}
+
+		return graph;
+	}
+	
+	
+	/**
+	 * Highlight a node in the specified graph.
+	 * 
+	 * @param graph the graph which contains the nodes
+	 * @param nodeName the name of the node to highlight (revision URI)
+	 * @param color the highlight color
+	 * @return true when node was highlighted elsewhere false when the graph does not contain the specified node
+	 */
+	public static boolean highlightNode(Graph graph, String nodeName, Color color) {
+		if (graph.findNodeByName(nodeName) != null) {		
+			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
+			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, color);	
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Remove the highlighting of a node in the specified graph.
+	 * 
+	 * @param graph the graph which contains the nodes
+	 * @param nodeName the name of the node where the highlighting should be removed (revision URI)
+	 * @return true when the highlighting of the node was removed elsewhere false when the graph does not contain the specified graph
+	 */
+	public static boolean removeHighlighting(Graph graph, String nodeName) {
+		if (graph.findNodeByName(nodeName) != null) {		
+			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
+			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, Color.WHITE);	
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	
 }
