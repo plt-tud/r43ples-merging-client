@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.JDialog;
@@ -173,8 +175,8 @@ public class Controller {
 	 */
 	public static void selectionChangedDifferencesTree() throws IOException {
 		
-		// Array list which stores all selected tree node objects
-		ArrayList<TreeNodeObject> list = new ArrayList<TreeNodeObject>();
+		// Hash map which stores all selected tree node objects and the corresponding tree paths
+		HashMap<TreeNodeObject, TreePath> map = new HashMap<TreeNodeObject, TreePath>();
 		
 		// Get the selected nodes
 		TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
@@ -182,12 +184,12 @@ public class Controller {
 			for (TreePath treePath : treePaths) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
 				TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
-				list.add(treeNodeObject);
+				map.put(treeNodeObject, treePath);
 			}
 		}
 		
 		// Update the triple table
-		updateTableResolutionTriples(list);
+		updateTableResolutionTriples(map);
 		tableResolutionTriplesSelectionChanged();
 		
 	}
@@ -196,14 +198,14 @@ public class Controller {
 	/**
 	 * Update the resolution triples table.
 	 * 
-	 * @param selectedElements the array list of all selected differences
+	 * @param selectedElements the hash map of all selected differences and the corresponding tree paths
 	 * @throws IOException 
 	 */
-	public static void updateTableResolutionTriples(ArrayList<TreeNodeObject> selectedElements) throws IOException {
+	public static void updateTableResolutionTriples(HashMap<TreeNodeObject, TreePath> selectedElements) throws IOException {
 		// Remove the old rows
 		ApplicationUI.getTableModelResolutionTriples().removeAllElements();
 		
-		for (TreeNodeObject nodeObject : selectedElements) {
+		for (TreeNodeObject nodeObject : selectedElements.keySet()) {
 			// Contains the row data
 			Object[] rowData = null;
 			if (nodeObject.getObject() != null) {
@@ -220,7 +222,7 @@ public class Controller {
 					// Create the row data
 					rowData = Management.createRowDataResolutionTriples(nodeObject.getResolutionState(), difference, differenceGroup);
 					// Create the table entry
-					TableEntry entry = new TableEntry(difference, nodeObject, rowData);
+					TableEntry entry = new TableEntry(difference, nodeObject, selectedElements.get(nodeObject), rowData);
 					ApplicationUI.getTableModelResolutionTriples().addRow(entry);
 				}
 			}
@@ -239,22 +241,39 @@ public class Controller {
 	public static void approveSelectedEntriesResolutionTriples() {
 		
 		int[] selectedRows = ApplicationUI.getTableResolutionTriples().getSelectedRows();
-		for (int i = 0; i<selectedRows.length; i++) {
-			ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getNodeObject().setResolutionState(ResolutionState.RESOLVED);
-			// Propagate changes to difference model
-			Boolean checkBoxStateBool = (Boolean) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getRowData()[5];
-			if (checkBoxStateBool.booleanValue()) {
-				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
-			} else {
-				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRows[i]).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
-			}
-		}
-
-		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
-		ApplicationUI.getTreeDifferencesDivision().updateUI();
+		// Sort the array
+		Arrays.sort(selectedRows);
 		
+		TreePath [] treePaths = new TreePath[selectedRows.length];
+		
+		for (int i = selectedRows.length - 1; i >= 0; i--) {
+			int selectedRow = ApplicationUI.getTableResolutionTriples().convertRowIndexToModel(selectedRows[i]);
+			ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().setResolutionState(ResolutionState.RESOLVED);
+			// Propagate changes to difference model
+			Boolean checkBoxStateBool = (Boolean) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getRowData()[5];
+			if (checkBoxStateBool.booleanValue()) {
+				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
+			} else {
+				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
+			}
+					
+			// Remove selection of the approved row in the tree
+			TableEntry entry = ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow);
+			treePaths[i] = entry.getTreePath();
+
+			// Remove the approved row
+			ApplicationUI.getTableModelResolutionTriples().removeRow(selectedRow);
+		}
+		ApplicationUI.getTableResolutionTriples().updateUI();
+		
+		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
+		
+		// Update the tree selection
+		ApplicationUI.getTreeDifferencesDivision().removeSelectionPaths(treePaths);
+		
+		ApplicationUI.getTreeDifferencesDivision().updateUI();
 	}
-	
+		
 	
 //	TODO Maybe it is better to use a check box tree and not use selection of nodes
 //	/**
@@ -330,9 +349,13 @@ public class Controller {
 			
 			Management.highlightNode(graph, highlightedNodeNameA, color);
 			Management.highlightNode(graph, highlightedNodeNameB, color);
-			
-			gp.updateUI();
+		} else {
+			// Remove highlighting of already highlighted nodes
+			Management.removeHighlighting(graph, highlightedNodeNameA);
+			Management.removeHighlighting(graph, highlightedNodeNameB);
 		}
+		
+		gp.updateUI();
 	}
 
 	

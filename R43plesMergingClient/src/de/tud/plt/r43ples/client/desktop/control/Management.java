@@ -8,7 +8,9 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
@@ -494,6 +496,22 @@ public class Management {
 		
 	}
 	
+	
+	/**
+//	 * Get the tree path of the specified tree node object.
+//	 * 
+//	 * @param tree the tree which contains the tree node object
+//	 * @param nodeObject the tree node object
+//	 * @return the tree path
+//	 */
+//	public static TreePath getTreePathOfTreeNodeObject(JTree tree, TreeNodeObject nodeObject) {
+//		DefaultMutableTreeNode root = ((DefaultMutableTreeNode) tree.getModel().getRoot())
+//		for (int i=0; i<((DefaultMutableTreeNode) tree.getModel().getRoot()).getChildCount(); i++) {
+//		
+//		((DefaultMutableTreeNode) tree.getModel().getRoot()).children()
+//		
+//	}	
+//	
 	
 	/**
 	 * Get the difference group of difference.

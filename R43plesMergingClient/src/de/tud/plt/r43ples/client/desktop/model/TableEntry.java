@@ -1,5 +1,7 @@
 package de.tud.plt.r43ples.client.desktop.model;
 
+import javax.swing.tree.TreePath;
+
 /**
  * Table entry of resolution triples table.
  * 
@@ -12,6 +14,8 @@ public class TableEntry {
 	private Difference difference;
 	/** The tree node object. **/
 	private TreeNodeObject nodeObject;
+	/** The tree path. **/
+	private TreePath treePath;
 	/** The row data. **/
 	private Object[] rowData;
 	
@@ -22,9 +26,10 @@ public class TableEntry {
 	 * @param nodeObject the node object
 	 * @param rowData the row data
 	 */
-	public TableEntry(Difference difference, TreeNodeObject nodeObject, Object[] rowData) {
+	public TableEntry(Difference difference, TreeNodeObject nodeObject, TreePath treePath , Object[] rowData) {
 		this.setDifference(difference);
 		this.setNodeObject(nodeObject);
+		this.setTreePath(treePath);
 		this.setRowData(rowData);
 	}
 
@@ -66,6 +71,26 @@ public class TableEntry {
 	 */
 	public void setNodeObject(TreeNodeObject nodeObject) {
 		this.nodeObject = nodeObject;
+	}
+
+
+	/**
+	 * Get the tree path.
+	 * 
+	 * @return the treePath
+	 */
+	public TreePath getTreePath() {
+		return treePath;
+	}
+
+
+	/**
+	 * Set the tree path.
+	 * 
+	 * @param treePath the treePath to set
+	 */
+	public void setTreePath(TreePath treePath) {
+		this.treePath = treePath;
 	}
 
 

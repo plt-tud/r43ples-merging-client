@@ -1,10 +1,8 @@
-package de.tud.plt.r43ples.client.desktop.ui;
+package de.tud.plt.r43ples.client.desktop.model;
 
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
-
-import de.tud.plt.r43ples.client.desktop.model.TableEntry;
 
 /**
  * Table model for resolution triples table.
@@ -111,6 +109,16 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	public void addRow(TableEntry entry) {
 		entries.add(entry);
+	}
+	
+	
+	/**
+	 * Remove a row of the model.
+	 * 
+	 * @param row the row to remove
+	 */
+	public void removeRow(int row) {
+		entries.remove(row);
 	}
 
 

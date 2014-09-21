@@ -34,6 +34,7 @@ import com.jidesoft.swing.CheckBoxTree;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.TableEntry;
+import de.tud.plt.r43ples.client.desktop.model.TableModelResolutionTriples;
 
 import java.awt.Dimension;
 
