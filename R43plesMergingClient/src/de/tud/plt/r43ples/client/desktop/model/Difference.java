@@ -12,10 +12,14 @@ public class Difference {
 
 	/** The triple. **/
 	private Triple triple;
-	/** The referenced revision URI in A. Characterizes in which revision the difference . **/
+	/** The referenced revision URI in A. Characterizes in which revision the difference occurred. **/
 	private String referencedRevisionA;
-	/** The referenced revision URI in B. Characterizes in which revision the difference . **/
+	/** The revision label of referenced revision A. **/
+	private String referencedRevisionLabelA;
+	/** The referenced revision URI in B. Characterizes in which revision the difference occurred. **/
 	private String referencedRevisionB;
+	/** The revision label of referenced revision B. **/
+	private String referencedRevisionLabelB;
 	/** The resolution state. **/
 	private SDDTripleStateEnum resolutionState;
 	
@@ -25,13 +29,17 @@ public class Difference {
 	 * 
 	 * @param triple the triple
 	 * @param referencedRevisionA the referenced revision in A
+	 * @param referencedRevisionLabelA the referenced revision label in A
 	 * @param referencedRevisionB the referenced revision in B
+	 * @param referencedRevisionLabelB the referenced revision label in B
 	 * @param resolutionState the resolution state
 	 */
-	public Difference(Triple triple, String referencedRevisionA, String referencedRevisionB, SDDTripleStateEnum resolutionState) {
+	public Difference(Triple triple, String referencedRevisionA, String referencedRevisionLabelA, String referencedRevisionB, String referencedRevisionLabelB, SDDTripleStateEnum resolutionState) {
 		this.triple = triple;
 		this.referencedRevisionA = referencedRevisionA;
+		this.referencedRevisionLabelA = referencedRevisionLabelA;
 		this.referencedRevisionB = referencedRevisionB;
+		this.referencedRevisionLabelB = referencedRevisionLabelB;
 		this.setResolutionState(resolutionState);
 	}
 
@@ -77,6 +85,26 @@ public class Difference {
 
 
 	/**
+	 * Get the referenced revision label in A.
+	 * 
+	 * @return the referencedRevisionLabelA
+	 */
+	public String getReferencedRevisionLabelA() {
+		return referencedRevisionLabelA;
+	}
+
+
+	/**
+	 * Set the referenced revision label in A.
+	 * 
+	 * @param referencedRevisionLabelA the referencedRevisionLabelA to set
+	 */
+	public void setReferencedRevisionLabelA(String referencedRevisionLabelA) {
+		this.referencedRevisionLabelA = referencedRevisionLabelA;
+	}
+
+
+	/**
 	 * Get the referenced revision in B.
 	 * 
 	 * @return the referenced revision in B
@@ -93,6 +121,26 @@ public class Difference {
 	 */
 	public void setReferencedRevisionB(String referencedRevisionB) {
 		this.referencedRevisionB = referencedRevisionB;
+	}
+
+
+	/**
+	 * Get the referenced revision label in B.
+	 * 
+	 * @return the referencedRevisionLabelB
+	 */
+	public String getReferencedRevisionLabelB() {
+		return referencedRevisionLabelB;
+	}
+
+
+	/**
+	 * Set the referenced revision label in B.
+	 * 
+	 * @param referencedRevisionLabelB the referencedRevisionLabelB to set
+	 */
+	public void setReferencedRevisionLabelB(String referencedRevisionLabelB) {
+		this.referencedRevisionLabelB = referencedRevisionLabelB;
 	}
 
 

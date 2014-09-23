@@ -167,6 +167,8 @@ public class Controller {
 		
 	}
 
+	
+	private static boolean updateTableFlag = false;
 
 	/**
 	 * Selection of differences tree was changed.
@@ -174,6 +176,9 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void selectionChangedDifferencesTree() throws IOException {
+		
+		// Set the update flag
+		updateTableFlag = true;
 		
 		// Hash map which stores all selected tree node objects and the corresponding tree paths
 		HashMap<TreeNodeObject, TreePath> map = new HashMap<TreeNodeObject, TreePath>();
@@ -183,14 +188,28 @@ public class Controller {
 		if (treePaths != null) {
 			for (TreePath treePath : treePaths) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
-				TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
-				map.put(treeNodeObject, treePath);
+				if (node.isLeaf()) {
+					TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
+					map.put(treeNodeObject, treePath);
+				} else {
+					// Select the sub nodes
+					for (int i = 0; i < node.getChildCount(); i++) {
+						DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+						ApplicationUI.getTreeDifferencesDivision().addSelectionPath(new TreePath(child.getPath()));
+					}
+					// Remove selection of parent node
+					ApplicationUI.getTreeDifferencesDivision().removeSelectionPath(new TreePath(node.getPath()));
+					// Set the update flag
+					updateTableFlag = false;
+				}
 			}
 		}
 		
-		// Update the triple table
-		updateTableResolutionTriples(map);
-		tableResolutionTriplesSelectionChanged();
+		if (updateTableFlag) {
+			// Update the triple table
+			updateTableResolutionTriples(map);
+			tableResolutionTriplesSelectionChanged();
+		}
 		
 	}
 	

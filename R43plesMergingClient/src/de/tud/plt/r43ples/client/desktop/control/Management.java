@@ -277,7 +277,70 @@ public class Management {
 		    		referencedRevisionB = qsDifferences.getResource("?referencedRevisionB").toString();
 		    	}
 		    	
-		    	Difference difference = new Difference(triple, referencedRevisionA, referencedRevisionB, automaticResolutionState);
+		    	// Add further information to difference
+		    	// Get the revision number if available
+		    	String referencedRevisionLabelA = null;
+		    	String referencedRevisionLabelB = null;
+		    	
+				if ((referencedRevisionA != null) && (referencedRevisionB == null)) {
+					String query = prefixes + String.format(
+							  "SELECT ?rev %n"
+							+ "FROM <%s> %n"
+							+ "WHERE { %n"
+							+ "	<%s> a rmo:Revision ; %n"
+							+ "		rmo:revisionNumber ?rev . %n"
+							+ "}", Config.r43ples_revision_graph, referencedRevisionA);
+					
+					String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+					logger.debug(result);
+					
+					ResultSet resultSet = ResultSetFactory.fromXML(result);
+					if (resultSet.hasNext()) {
+						QuerySolution qs = resultSet.next();
+						referencedRevisionLabelA = qs.getLiteral("?rev").toString();
+					}
+				} else if ((referencedRevisionA == null) && (referencedRevisionB != null)) {
+					String query = prefixes + String.format(
+							  "SELECT ?rev %n"
+							+ "FROM <%s> %n"
+							+ "WHERE { %n"
+							+ "	<%s> a rmo:Revision ; %n"
+							+ "		rmo:revisionNumber ?rev . %n"
+							+ "}", Config.r43ples_revision_graph, referencedRevisionB);
+					
+					String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+					logger.debug(result);
+					
+					// Iterate over all labels
+					ResultSet resultSet = ResultSetFactory.fromXML(result);
+					if (resultSet.hasNext()) {
+						QuerySolution qs = resultSet.next();
+						referencedRevisionLabelB = qs.getLiteral("?rev").toString();
+					}
+				} else if ((referencedRevisionA != null) && (referencedRevisionB != null)) {
+					String query = prefixes + String.format(
+							  "SELECT ?revA ?revB %n"
+							+ "FROM <%s> %n"
+							+ "WHERE { %n"
+							+ "	<%s> a rmo:Revision ; %n"
+							+ "		rmo:revisionNumber ?revA . %n"
+							+ "	<%s> a rmo:Revision ; %n"
+							+ "		rmo:revisionNumber ?revB . %n"
+							+ "}", Config.r43ples_revision_graph, referencedRevisionA, referencedRevisionB);
+					
+					String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+					logger.debug(result);
+					
+					// Iterate over all labels
+					ResultSet resultSet = ResultSetFactory.fromXML(result);
+					if (resultSet.hasNext()) {
+						QuerySolution qs = resultSet.next();
+						referencedRevisionLabelA = qs.getLiteral("?revA").toString();
+						referencedRevisionLabelB = qs.getLiteral("?revB").toString();
+					}
+				}	    	
+		    	
+		    	Difference difference = new Difference(triple, referencedRevisionA, referencedRevisionLabelA, referencedRevisionB, referencedRevisionLabelB, automaticResolutionState);
 		    	differenceGroup.addDifference(tripleToString(triple), difference);
 		    }
 	    	differenceModel.addDifferenceGroup(differenceGroup.getTripleStateA().toString() + "-" + differenceGroup.getTripleStateB().toString(), differenceGroup);
@@ -550,66 +613,17 @@ public class Management {
 		} else {
 			rowData[2] = "<" + difference.getTriple().getObject() + ">";
 		}
-		
+			
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			String query = prefixes + String.format(
-					  "SELECT ?rev %n"
-					+ "FROM <%s> %n"
-					+ "WHERE { %n"
-					+ "	<%s> a rmo:Revision ; %n"
-					+ "		rmo:revisionNumber ?rev . %n"
-					+ "}", Config.r43ples_revision_graph, difference.getReferencedRevisionA());
-			
-			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
-			logger.debug(result);
-			
-			ResultSet resultSet = ResultSetFactory.fromXML(result);
-			if (resultSet.hasNext()) {
-				QuerySolution qs = resultSet.next();
-				rowData[3] = differenceGroup.getTripleStateA() + " (" + qs.getLiteral("?rev").toString() + ")";
-				rowData[4] = differenceGroup.getTripleStateB();
-			}
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB();
 		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			String query = prefixes + String.format(
-					  "SELECT ?rev %n"
-					+ "FROM <%s> %n"
-					+ "WHERE { %n"
-					+ "	<%s> a rmo:Revision ; %n"
-					+ "		rmo:revisionNumber ?rev . %n"
-					+ "}", Config.r43ples_revision_graph, difference.getReferencedRevisionB());
-			
-			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
-			logger.debug(result);
-			
-			// Iterate over all labels
-			ResultSet resultSet = ResultSetFactory.fromXML(result);
-			if (resultSet.hasNext()) {
-				QuerySolution qs = resultSet.next();
-				rowData[3] = differenceGroup.getTripleStateA();
-				rowData[4] = differenceGroup.getTripleStateB() + " (" + qs.getLiteral("?rev").toString() + ")";
-			}
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			String query = prefixes + String.format(
-					  "SELECT ?revA ?revB %n"
-					+ "FROM <%s> %n"
-					+ "WHERE { %n"
-					+ "	<%s> a rmo:Revision ; %n"
-					+ "		rmo:revisionNumber ?revA . %n"
-					+ "	<%s> a rmo:Revision ; %n"
-					+ "		rmo:revisionNumber ?revB . %n"
-					+ "}", Config.r43ples_revision_graph, difference.getReferencedRevisionA(), difference.getReferencedRevisionB());
-			
-			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
-			logger.debug(result);
-			
-			// Iterate over all labels
-			ResultSet resultSet = ResultSetFactory.fromXML(result);
-			if (resultSet.hasNext()) {
-				QuerySolution qs = resultSet.next();
-				rowData[3] = differenceGroup.getTripleStateA() + " (" + qs.getLiteral("?revA").toString() + ")";
-				rowData[4] = differenceGroup.getTripleStateB() + " (" + qs.getLiteral("?revB").toString() + ")";
-			}
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else {
 			rowData[3] = differenceGroup.getTripleStateA();
 			rowData[4] = differenceGroup.getTripleStateB();
