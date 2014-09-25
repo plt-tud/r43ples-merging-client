@@ -1,4 +1,4 @@
-package de.tud.plt.r43ples.client.desktop.model;
+package de.tud.plt.r43ples.client.desktop.model.table;
 
 import java.util.List;
 

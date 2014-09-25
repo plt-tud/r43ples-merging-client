@@ -1,4 +1,4 @@
-package de.tud.plt.r43ples.client.desktop.ui;
+package de.tud.plt.r43ples.client.desktop.ui.renderer.tree;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -9,7 +9,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
-import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
+import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 
 /**
  * The tree cell renderer for difference tree (division).

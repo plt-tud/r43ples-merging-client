@@ -1,6 +1,9 @@
-package de.tud.plt.r43ples.client.desktop.model;
+package de.tud.plt.r43ples.client.desktop.model.table;
 
 import javax.swing.tree.TreePath;
+
+import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
+import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 
 /**
  * Table entry of resolution triples table.

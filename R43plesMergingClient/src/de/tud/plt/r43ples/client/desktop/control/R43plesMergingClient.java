@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import de.tud.plt.r43ples.client.desktop.ui.ApplicationUI;
+import de.tud.plt.r43ples.client.desktop.ui.dialog.ApplicationUI;
 
 /**
  * The R43ples Merging Client provides an user interface for merging branches.

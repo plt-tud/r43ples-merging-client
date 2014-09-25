@@ -1,4 +1,4 @@
-package de.tud.plt.r43ples.client.desktop.ui;
+package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 
 import java.util.EventObject;
 

@@ -36,14 +36,14 @@ import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.TripleObjectTypeEnum;
-import de.tud.plt.r43ples.client.desktop.model.Difference;
-import de.tud.plt.r43ples.client.desktop.model.DifferenceGroup;
-import de.tud.plt.r43ples.client.desktop.model.DifferenceModel;
-import de.tud.plt.r43ples.client.desktop.model.HttpResponse;
-import de.tud.plt.r43ples.client.desktop.model.TableEntrySummaryReport;
-import de.tud.plt.r43ples.client.desktop.model.TableModelSummaryReport;
-import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
-import de.tud.plt.r43ples.client.desktop.model.Triple;
+import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
+import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
+import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
+import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 
 /**
  * Provides methods for data management.

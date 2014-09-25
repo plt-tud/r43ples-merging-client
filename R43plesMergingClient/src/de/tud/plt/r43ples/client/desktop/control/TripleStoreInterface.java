@@ -10,7 +10,7 @@ import java.net.URLEncoder;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import de.tud.plt.r43ples.client.desktop.model.HttpResponse;
+import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 
 /** 
  * Provides a interface to the triple store with URI and port specified in the configuration file.

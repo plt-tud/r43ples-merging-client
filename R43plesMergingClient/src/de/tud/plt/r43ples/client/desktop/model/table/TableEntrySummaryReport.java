@@ -1,6 +1,8 @@
-package de.tud.plt.r43ples.client.desktop.model;
+package de.tud.plt.r43ples.client.desktop.model.table;
 
 import java.awt.Color;
+
+import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 
 /**
  * Table entry of summary report table.

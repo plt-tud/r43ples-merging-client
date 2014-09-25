@@ -23,15 +23,15 @@ import att.grappa.GrappaSupport;
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
-import de.tud.plt.r43ples.client.desktop.model.Difference;
-import de.tud.plt.r43ples.client.desktop.model.DifferenceGroup;
-import de.tud.plt.r43ples.client.desktop.model.DifferenceModel;
-import de.tud.plt.r43ples.client.desktop.model.TableEntry;
-import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
-import de.tud.plt.r43ples.client.desktop.ui.ApplicationUI;
-import de.tud.plt.r43ples.client.desktop.ui.ReportDialog;
+import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
+import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
+import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
+import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
-import de.tud.plt.r43ples.client.desktop.ui.TableCellRendererSummaryReport;
+import de.tud.plt.r43ples.client.desktop.ui.dialog.ApplicationUI;
+import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
 
 /**
  * The controller.

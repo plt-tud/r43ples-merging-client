@@ -1,4 +1,4 @@
-package de.tud.plt.r43ples.client.desktop.ui;
+package de.tud.plt.r43ples.client.desktop.ui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,8 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import de.tud.plt.r43ples.client.desktop.model.TableEntrySummaryReport;
-import de.tud.plt.r43ples.client.desktop.model.TableModelSummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
 
 /**
  * Report dialog displays the resolution state.

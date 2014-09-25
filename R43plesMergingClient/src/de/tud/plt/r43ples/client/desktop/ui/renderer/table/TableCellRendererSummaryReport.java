@@ -1,11 +1,11 @@
-package de.tud.plt.r43ples.client.desktop.ui;
+package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import de.tud.plt.r43ples.client.desktop.model.TableModelSummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
 
 public class TableCellRendererSummaryReport extends DefaultTableCellRenderer {
 

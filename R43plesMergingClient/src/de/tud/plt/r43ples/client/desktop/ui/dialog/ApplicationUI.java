@@ -1,4 +1,4 @@
-package de.tud.plt.r43ples.client.desktop.ui;
+package de.tud.plt.r43ples.client.desktop.ui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -32,8 +32,9 @@ import javax.swing.tree.TreeSelectionModel;
 import org.apache.jena.atlas.web.HttpException;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
-import de.tud.plt.r43ples.client.desktop.model.TableEntry;
-import de.tud.plt.r43ples.client.desktop.model.TableModelResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.tree.TreeCellRendererDifferences;
 
 /**
  * The application UI of the merging client.
