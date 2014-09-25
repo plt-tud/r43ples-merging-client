@@ -5,20 +5,19 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
- * Table model for resolution triples table.
- * Column 5 will contain checkboxes.
+ * Table model for summary report table.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelResolutionTriples extends AbstractTableModel {
+public class TableModelSummaryReport extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Resolution state"};
+	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Conflicting", "Automatic resolution state", "Resolution state", "Approved"};
 	/** The row data list. **/
-	private List<TableEntry> entries;
+	private List<TableEntrySummaryReport> entries;
 
 	
 	/**
@@ -26,7 +25,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelResolutionTriples(List<TableEntry> entries) {
+	public TableModelSummaryReport(List<TableEntrySummaryReport> entries) {
 		this.entries = entries;
 	}
 	
@@ -45,9 +44,6 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int column) {
-		if (column == 5) {
-			return Boolean.class;
-		}
 		return super.getColumnClass(column);		
 	}
 
@@ -75,7 +71,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntry entry = entries.get(rowIndex);
+		TableEntrySummaryReport entry = entries.get(rowIndex);
 		return entry.getRowData()[columnIndex];
 	}
 	
@@ -107,7 +103,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntry entry) {
+	public void addRow(TableEntrySummaryReport entry) {
 		entries.add(entry);
 	}
 	
@@ -136,7 +132,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntry getTableEntry(int rowIndex) {
+	public TableEntrySummaryReport getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
 	}
 

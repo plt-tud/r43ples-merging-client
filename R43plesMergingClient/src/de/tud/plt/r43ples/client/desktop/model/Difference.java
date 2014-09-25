@@ -1,5 +1,6 @@
 package de.tud.plt.r43ples.client.desktop.model;
 
+import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 
 /**
@@ -20,8 +21,10 @@ public class Difference {
 	private String referencedRevisionB;
 	/** The revision label of referenced revision B. **/
 	private String referencedRevisionLabelB;
-	/** The resolution state. **/
-	private SDDTripleStateEnum resolutionState;
+	/** The triple resolution state. **/
+	private SDDTripleStateEnum tripleResolutionState;
+	/** The resolution state of this differenced. **/
+	private ResolutionState resolutionState;
 	
 	
 	/**
@@ -32,15 +35,17 @@ public class Difference {
 	 * @param referencedRevisionLabelA the referenced revision label in A
 	 * @param referencedRevisionB the referenced revision in B
 	 * @param referencedRevisionLabelB the referenced revision label in B
+	 * @param tripleResolutionState the triple resolution state
 	 * @param resolutionState the resolution state
 	 */
-	public Difference(Triple triple, String referencedRevisionA, String referencedRevisionLabelA, String referencedRevisionB, String referencedRevisionLabelB, SDDTripleStateEnum resolutionState) {
+	public Difference(Triple triple, String referencedRevisionA, String referencedRevisionLabelA, String referencedRevisionB, String referencedRevisionLabelB, SDDTripleStateEnum tripleResolutionState, ResolutionState resolutionState) {
 		this.triple = triple;
 		this.referencedRevisionA = referencedRevisionA;
 		this.referencedRevisionLabelA = referencedRevisionLabelA;
 		this.referencedRevisionB = referencedRevisionB;
 		this.referencedRevisionLabelB = referencedRevisionLabelB;
-		this.setResolutionState(resolutionState);
+		this.tripleResolutionState = tripleResolutionState;
+		this.resolutionState = resolutionState;
 	}
 
 
@@ -145,11 +150,31 @@ public class Difference {
 
 
 	/**
+	 * Get the triple resolution state.
+	 * 
+	 * @return the triple resolution state
+	 */
+	public SDDTripleStateEnum getTripleResolutionState() {
+		return tripleResolutionState;
+	}
+
+
+	/**
+	 * Set the triple resolution state.
+	 * 
+	 * @param tripleResolutionState the triple resolution state
+	 */
+	public void setTripleResolutionState(SDDTripleStateEnum tripleResolutionState) {
+		this.tripleResolutionState = tripleResolutionState;
+	}
+
+
+	/**
 	 * Get the resolution state.
 	 * 
-	 * @return the resolution state
+	 * @return the resolutionState
 	 */
-	public SDDTripleStateEnum getResolutionState() {
+	public ResolutionState getResolutionState() {
 		return resolutionState;
 	}
 
@@ -157,9 +182,9 @@ public class Difference {
 	/**
 	 * Set the resolution state.
 	 * 
-	 * @param resolutionState the resolution state
+	 * @param resolutionState the resolutionState to set
 	 */
-	public void setResolutionState(SDDTripleStateEnum resolutionState) {
+	public void setResolutionState(ResolutionState resolutionState) {
 		this.resolutionState = resolutionState;
 	}
 	

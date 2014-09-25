@@ -3,6 +3,7 @@ package de.tud.plt.r43ples.client.desktop.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -14,6 +15,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import de.tud.plt.r43ples.client.desktop.model.TableEntrySummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.TableModelSummaryReport;
 
 /**
  * Report dialog displays the resolution state.
@@ -40,6 +44,8 @@ public class ReportDialog extends JDialog {
 	private static JTextArea textAreaMessage;
 	/** The table. **/
 	private static JTable table;
+	/** The table model. **/
+	private static TableModelSummaryReport tableModel = new TableModelSummaryReport(new ArrayList<TableEntrySummaryReport>());
 
 
 	/**
@@ -115,6 +121,7 @@ public class ReportDialog extends JDialog {
 		contentPanel.add(scrollPaneTable, BorderLayout.CENTER);
 		
 		table = new JTable();
+		table.setModel(tableModel);
 		scrollPaneTable.setViewportView(table);
 		{
 			JPanel buttonPane = new JPanel();
@@ -228,6 +235,22 @@ public class ReportDialog extends JDialog {
 	 */
 	public static void setTable(JTable table) {
 		ReportDialog.table = table;
+	}
+
+
+	/**
+	 * @return the tableModel
+	 */
+	public static TableModelSummaryReport getTableModel() {
+		return tableModel;
+	}
+
+
+	/**
+	 * @param tableModel the tableModel to set
+	 */
+	public static void setTableModel(TableModelSummaryReport tableModel) {
+		ReportDialog.tableModel = tableModel;
 	}
 	
 }

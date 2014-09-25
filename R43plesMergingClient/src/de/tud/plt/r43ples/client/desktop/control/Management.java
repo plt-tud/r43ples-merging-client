@@ -8,9 +8,8 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.JTree;
+import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
@@ -41,6 +40,8 @@ import de.tud.plt.r43ples.client.desktop.model.Difference;
 import de.tud.plt.r43ples.client.desktop.model.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.DifferenceModel;
 import de.tud.plt.r43ples.client.desktop.model.HttpResponse;
+import de.tud.plt.r43ples.client.desktop.model.TableEntrySummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.TableModelSummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.model.Triple;
 
@@ -227,6 +228,11 @@ public class Management {
 	    	SDDTripleStateEnum automaticResolutionState = convertSDDStringToSDDTripleState(qsDifferenceGroups.getResource("?automaticResolutionState").toString());
 	    	boolean conflicting = qsDifferenceGroups.getLiteral("?conflicting").toString().equals("1^^http://www.w3.org/2001/XMLSchema#integer");   	
 
+	    	ResolutionState resolutionState = ResolutionState.DIFFERENCE;
+	    	if (conflicting) {
+	    		resolutionState = ResolutionState.CONFLICT;
+	    	}
+	    	
 	    	DifferenceGroup differenceGroup = new DifferenceGroup(tripleStateA, tripleStateB, automaticResolutionState, conflicting);
 	    	
 	    	// Query all differences
@@ -340,7 +346,7 @@ public class Management {
 					}
 				}	    	
 		    	
-		    	Difference difference = new Difference(triple, referencedRevisionA, referencedRevisionLabelA, referencedRevisionB, referencedRevisionLabelB, automaticResolutionState);
+		    	Difference difference = new Difference(triple, referencedRevisionA, referencedRevisionLabelA, referencedRevisionB, referencedRevisionLabelB, automaticResolutionState, resolutionState);
 		    	differenceGroup.addDifference(tripleToString(triple), difference);
 		    }
 	    	differenceModel.addDifferenceGroup(differenceGroup.getTripleStateA().toString() + "-" + differenceGroup.getTripleStateB().toString(), differenceGroup);
@@ -599,12 +605,11 @@ public class Management {
 	/**
 	 * Create the row data for resolution triples.
 	 * 
-	 * @param resolutionState the resolution state
 	 * @param difference the difference
 	 * @param differenceGroup the difference group
 	 * @throws IOException 
 	 */
-	public static Object[] createRowDataResolutionTriples(ResolutionState resolutionState, Difference difference, DifferenceGroup differenceGroup) throws IOException {
+	public static Object[] createRowDataResolutionTriples(Difference difference, DifferenceGroup differenceGroup) throws IOException {
 		Object[] rowData = new Object[6];
 		rowData[0] = "<" + difference.getTriple().getSubject() + ">";
 		rowData[1] = "<" + difference.getTriple().getPredicate() + ">";
@@ -629,7 +634,7 @@ public class Management {
 			rowData[4] = differenceGroup.getTripleStateB();
 		}
 
-		rowData[5] = new Boolean(true);
+		rowData[5] = difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED);
 		
 		return rowData;
 		
@@ -774,6 +779,105 @@ public class Management {
 		} else {
 			return false;
 		}
+	}
+	
+	
+	/**
+	 * Create the row data for summary report.
+	 * 
+	 * @param difference the difference
+	 * @param differenceGroup the difference group
+	 */
+	public static Object[] createRowDataSummaryReport(Difference difference, DifferenceGroup differenceGroup) {
+		Object[] rowData = new Object[9];
+		rowData[0] = "<" + difference.getTriple().getSubject() + ">";
+		rowData[1] = "<" + difference.getTriple().getPredicate() + ">";
+		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
+			rowData[2] = "\"" + difference.getTriple().getObject() + "\"";
+		} else {
+			rowData[2] = "<" + difference.getTriple().getObject() + ">";
+		}
+			
+		// Get the revision number if available
+		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB();
+		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else {
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB();
+		}
+
+		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
+		
+		rowData[6] = differenceGroup.getAutomaticResolutionState().toString().toUpperCase();
+		
+		rowData[7] = difference.getTripleResolutionState().toString().toUpperCase();
+		
+		rowData[8] = difference.getResolutionState().toString().toUpperCase();
+		
+		return rowData;
+
+	}
+	
+	
+	
+	/**
+	 * Create the summary report table content.
+	 * 
+	 * @param table the table reference
+	 * @param differenceModel the difference model
+	 */
+	public static void createReportTable(JTable table, DifferenceModel differenceModel) {
+		
+		// Remove all entries
+		((TableModelSummaryReport) table.getModel()).removeAllElements();
+		
+		// Differ between conflicting and non conflicting difference groups
+		ArrayList<DifferenceGroup> conflictingDifferenceGroups = new ArrayList<DifferenceGroup>();
+		ArrayList<DifferenceGroup> nonconflictingDifferenceGroups = new ArrayList<DifferenceGroup>();
+		
+		Iterator<String> iteDifferenceGroupNames = differenceModel.getDifferenceGroups().keySet().iterator();
+		while (iteDifferenceGroupNames.hasNext()) {
+			String differenceGroupName = iteDifferenceGroupNames.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupName);
+			if (differenceGroup.isConflicting()) {
+				conflictingDifferenceGroups.add(differenceGroup);
+			} else {
+				nonconflictingDifferenceGroups.add(differenceGroup);
+			}
+		}
+		
+		// Check if all conflicts were approved
+		Iterator<DifferenceGroup> iteConflictingDifferenceGroups = conflictingDifferenceGroups.iterator();
+		while (iteConflictingDifferenceGroups.hasNext()) {
+			DifferenceGroup differenceGroup = iteConflictingDifferenceGroups.next();
+			
+			Iterator<String> iteDifferenceNames = differenceGroup.getDifferences().keySet().iterator();
+			while (iteDifferenceNames.hasNext()) {
+				String currentDifferenceName = iteDifferenceNames.next();
+				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
+				
+				Color color = Color.GREEN;
+				if (!difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+					color = Color.RED;
+				}
+				
+				// Create new table entry
+				((TableModelSummaryReport) table.getModel()).addRow(new TableEntrySummaryReport(difference, color, createRowDataSummaryReport(difference, differenceGroup)));
+
+			}
+		}
+		
+		// Check if the resolution state of differences was changed manually
+		
+				
+				
 	}
 	
 	

@@ -23,7 +23,9 @@ public class TableEntry {
 	/**
 	 * The constructor.
 	 * 
+	 * @param difference the difference
 	 * @param nodeObject the node object
+	 * @param treePath the tree path
 	 * @param rowData the row data
 	 */
 	public TableEntry(Difference difference, TreeNodeObject nodeObject, TreePath treePath , Object[] rowData) {

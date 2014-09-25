@@ -31,6 +31,7 @@ import de.tud.plt.r43ples.client.desktop.model.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.ApplicationUI;
 import de.tud.plt.r43ples.client.desktop.ui.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
+import de.tud.plt.r43ples.client.desktop.ui.TableCellRendererSummaryReport;
 
 /**
  * The controller.
@@ -208,6 +209,7 @@ public class Controller {
 		if (updateTableFlag) {
 			// Update the triple table
 			updateTableResolutionTriples(map);
+			ApplicationUI.getTableResolutionTriples().clearSelection();
 			tableResolutionTriplesSelectionChanged();
 		}
 		
@@ -239,7 +241,7 @@ public class Controller {
 					// Get the difference group
 					DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
 					// Create the row data
-					rowData = Management.createRowDataResolutionTriples(nodeObject.getResolutionState(), difference, differenceGroup);
+					rowData = Management.createRowDataResolutionTriples(difference, differenceGroup);
 					// Create the table entry
 					TableEntry entry = new TableEntry(difference, nodeObject, selectedElements.get(nodeObject), rowData);
 					ApplicationUI.getTableModelResolutionTriples().addRow(entry);
@@ -268,12 +270,13 @@ public class Controller {
 		for (int i = selectedRows.length - 1; i >= 0; i--) {
 			int selectedRow = ApplicationUI.getTableResolutionTriples().convertRowIndexToModel(selectedRows[i]);
 			ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().setResolutionState(ResolutionState.RESOLVED);
+			((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setResolutionState(ResolutionState.RESOLVED);
 			// Propagate changes to difference model
 			Boolean checkBoxStateBool = (Boolean) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getRowData()[5];
 			if (checkBoxStateBool.booleanValue()) {
-				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
+				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setTripleResolutionState(SDDTripleStateEnum.ADDED);
 			} else {
-				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setResolutionState(SDDTripleStateEnum.ADDED);
+				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setTripleResolutionState(SDDTripleStateEnum.DELETED);
 			}
 					
 			// Remove selection of the approved row in the tree
@@ -322,6 +325,9 @@ public class Controller {
 //	}
 	
 	
+	/**
+	 * Execute the push.
+	 */
 	public static void executePush() {
 		// Set the texts
 		ReportDialog.getTfGraph().setText(StartMergingDialog.getcBModelGraph().getSelectedItem().toString());
@@ -330,13 +336,19 @@ public class Controller {
 		ReportDialog.getTfUser().setText(StartMergingDialog.getTfUser().getText());
 		ReportDialog.getTextAreaMessage().setText(StartMergingDialog.getTextAreaMessage().getText());
 		
-		// TODO Create Table
+		// Set the cell renderer
+		TableCellRendererSummaryReport renderer = new TableCellRendererSummaryReport();
+		for (int i = 0; i < ReportDialog.getTableModel().getColumnCount(); i++) {
+			ReportDialog.getTable().getColumnModel().getColumn(i).setCellRenderer(renderer);
+		}
+
+		// Create table content		
+		Management.createReportTable(ReportDialog.getTable(), differenceModel);
 		
 		report.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		report.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
 		report.setModal(true);
 		report.setVisible(true);
-
 	}
 	
 	

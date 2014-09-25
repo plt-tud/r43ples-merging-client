@@ -2,6 +2,7 @@ package de.tud.plt.r43ples.client.desktop.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -30,13 +31,9 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.jena.atlas.web.HttpException;
 
-import com.jidesoft.swing.CheckBoxTree;
-
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.TableModelResolutionTriples;
-
-import java.awt.Dimension;
 
 /**
  * The application UI of the merging client.
