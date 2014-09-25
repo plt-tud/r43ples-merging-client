@@ -40,6 +40,7 @@ import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
 import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
+import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
@@ -819,7 +820,7 @@ public class Management {
 		
 		rowData[7] = difference.getTripleResolutionState().toString().toUpperCase();
 		
-		rowData[8] = difference.getResolutionState().toString().toUpperCase();
+		rowData[8] = Boolean.toString(difference.getResolutionState().equals(ResolutionState.RESOLVED)).toUpperCase();
 		
 		return rowData;
 
@@ -832,8 +833,11 @@ public class Management {
 	 * 
 	 * @param table the table reference
 	 * @param differenceModel the difference model
+	 * @return the report creation result
 	 */
-	public static void createReportTable(JTable table, DifferenceModel differenceModel) {
+	public static ReportResult createReportTable(JTable table, DifferenceModel differenceModel) {
+		
+		ReportResult result = new ReportResult();
 		
 		// Remove all entries
 		((TableModelSummaryReport) table.getModel()).removeAllElements();
@@ -866,6 +870,7 @@ public class Management {
 				Color color = Color.GREEN;
 				if (!difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
 					color = Color.RED;
+					result.incrementCounterConflictsNotApproved();
 				}
 				
 				// Create new table entry
@@ -875,8 +880,28 @@ public class Management {
 		}
 		
 		// Check if the resolution state of differences was changed manually
-		
+		Iterator<DifferenceGroup> iteNonConflictingDifferenceGroups = nonconflictingDifferenceGroups.iterator();
+		while (iteNonConflictingDifferenceGroups.hasNext()) {
+			DifferenceGroup differenceGroup = iteNonConflictingDifferenceGroups.next();
+			
+			Iterator<String> iteDifferenceNames = differenceGroup.getDifferences().keySet().iterator();
+			while (iteDifferenceNames.hasNext()) {
+				String currentDifferenceName = iteDifferenceNames.next();
+				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
 				
+				Color color = Color.GREEN;
+				if (!difference.getTripleResolutionState().equals(differenceGroup.getAutomaticResolutionState())) {
+					color = Color.ORANGE;
+					result.incrementCounterDifferencesResolutionChanged();;
+				}
+				
+				// Create new table entry
+				((TableModelSummaryReport) table.getModel()).addRow(new TableEntrySummaryReport(difference, color, createRowDataSummaryReport(difference, differenceGroup)));
+
+			}
+		}
+		
+		return result;
 				
 	}
 	

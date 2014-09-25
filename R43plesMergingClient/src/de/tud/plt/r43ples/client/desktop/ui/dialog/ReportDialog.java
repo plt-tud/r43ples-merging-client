@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
+import javax.swing.ListSelectionModel;
 
 /**
  * Report dialog displays the resolution state.
@@ -122,6 +123,7 @@ public class ReportDialog extends JDialog {
 		
 		table = new JTable();
 		table.setModel(tableModel);
+		table.setRowSelectionAllowed(true);
 		scrollPaneTable.setViewportView(table);
 		{
 			JPanel buttonPane = new JPanel();
