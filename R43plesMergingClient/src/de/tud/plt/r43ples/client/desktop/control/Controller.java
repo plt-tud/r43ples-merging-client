@@ -26,6 +26,7 @@ import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
@@ -343,7 +344,107 @@ public class Controller {
 		}
 
 		// Create table content		
-		Management.createReportTable(ReportDialog.getTable(), differenceModel);
+		ReportResult result = Management.createReportTable(ReportDialog.getTable(), differenceModel);
+		
+		// Message dialog strings
+		// Header
+		String errorNotApprovedHeader = "Error: Not approved conflicting differences.";
+		String warningManuallyChangedHeader = "Warning: Non conflicting difference resolution states manually changed";
+		String infoHeader = "Info: Summary report";
+		// Body
+		String errorNotApprovedBody = "Please approve all conflicting differences before executing a push. %n";
+		String errorNotApprovedSingleCounterBody = "There is 1 not approved difference. %n";
+		String errorNotApprovedMultipleCounterBody = "There are %s not approved differences. %n";
+		String warningManuallyChangedBody = "Manual changes of non conflicting difference resolution states require the get operation of the whole dataset. This can take a few moments. %n";
+		String warningManuallyChangedSingleCounterBody = "There is 1 manually changed non conflicting difference. %n";
+		String warningManuallyChangedMultipleCounterBody = "There are %s manually changed non conflicting differences. %n";
+		String infoBody = "";
+		
+		// Next steps
+		String nextSteps = "Next steps: %n";
+		String errorNotApprovedNextSteps = "Go back to the main screen and approve all conflicting differences. %n";
+		String warningManuallyChangedNextSteps = "Use another SDD or push the changes with were made manually. %n";
+		String infoNextSteps = "Push the merged revision. %n";
+		
+		String message = "";
+		String header = "";
+		int messageLevel = 0;
+		
+		// Create the message content
+		if ((result.getConflictsNotApproved() > 0) && (result.getDifferencesResolutionChanged() > 0)) {
+			// Not approved conflicts and manually changed non conflicting differences
+			
+			// Create the header
+			header += errorNotApprovedHeader;
+			// Set the message level
+			messageLevel = JOptionPane.ERROR_MESSAGE;
+			// Create the body
+			// Error body
+			message += errorNotApprovedBody;
+			if (result.getConflictsNotApproved() == 1) {
+				message += errorNotApprovedSingleCounterBody;				
+			} else {
+				message += String.format(errorNotApprovedMultipleCounterBody, result.getConflictsNotApproved());
+			}
+			// Warning body
+			message += warningManuallyChangedBody;
+			if (result.getDifferencesResolutionChanged() == 1) {
+				message += warningManuallyChangedSingleCounterBody;
+			} else {
+				message += String.format(warningManuallyChangedMultipleCounterBody, result.getDifferencesResolutionChanged());
+			}
+			// Next steps
+			message += nextSteps + errorNotApprovedNextSteps + warningManuallyChangedNextSteps;
+		} else if ((result.getConflictsNotApproved() > 0) && (result.getDifferencesResolutionChanged() == 0)) {
+			// Not approved conflicts only
+			
+			// Create the header
+			header += errorNotApprovedHeader;
+			// Set the message level
+			messageLevel = JOptionPane.ERROR_MESSAGE;
+			// Create the body
+			// Error body
+			message += errorNotApprovedBody;
+			if (result.getConflictsNotApproved() == 1) {
+				message += errorNotApprovedSingleCounterBody;				
+			} else {
+				message += String.format(errorNotApprovedMultipleCounterBody, result.getConflictsNotApproved());
+			}
+			// Next steps
+			message += nextSteps + errorNotApprovedNextSteps;
+		} else if ((result.getConflictsNotApproved() == 0) && (result.getDifferencesResolutionChanged() > 0)) {
+			// Manually changed non conflicting differences only
+			
+			// Create the header
+			header += warningManuallyChangedHeader;
+			// Set the message level
+			messageLevel = JOptionPane.WARNING_MESSAGE;
+			// Create the body
+			// Warning body
+			message += warningManuallyChangedBody;
+			if (result.getDifferencesResolutionChanged() == 1) {
+				message += warningManuallyChangedSingleCounterBody;
+			} else {
+				message += String.format(warningManuallyChangedMultipleCounterBody, result.getDifferencesResolutionChanged());
+			}
+			// Next steps
+			message += nextSteps + warningManuallyChangedNextSteps;
+		} else if ((result.getConflictsNotApproved() == 0) && (result.getDifferencesResolutionChanged() == 0)) {
+			// Info	
+			
+			// Create the header
+			header += infoHeader;
+			// Set the message level
+			messageLevel = JOptionPane.INFORMATION_MESSAGE;
+			// Create the body
+			// Info body
+			message += infoBody;
+			// Next steps
+			message += nextSteps + infoNextSteps;
+		}
+		
+		// Show message dialog
+		JOptionPane.showMessageDialog(dialog, String.format(message), header, messageLevel);
 		
 		report.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		report.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
