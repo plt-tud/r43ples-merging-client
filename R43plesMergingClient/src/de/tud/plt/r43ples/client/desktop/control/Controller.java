@@ -58,6 +58,8 @@ public class Controller {
 	private static String highlightedNodeNameA = null;
 	/** The currently highlighted node name B in the revision graph. **/
 	private static String highlightedNodeNameB = null;
+	/** The report result. **/
+	private static ReportResult reportResult = null;
 	
 	
 	/**
@@ -344,7 +346,7 @@ public class Controller {
 		}
 
 		// Create table content		
-		ReportResult result = Management.createReportTable(ReportDialog.getTable(), differenceModel);
+		reportResult = Management.createReportTable(ReportDialog.getTable(), differenceModel);
 		
 		// Message dialog strings
 		// Header
@@ -371,7 +373,7 @@ public class Controller {
 		int messageLevel = 0;
 		
 		// Create the message content
-		if ((result.getConflictsNotApproved() > 0) && (result.getDifferencesResolutionChanged() > 0)) {
+		if ((reportResult.getConflictsNotApproved() > 0) && (reportResult.getDifferencesResolutionChanged() > 0)) {
 			// Not approved conflicts and manually changed non conflicting differences
 			
 			// Create the header
@@ -381,21 +383,21 @@ public class Controller {
 			// Create the body
 			// Error body
 			message += errorNotApprovedBody;
-			if (result.getConflictsNotApproved() == 1) {
+			if (reportResult.getConflictsNotApproved() == 1) {
 				message += errorNotApprovedSingleCounterBody;				
 			} else {
-				message += String.format(errorNotApprovedMultipleCounterBody, result.getConflictsNotApproved());
+				message += String.format(errorNotApprovedMultipleCounterBody, reportResult.getConflictsNotApproved());
 			}
 			// Warning body
 			message += warningManuallyChangedBody;
-			if (result.getDifferencesResolutionChanged() == 1) {
+			if (reportResult.getDifferencesResolutionChanged() == 1) {
 				message += warningManuallyChangedSingleCounterBody;
 			} else {
-				message += String.format(warningManuallyChangedMultipleCounterBody, result.getDifferencesResolutionChanged());
+				message += String.format(warningManuallyChangedMultipleCounterBody, reportResult.getDifferencesResolutionChanged());
 			}
 			// Next steps
 			message += nextSteps + errorNotApprovedNextSteps + warningManuallyChangedNextSteps;
-		} else if ((result.getConflictsNotApproved() > 0) && (result.getDifferencesResolutionChanged() == 0)) {
+		} else if ((reportResult.getConflictsNotApproved() > 0) && (reportResult.getDifferencesResolutionChanged() == 0)) {
 			// Not approved conflicts only
 			
 			// Create the header
@@ -405,14 +407,14 @@ public class Controller {
 			// Create the body
 			// Error body
 			message += errorNotApprovedBody;
-			if (result.getConflictsNotApproved() == 1) {
+			if (reportResult.getConflictsNotApproved() == 1) {
 				message += errorNotApprovedSingleCounterBody;				
 			} else {
-				message += String.format(errorNotApprovedMultipleCounterBody, result.getConflictsNotApproved());
+				message += String.format(errorNotApprovedMultipleCounterBody, reportResult.getConflictsNotApproved());
 			}
 			// Next steps
 			message += nextSteps + errorNotApprovedNextSteps;
-		} else if ((result.getConflictsNotApproved() == 0) && (result.getDifferencesResolutionChanged() > 0)) {
+		} else if ((reportResult.getConflictsNotApproved() == 0) && (reportResult.getDifferencesResolutionChanged() > 0)) {
 			// Manually changed non conflicting differences only
 			
 			// Create the header
@@ -422,14 +424,14 @@ public class Controller {
 			// Create the body
 			// Warning body
 			message += warningManuallyChangedBody;
-			if (result.getDifferencesResolutionChanged() == 1) {
+			if (reportResult.getDifferencesResolutionChanged() == 1) {
 				message += warningManuallyChangedSingleCounterBody;
 			} else {
-				message += String.format(warningManuallyChangedMultipleCounterBody, result.getDifferencesResolutionChanged());
+				message += String.format(warningManuallyChangedMultipleCounterBody, reportResult.getDifferencesResolutionChanged());
 			}
 			// Next steps
 			message += nextSteps + warningManuallyChangedNextSteps;
-		} else if ((result.getConflictsNotApproved() == 0) && (result.getDifferencesResolutionChanged() == 0)) {
+		} else if ((reportResult.getConflictsNotApproved() == 0) && (reportResult.getDifferencesResolutionChanged() == 0)) {
 			// Info	
 			
 			// Create the header
@@ -520,6 +522,38 @@ public class Controller {
 		ApplicationUI.getScrollPaneGraph().setViewportView(gp);
 
 		gp.updateUI();
+	}
+	
+	
+	/**
+	 * Close the summary report.
+	 */
+	public static void closeSummaryReport() {
+		report.setVisible(false);
+	}
+	
+	
+	/**
+	 * Push the changes to the remote repository.
+	 */
+	public static void pushToRemoteRepository() {
+		if (reportResult != null) {
+			if (reportResult.getConflictsNotApproved() == 0) {
+				if (reportResult.getDifferencesResolutionChanged() > 0) {
+					// Get the whole dataset
+					
+					// Update dataset with local data
+					
+				} else {
+					// Create MERGE WITH query
+					
+				}
+			}
+		}
+		
+		
+		
+		
 	}
 
 }
