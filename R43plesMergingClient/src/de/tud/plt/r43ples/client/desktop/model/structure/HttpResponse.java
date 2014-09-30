@@ -73,7 +73,6 @@ public class HttpResponse {
 	}
 	
 	
-	
 	/**
 	 * Get header parameter by name.
 	 * 
@@ -83,36 +82,8 @@ public class HttpResponse {
 	public List<String> getHeaderParameterByName(String headerParameterName) {
 		return headerParameters.get(headerParameterName);
 	}
-	
-	
-	/**
-	 * Get the current revision number by header parameter.
-	 * 
-	 * @return the current revision number
-	 */
-	public String getRevisionNumberHeaderParameter() {
-		if (headerParameters.get("graph-revision-number") != null) {
-			return headerParameters.get("graph-revision-number").get(0);
-		} else {
-			return null;
-		}
-	}
-	
-	
-	/**
-	 * Get the revision number of master by header parameter.
-	 * 
-	 * @return the master revision number
-	 */
-	public String getRevisionNumberOfMasterHeaderParameter() {
-		if (headerParameters.get("graph-revision-number-of-master") != null) {
-			return headerParameters.get("graph-revision-number-of-master").get(0);
-		} else {
-			return null;
-		}
-	}
 
-
+	
 	/**
 	 * Get the body.
 	 * 

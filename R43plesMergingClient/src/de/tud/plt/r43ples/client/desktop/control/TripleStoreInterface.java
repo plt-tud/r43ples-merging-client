@@ -6,6 +6,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -49,7 +52,6 @@ public class TripleStoreInterface {
 		encoding = (encoding == null) ? "UTF-8" : encoding;
 		String body = IOUtils.toString(in, encoding);
 		return body;
-		
 	}
 	
 	
@@ -75,7 +77,6 @@ public class TripleStoreInterface {
 		encoding = (encoding == null) ? "UTF-8" : encoding;
 		String body = IOUtils.toString(in, encoding);
 		return body;
-		
 	}
 	
 	/**
@@ -105,10 +106,9 @@ public class TripleStoreInterface {
 		String encoding = http.getContentEncoding();
 		encoding = (encoding == null) ? "UTF-8" : encoding;
 		String body = IOUtils.toString(in, encoding);
-		
+
 		// Return the response
-		return new HttpResponse(http.getResponseCode(),http.getHeaderFields(), body);
-		
+		return new HttpResponse(http.getResponseCode(), http.getHeaderFields(), body);
 	}
 	
 }

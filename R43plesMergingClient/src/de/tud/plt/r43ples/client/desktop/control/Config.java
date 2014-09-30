@@ -15,6 +15,8 @@ public class Config {
 	public static String r43ples_sparql_endpoint;
 	/** The R43ples revision graph. **/
 	public static String r43ples_revision_graph;
+	/** The R43ples SDD graph. **/
+	public static String r43ples_sdd_graph;
 	
 	/**
 	 * Read the configuration information from local file
@@ -27,6 +29,7 @@ public class Config {
 		PropertiesConfiguration config = new PropertiesConfiguration(configFilePath);
 		r43ples_sparql_endpoint = config.getString("r43ples.sparql.endpoint");
 		r43ples_revision_graph = config.getString("r43ples.revision.graph");
+		r43ples_sdd_graph = config.getString("r43ples.sdd.graph");
 		
 	}
 

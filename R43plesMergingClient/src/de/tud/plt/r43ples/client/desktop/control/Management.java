@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -101,6 +100,41 @@ public class Management {
 	
 	
 	/**
+	 * Get all SDDs.
+	 * 
+	 * @return the array list of all SDDs
+	 * @throws IOException 
+	 */
+	public static ArrayList<String> getAllSDDs() throws IOException {
+		logger.info("Get all SDDs.");
+		
+		// Result array list
+		ArrayList<String> list = new ArrayList<String>();
+		
+    	// Query all differences
+		String query = prefixes + String.format(
+				  "SELECT ?sddUri %n"
+				+ "FROM <%s>"
+				+ "WHERE { %n"
+				+ "	?sddUri a sddo:StructuralDefinitionGroup . %n"
+				+ "}", Config.r43ples_sdd_graph);
+		logger.debug(query);
+		
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		logger.debug(result);
+		
+		// Iterate over all SDDs
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		while (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			list.add(qs.getResource("?sddUri").toString());
+		}
+
+		return list;
+	}
+	
+	
+	/**
 	 * Get all branch names of graph.
 	 * 
 	 * @param graphName the graph name
@@ -144,6 +178,7 @@ public class Management {
 	 * Execute each kind of MERGE query.
 	 * 
 	 * @param graphName the graph name
+	 * @param sdd the SDD
 	 * @param user the user
 	 * @param commitMessage the commit message
 	 * @param type the merge query type
@@ -151,40 +186,34 @@ public class Management {
 	 * @param branchNameB the branch name B
 	 * @param triples the triples which should be in the WITH part
 	 * @param differenceModel the difference model for storing the java representation
-	 * @return the query result
+	 * @return the query HTTP response
 	 * @throws IOException 
 	 */
-	public static String executeMergeQuery(String graphName, String user, String commitMessage, MergeQueryTypeEnum type, String branchNameA, String branchNameB, String triples, DifferenceModel differenceModel) throws IOException {
-		// TODO Response should include the status / only the status
+	public static HttpResponse executeMergeQuery(String graphName, String sdd, String user, String commitMessage, MergeQueryTypeEnum type, String branchNameA, String branchNameB, String triples, DifferenceModel differenceModel) throws IOException {
 		logger.info("Execute merge query of type " + type.toString());
 		
-		String queryTemplate = 
-				  "USER \"%s\""
-				+ "MESSAGE \"%s\""
-				+ "MERGE %s GRAPH <%s> BRANCH \"%s\" INTO \"%s\"";		
+		String queryTemplateCommon = 
+				  "USER \"%s\" %n"
+				+ "MESSAGE \"%s\" %n"
+				+ "MERGE GRAPH <%s> SDD <%s> BRANCH \"%s\" INTO \"%s\"";
 		
-		if (type.equals(MergeQueryTypeEnum.COMMON)) {
-			String query = String.format(queryTemplate, user, commitMessage, "", graphName, branchNameA, branchNameB);
-			HttpResponse response =TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
-			if (response.getStatusCode() == HttpURLConnection.HTTP_CONFLICT) {
-				// There was a conflict
-				logger.info("Merge query produced conflicts.");
-				// Read the difference model to java model
-				readDifferenceModel(response.getBody(), differenceModel);
-				// TODO
-			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
-				// There was no conflict merged revision was created
-				logger.info("Merge query produced no conflicts. Merged revision was created.");
-				//TODO
-			} else {
-				// Error occurred
-				
-			}
-			
-			
-			
-		} 
+		String queryTemplateWith = 
+				  "USER \"%s\" %n"
+				+ "MESSAGE \"%s\" %n"
+				+ "MERGE GRAPH <%s> SDD <%s> BRANCH \"%s\" INTO \"%s\" WITH { %n"
+				+ "	%s"
+				+ "}";
 
+		if (type.equals(MergeQueryTypeEnum.COMMON)) {
+			String query = String.format(queryTemplateCommon, user, commitMessage, graphName, sdd, branchNameA, branchNameB);
+			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+			
+		} else if (type.equals(MergeQueryTypeEnum.WITH)) {
+			String query = String.format(queryTemplateWith, user, commitMessage, graphName, sdd, branchNameA, branchNameB, triples);
+			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+		}
+
+		// TODO Add MANUAL and AUTO
 		
 		return null;
 	}
@@ -905,5 +934,124 @@ public class Management {
 				
 	}
 	
+
+	/**
+	 * Get the triples of the MERGE WITH query.
+	 * 
+	 * @param differenceModel the difference model
+	 * @return the triples of the MERGE WITH query
+	 */
+	public static String getTriplesOfMergeWithQuery(DifferenceModel differenceModel) {
+		
+		// Contains all triples to add
+		String triples = "";
+		
+		// Iterate over all difference groups
+		Iterator<String> iteDifferenceGroupNames = differenceModel.getDifferenceGroups().keySet().iterator();
+		while (iteDifferenceGroupNames.hasNext()) {
+			String differenceGroupName = iteDifferenceGroupNames.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupName);
+			if (differenceGroup.isConflicting()) {
+				// Iterate over all difference of current conflicting difference group
+				Iterator<String> iteDifferenceNames = differenceGroup.getDifferences().keySet().iterator();
+				while (iteDifferenceNames.hasNext()) {
+					String currentDifferenceName = iteDifferenceNames.next();
+					Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
+
+					if (difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED)) {
+						String triple = "";						
+						triple += "<" + difference.getTriple().getSubject() + "> ";
+						triple += "<" + difference.getTriple().getPredicate() + "> ";
+						if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
+							triple += "\"" + difference.getTriple().getObject() + "\"";
+						} else {
+							triple += "<" + difference.getTriple().getObject() + ">";
+						}
+						triples += triple + "\n";
+					}
+				}
+			}
+		}
+
+		return triples;
+	}
 	
+	
+	/**
+	 * Get the header graph name.
+	 * Removes the http:// of the graph name because it is not permitted that a header parameter contains a colon.
+	 * 
+	 * @param graphName the graph name
+	 * @return the header graph name
+	 */
+	public static String getHeaderGraphName(String graphName) {
+		String graphNameHeader = null;
+		if (graphName.startsWith("http://")) {
+			graphNameHeader = graphName.substring(7);
+		}
+		return graphNameHeader;
+	}
+
+	
+	/**
+	 * Get the revision number of the new revision of the HTTP response.
+	 * 
+	 * @param response the HTTP response
+	 * @param graphName the graph name
+	 * @return the new revision number
+	 */
+	public static String getRevisionNumberOfNewRevisionHeaderParameter(HttpResponse response, String graphName) {
+		String identifier = "%s-revision-number";
+		String graphNameHeader = getHeaderGraphName(graphName);
+		
+		return response.getHeaderParameterByName(String.format(identifier, graphNameHeader)).get(0);
+	}
+	
+
+	/**
+	 * Get the revision number of MASTER of the HTTP response.
+	 * 
+	 * @param response the HTTP response
+	 * @param graphName the graph name
+	 * @return the MASTER revision number
+	 */
+	public static String getRevisionNumberOfMasterHeaderParameter(HttpResponse response, String graphName) {
+		String identifier = "%s-revision-number-of-master";
+		String graphNameHeader = getHeaderGraphName(graphName);
+		
+		return response.getHeaderParameterByName(String.format(identifier, graphNameHeader)).get(0);
+	}
+	
+	
+	/**
+	 * Get the revision number of the branch A of the HTTP response.
+	 * Only available after execution of a MERGE query.
+	 * 
+	 * @param response the HTTP response
+	 * @param graphName the graph name
+	 * @return the branch A revision number
+	 */
+	public static String getRevisionNumberOfBranchAHeaderParameter(HttpResponse response, String graphName) {
+		String identifier = "%s-revision-number-of-branch-A";
+		String graphNameHeader = getHeaderGraphName(graphName);
+		
+		return response.getHeaderParameterByName(String.format(identifier, graphNameHeader)).get(0);
+	}
+	
+	
+	/**
+	 * Get the revision number of the branch B of the HTTP response.
+	 * Only available after execution of a MERGE query.
+	 * 
+	 * @param response the HTTP response
+	 * @param graphName the graph name
+	 * @return the branch B revision number
+	 */
+	public static String getRevisionNumberOfBranchBHeaderParameter(HttpResponse response, String graphName) {
+		String identifier = "%s-revision-number-of-branch-B";
+		String graphNameHeader = getHeaderGraphName(graphName);
+		
+		return response.getHeaderParameterByName(String.format(identifier, graphNameHeader)).get(0);
+	}
+
 }

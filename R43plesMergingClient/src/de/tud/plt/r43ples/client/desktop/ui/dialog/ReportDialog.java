@@ -3,6 +3,9 @@ package de.tud.plt.r43ples.client.desktop.ui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -20,11 +23,6 @@ import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
 
-import javax.swing.ListSelectionModel;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
 /**
  * Report dialog displays the resolution state.
  * User can start the merging process with manually generated changes,
@@ -40,6 +38,8 @@ public class ReportDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	/** The graph text field. **/
 	private static JTextField tfGraph;
+	/** The SDD text field. **/
+	private static JTextField tfSDD;
 	/** The revision A text field. **/
 	private static JTextField tfRevisionA;
 	/** The revision B text field. **/
@@ -66,7 +66,7 @@ public class ReportDialog extends JDialog {
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{
 			JPanel panelQuerySummary = new JPanel();
-			panelQuerySummary.setPreferredSize(new Dimension(10, 250));
+			panelQuerySummary.setPreferredSize(new Dimension(10, 280));
 			contentPanel.add(panelQuerySummary, BorderLayout.NORTH);
 			panelQuerySummary.setLayout(null);
 			
@@ -84,42 +84,52 @@ public class ReportDialog extends JDialog {
 			panelQuerySummary.add(tfGraph);
 			tfGraph.setColumns(10);
 			
+			JLabel lblSDD = new JLabel("SDD");
+			lblSDD.setBounds(10, 73, 70, 20);
+			panelQuerySummary.add(lblSDD);
+			
+			tfSDD = new JTextField();
+			tfSDD.setEnabled(false);
+			tfSDD.setColumns(10);
+			tfSDD.setBounds(90, 73, 300, 20);
+			panelQuerySummary.add(tfSDD);
+			
 			JLabel lblMerge = new JLabel("MERGE");
-			lblMerge.setBounds(10, 73, 70, 20);
+			lblMerge.setBounds(10, 104, 70, 20);
 			panelQuerySummary.add(lblMerge);
 			
 			tfRevisionA = new JTextField();
 			tfRevisionA.setEnabled(false);
 			tfRevisionA.setColumns(10);
-			tfRevisionA.setBounds(90, 73, 100, 20);
+			tfRevisionA.setBounds(90, 104, 100, 20);
 			panelQuerySummary.add(tfRevisionA);
 			
 			JLabel lblInto = new JLabel("INTO");
 			lblInto.setHorizontalAlignment(SwingConstants.CENTER);
-			lblInto.setBounds(200, 73, 80, 20);
+			lblInto.setBounds(200, 104, 80, 20);
 			panelQuerySummary.add(lblInto);
 			
 			tfRevisionB = new JTextField();
 			tfRevisionB.setEnabled(false);
 			tfRevisionB.setColumns(10);
-			tfRevisionB.setBounds(290, 73, 100, 20);
+			tfRevisionB.setBounds(290, 104, 100, 20);
 			panelQuerySummary.add(tfRevisionB);
 			
 			JLabel lblUser = new JLabel("USER");
-			lblUser.setBounds(10, 104, 60, 20);
+			lblUser.setBounds(10, 135, 60, 20);
 			panelQuerySummary.add(lblUser);
 			
 			tfUser = new JTextField();
 			tfUser.setColumns(10);
-			tfUser.setBounds(90, 104, 300, 20);
+			tfUser.setBounds(90, 135, 300, 20);
 			panelQuerySummary.add(tfUser);
 			
 			textAreaMessage = new JTextArea();
-			textAreaMessage.setBounds(90, 135, 300, 100);
+			textAreaMessage.setBounds(90, 166, 300, 100);
 			panelQuerySummary.add(textAreaMessage);
 			
 			JLabel lblMessage = new JLabel("MESSAGE");
-			lblMessage.setBounds(10, 135, 60, 20);
+			lblMessage.setBounds(10, 166, 60, 20);
 			panelQuerySummary.add(lblMessage);
 		}
 		
@@ -142,7 +152,12 @@ public class ReportDialog extends JDialog {
 					 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 					 */
 					public void actionPerformed(ActionEvent arg0) {
-						Controller.pushToRemoteRepository();
+						try {
+							Controller.pushToRemoteRepository();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				});
 				okButton.setActionCommand("OK");
@@ -180,6 +195,22 @@ public class ReportDialog extends JDialog {
 	 */
 	public static void setTfGraph(JTextField tfGraph) {
 		ReportDialog.tfGraph = tfGraph;
+	}
+
+
+	/**
+	 * @return the tfSDD
+	 */
+	public static JTextField getTfSDD() {
+		return tfSDD;
+	}
+
+
+	/**
+	 * @param tfSDD the tfSDD to set
+	 */
+	public static void setTfSDD(JTextField tfSDD) {
+		ReportDialog.tfSDD = tfSDD;
 	}
 
 
@@ -277,5 +308,4 @@ public class ReportDialog extends JDialog {
 	public static void setTableModel(TableModelSummaryReport tableModel) {
 		ReportDialog.tableModel = tableModel;
 	}
-	
 }

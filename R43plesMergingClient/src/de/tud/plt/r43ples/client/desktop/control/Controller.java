@@ -3,6 +3,7 @@ package de.tud.plt.r43ples.client.desktop.control;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
@@ -46,6 +48,10 @@ public class Controller {
 	private static Logger logger = Logger.getLogger(Controller.class);
 	/** The start merging dialog instance. **/
 	private static StartMergingDialog dialog = new StartMergingDialog();
+	/** The revision number of the branch A. **/
+	private static String revisionNumberBranchA;
+	/** The revision number of the branch B. **/
+	private static String revisionNumberBranchB;
 	/** The difference model. **/
 	private static DifferenceModel differenceModel = new DifferenceModel();;
 	/** The summary report dialog instance. **/
@@ -77,6 +83,16 @@ public class Controller {
 		Iterator<String> iteElements = elements.iterator();
 		while (iteElements.hasNext()) {
 			StartMergingDialog.getcBModelGraph().addElement(iteElements.next());
+		}
+		
+		// Get all possible SDDs
+		ArrayList<String> elementsSDD = Management.getAllSDDs();
+		// Remove all existing elements
+		StartMergingDialog.getcBModelSDD().removeAllElements();
+		// Add current elements
+		Iterator<String> iteElementsSDD = elementsSDD.iterator();
+		while (iteElementsSDD.hasNext()) {
+			StartMergingDialog.getcBModelSDD().addElement(iteElementsSDD.next());
 		}
 		
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -129,6 +145,7 @@ public class Controller {
 			// Start new merging process
 			// Get the selected graph
 			String graphName = (String) StartMergingDialog.getcBModelGraph().getSelectedItem();
+			String sdd = (String) StartMergingDialog.getcBModelSDD().getSelectedItem();
 			
 			String user = StartMergingDialog.getTfUser().getText();
 			String commitMessage = StartMergingDialog.getTextAreaMessage().getText();
@@ -145,7 +162,26 @@ public class Controller {
 				type = MergeQueryTypeEnum.MANUAL;
 			}
 	
-			Management.executeMergeQuery(graphName, user, commitMessage, type, branchNameA, branchNameB, null, differenceModel);
+			HttpResponse response = Management.executeMergeQuery(graphName, sdd, user, commitMessage, type, branchNameA, branchNameB, null, differenceModel);
+			
+			if (response.getStatusCode() == HttpURLConnection.HTTP_CONFLICT) {
+				// There was a conflict
+				logger.info("Merge query produced conflicts.");
+				// Read the difference model to java model
+				Management.readDifferenceModel(response.getBody(), differenceModel);
+				// Save the current revision numbers
+				revisionNumberBranchA = Management.getRevisionNumberOfBranchAHeaderParameter(response, graphName);
+				revisionNumberBranchB = Management.getRevisionNumberOfBranchBHeaderParameter(response, graphName);
+				// TODO
+			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
+				// There was no conflict merged revision was created
+				logger.info("Merge query produced no conflicts. Merged revision was created.");
+				//TODO
+			} else {
+				// Error occurred
+				// TODO
+			}
+			
 			
 			// TODO close dialog after execution + error handling
 			
@@ -334,8 +370,9 @@ public class Controller {
 	public static void executePush() {
 		// Set the texts
 		ReportDialog.getTfGraph().setText(StartMergingDialog.getcBModelGraph().getSelectedItem().toString());
-		ReportDialog.getTfRevisionA().setText(StartMergingDialog.getcBModelRevisionA().getSelectedItem().toString());
-		ReportDialog.getTfRevisionB().setText(StartMergingDialog.getcBModelRevisionB().getSelectedItem().toString());
+		ReportDialog.getTfSDD().setText(StartMergingDialog.getcBModelSDD().getSelectedItem().toString());
+		ReportDialog.getTfRevisionA().setText(StartMergingDialog.getcBModelRevisionA().getSelectedItem().toString() + " (" + revisionNumberBranchA + ")");
+		ReportDialog.getTfRevisionB().setText(StartMergingDialog.getcBModelRevisionB().getSelectedItem().toString() + " (" + revisionNumberBranchB + ")");
 		ReportDialog.getTfUser().setText(StartMergingDialog.getTfUser().getText());
 		ReportDialog.getTextAreaMessage().setText(StartMergingDialog.getTextAreaMessage().getText());
 		
@@ -365,7 +402,7 @@ public class Controller {
 		// Next steps
 		String nextSteps = "Next steps: %n";
 		String errorNotApprovedNextSteps = "Go back to the main screen and approve all conflicting differences. %n";
-		String warningManuallyChangedNextSteps = "Use another SDD or push the changes with were made manually. %n";
+		String warningManuallyChangedNextSteps = "Use another SDD or push the changes which were made manually. %n";
 		String infoNextSteps = "Push the merged revision. %n";
 		
 		String message = "";
@@ -535,8 +572,9 @@ public class Controller {
 	
 	/**
 	 * Push the changes to the remote repository.
+	 * @throws IOException 
 	 */
-	public static void pushToRemoteRepository() {
+	public static void pushToRemoteRepository() throws IOException {
 		if (reportResult != null) {
 			if (reportResult.getConflictsNotApproved() == 0) {
 				if (reportResult.getDifferencesResolutionChanged() > 0) {
@@ -545,15 +583,17 @@ public class Controller {
 					// Update dataset with local data
 					
 				} else {
-					// Create MERGE WITH query
+					String user = ReportDialog.getTfUser().getText();
+					String message = ReportDialog.getTextAreaMessage().getText();
+					String graphName = ReportDialog.getTfGraph().getText();
+					String sdd = ReportDialog.getTfSDD().getText();
+					String triples = Management.getTriplesOfMergeWithQuery(differenceModel);
 					
+					// Execute MERGE WITH query
+					Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
 				}
 			}
 		}
-		
-		
-		
-		
 	}
 
 }

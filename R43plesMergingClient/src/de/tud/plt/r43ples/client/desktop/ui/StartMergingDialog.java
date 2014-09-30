@@ -34,6 +34,10 @@ import javax.swing.JTextArea;
  * @author Stephan Hensel
  *
  */
+/**
+ * @author Stephan Hensel
+ *
+ */
 public class StartMergingDialog extends JDialog {
 
 	/** The default serial version UID. **/
@@ -56,6 +60,8 @@ public class StartMergingDialog extends JDialog {
 	
 	/** The combo box model of the graph names. **/
 	private static DefaultComboBoxModel<String> cBModelGraph = new DefaultComboBoxModel<String>();
+	/** The combo box model of the SDDs. **/
+	private static DefaultComboBoxModel<String> cBModelSDD = new DefaultComboBoxModel<String>();
 	/** The combo box model of the possible revision numbers for A. **/
 	private static DefaultComboBoxModel<String> cBModelRevisionA = new DefaultComboBoxModel<String>();
 	/** The combo box model of the possible revision numbers for B. **/
@@ -67,7 +73,7 @@ public class StartMergingDialog extends JDialog {
 	 */
 	public StartMergingDialog() {
 		setTitle("Start Merging");
-		setBounds(100, 100, 450, 355);
+		setBounds(100, 100, 450, 380);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -99,6 +105,7 @@ public class StartMergingDialog extends JDialog {
 		
 		JComboBox<String> cBGraph = new JComboBox<String>();
 		cBGraph.addActionListener(new ActionListener() {
+			
 			/* (non-Javadoc)
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
@@ -115,41 +122,51 @@ public class StartMergingDialog extends JDialog {
 		cBGraph.setModel(cBModelGraph);
 		contentPanel.add(cBGraph);
 		
+		JLabel lblSelectSDD = new JLabel("Select the SDD");
+		lblSelectSDD.setBounds(13, 103, 96, 20);
+		contentPanel.add(lblSelectSDD);
+		
+		JComboBox<String> cBSDD = new JComboBox<String>();
+		cBSDD.setBounds(119, 103, 305, 20);
+		cBSDD.setModel(cBModelSDD);
+		contentPanel.add(cBSDD);
+		
 		JLabel lblMerge = new JLabel("MERGE");
-		lblMerge.setBounds(13, 103, 60, 20);
+		lblMerge.setBounds(13, 134, 60, 20);
 		contentPanel.add(lblMerge);
 		
 		JComboBox<String> comboBoxRevisionA = new JComboBox<String>();
-		comboBoxRevisionA.setBounds(119, 103, 110, 20);
+		comboBoxRevisionA.setBounds(119, 134, 110, 20);
 		comboBoxRevisionA.setModel(cBModelRevisionA);
 		contentPanel.add(comboBoxRevisionA);
 		
 		JLabel lblInto = new JLabel("INTO");
 		lblInto.setHorizontalAlignment(SwingConstants.CENTER);
-		lblInto.setBounds(239, 103, 65, 20);
+		lblInto.setBounds(239, 134, 65, 20);
 		contentPanel.add(lblInto);
 		
 		JComboBox<String> comboBoxRevisionB = new JComboBox<String>();
-		comboBoxRevisionB.setBounds(314, 103, 110, 20);
+		comboBoxRevisionB.setBounds(314, 134, 110, 20);
 		comboBoxRevisionB.setModel(cBModelRevisionB);
 		contentPanel.add(comboBoxRevisionB);
 		
 		JLabel lblUser = new JLabel("USER");
-		lblUser.setBounds(13, 134, 60, 20);
+		lblUser.setBounds(13, 165, 60, 20);
 		contentPanel.add(lblUser);
 		
 		tfUser = new JTextField();
-		tfUser.setBounds(119, 134, 305, 20);
+		tfUser.setBounds(119, 165, 305, 20);
 		contentPanel.add(tfUser);
 		tfUser.setColumns(10);
 		
 		JLabel lblMessage = new JLabel("MESSAGE");
-		lblMessage.setBounds(13, 165, 60, 20);
+		lblMessage.setBounds(13, 196, 60, 20);
 		contentPanel.add(lblMessage);
 		
 		textAreaMessage = new JTextArea();
-		textAreaMessage.setBounds(119, 165, 305, 100);
+		textAreaMessage.setBounds(119, 196, 305, 100);
 		contentPanel.add(textAreaMessage);
+		
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -157,6 +174,7 @@ public class StartMergingDialog extends JDialog {
 			{
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
+					
 					/* (non-Javadoc)
 					 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 					 */
@@ -176,6 +194,7 @@ public class StartMergingDialog extends JDialog {
 			{
 				JButton cancelButton = new JButton("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
+					
 					/* (non-Javadoc)
 					 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 					 */
@@ -200,6 +219,22 @@ public class StartMergingDialog extends JDialog {
 		StartMergingDialog.cBModelGraph = cBModelGraph;
 	}
 
+
+
+	/**
+	 * @return the cBModelSDD
+	 */
+	public static DefaultComboBoxModel<String> getcBModelSDD() {
+		return cBModelSDD;
+	}
+
+
+	/**
+	 * @param cBModelSDD the cBModelSDD to set
+	 */
+	public static void setcBModelSDD(DefaultComboBoxModel<String> cBModelSDD) {
+		StartMergingDialog.cBModelSDD = cBModelSDD;
+	}
 
 
 	public static DefaultComboBoxModel<String> getcBModelRevisionA() {
