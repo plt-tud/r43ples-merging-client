@@ -21,6 +21,10 @@ import att.grappa.Graph;
 import att.grappa.GrappaAdapter;
 import att.grappa.GrappaPanel;
 import att.grappa.GrappaSupport;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.update.UpdateAction;
+
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
@@ -572,28 +576,71 @@ public class Controller {
 	
 	/**
 	 * Push the changes to the remote repository.
+	 * 
 	 * @throws IOException 
 	 */
 	public static void pushToRemoteRepository() throws IOException {
 		if (reportResult != null) {
 			if (reportResult.getConflictsNotApproved() == 0) {
+				// Get the definitions
+				String user = ReportDialog.getTfUser().getText();
+				String message = ReportDialog.getTextAreaMessage().getText();
+				String graphName = ReportDialog.getTfGraph().getText();
+				String sdd = ReportDialog.getTfSDD().getText();
+				
 				if (reportResult.getDifferencesResolutionChanged() > 0) {
 					// Get the whole dataset
-					
+					Model wholeContentModel = Management.getWholeContentOfRevision(graphName, revisionNumberBranchA);
+					logger.debug("Whole model as N-Triples: \n" + Management.writeJenaModelToNTriplesString(wholeContentModel));
+			
 					// Update dataset with local data
+					ArrayList<String> list = Management.getAllTriplesDividedIntoInsertAndDelete(differenceModel, wholeContentModel);
+					
+					logger.debug("INSERT: \n" + list.get(0));
+					logger.debug("DELETE: \n" + list.get(1));
+					
+					String updateQueryInsert = String.format(
+							  "INSERT DATA { %n"
+							+ "	%s %n"
+							+ "}", list.get(0));
+					UpdateAction.parseExecute(updateQueryInsert, wholeContentModel);
+					
+					String updateQueryDelete = String.format(
+							  "DELETE DATA { %n"
+							+ " %s %n"
+							+ "}", list.get(1));
+					UpdateAction.parseExecute(updateQueryDelete, wholeContentModel);
+					
+					String triples = Management.writeJenaModelToNTriplesString(wholeContentModel);
+					logger.debug("Updated model as N-Triples: \n" + triples); 
+					
+					// Execute MERGE MANUAL query
+					HttpResponse response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.MANUAL, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
+					
+					// TODO Add user message dialog
 					
 				} else {
-					String user = ReportDialog.getTfUser().getText();
-					String message = ReportDialog.getTextAreaMessage().getText();
-					String graphName = ReportDialog.getTfGraph().getText();
-					String sdd = ReportDialog.getTfSDD().getText();
 					String triples = Management.getTriplesOfMergeWithQuery(differenceModel);
 					
 					// Execute MERGE WITH query
-					Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
+					HttpResponse response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
+					
+					// TODO Add user message dialog
 				}
 			}
 		}
+		// TODO Show result dialog
+		
+	}
+
+
+	/**
+	 * Select all entries of resolution triples table.
+	 */
+	public static void selectAllEntriesResolutionTriples() {
+		if (ApplicationUI.getTableModelResolutionTriples().getRowCount() > 0) {
+			ApplicationUI.getTableResolutionTriples().setRowSelectionInterval(0, ApplicationUI.getTableModelResolutionTriples().getRowCount() - 1);
+		}		
 	}
 
 }

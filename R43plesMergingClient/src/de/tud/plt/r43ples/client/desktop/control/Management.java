@@ -2,6 +2,7 @@ package de.tud.plt.r43ples.client.desktop.control;
 
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -173,7 +174,6 @@ public class Management {
 	}
 	
 	
-	
 	/**
 	 * Execute each kind of MERGE query.
 	 * 
@@ -184,7 +184,7 @@ public class Management {
 	 * @param type the merge query type
 	 * @param branchNameA the branch name A
 	 * @param branchNameB the branch name B
-	 * @param triples the triples which should be in the WITH part
+	 * @param triples the triples which should be in the WITH part as N-Triples
 	 * @param differenceModel the difference model for storing the java representation
 	 * @return the query HTTP response
 	 * @throws IOException 
@@ -203,17 +203,32 @@ public class Management {
 				+ "MERGE GRAPH <%s> SDD <%s> BRANCH \"%s\" INTO \"%s\" WITH { %n"
 				+ "	%s"
 				+ "}";
+		
+		String queryTemplateAuto = 
+				  "USER \"%s\" %n"
+				+ "MESSAGE \"%s\" %n"
+				+ "MERGE AUTO GRAPH <%s> SDD <%s> BRANCH \"%s\" INTO \"%s\"";
+		
+		String queryTemplateManual = 
+				  "USER \"%s\" %n"
+				+ "MESSAGE \"%s\" %n"
+				+ "MERGE MANUAL GRAPH <%s> SDD <%s> BRANCH \"%s\" INTO \"%s\" WITH { %n"
+				+ "	%s"
+				+ "}";
 
 		if (type.equals(MergeQueryTypeEnum.COMMON)) {
 			String query = String.format(queryTemplateCommon, user, commitMessage, graphName, sdd, branchNameA, branchNameB);
 			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
-			
 		} else if (type.equals(MergeQueryTypeEnum.WITH)) {
 			String query = String.format(queryTemplateWith, user, commitMessage, graphName, sdd, branchNameA, branchNameB, triples);
 			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+		} else if (type.equals(MergeQueryTypeEnum.AUTO)) {
+			String query = String.format(queryTemplateAuto, user, commitMessage, graphName, sdd, branchNameA, branchNameB);
+			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+		} else if (type.equals(MergeQueryTypeEnum.MANUAL)) {
+			String query = String.format(queryTemplateManual, user, commitMessage, graphName, sdd, branchNameA, branchNameB, triples);
+			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
 		}
-
-		// TODO Add MANUAL and AUTO
 		
 		return null;
 	}
@@ -405,6 +420,20 @@ public class Management {
 	}
 	
 	
+	/**
+	 * Write jena model to N-Triples string.
+	 * 
+	 * @param model the model
+	 * @return the N-Triples string
+	 */
+	public static String writeJenaModelToNTriplesString(Model model) {
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		
+		model.write(stream, "N-TRIPLES");
+		
+		return stream.toString();
+	}
+		
 	
 	/**
 	 * Convert SDD state string to SDD triple state. If value does not exists in enum null will be returned.
@@ -975,6 +1004,92 @@ public class Management {
 
 		return triples;
 	}
+	
+	
+	/**
+	 * Get the whole content of a revision as jena model.
+	 * 
+	 * @param graphName the graph name
+	 * @param revision the revision
+	 * @return the whole content of the revision of the graph as jena model
+	 * @throws IOException 
+	 */
+	public static Model getWholeContentOfRevision(String graphName, String revision) throws IOException {
+		String query = String.format(
+				  "CONSTRUCT {?s ?p ?o} %n"
+				+ "FROM <%s> REVISION \"%s\" %n"
+				+ "WHERE { %n"
+				+ "	?s ?p ?o %n"
+				+ "}", graphName, revision);
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		logger.debug(result);
+
+		return readTurtleStringToJenaModel(result);
+	}
+	
+	
+	/**
+	 * Get all triples divided into insert and delete.
+	 * 
+	 * @param differenceModel the difference model
+	 * @return array list which has two entries (entry 0 contains the triples to insert; entry 1 contains the triples to delete)
+	 */
+	public static ArrayList<String> getAllTriplesDividedIntoInsertAndDelete(DifferenceModel differenceModel, Model model) {
+		// The result list
+		ArrayList<String> list = new ArrayList<String>();
+		
+		String triplesToInsert = "";
+		String triplesToDelete = "";
+		
+		// Iterate over all difference groups
+		Iterator<String> iteDifferenceGroups = differenceModel.getDifferenceGroups().keySet().iterator();
+		while (iteDifferenceGroups.hasNext()) {
+			String differenceGroupKey = iteDifferenceGroups.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupKey);
+			
+			Iterator<String> iteDifferences = differenceGroup.getDifferences().keySet().iterator();
+			while (iteDifferences.hasNext()) {
+				String differenceKey = iteDifferences.next();
+				Difference difference = differenceGroup.getDifferences().get(differenceKey);
+				
+				// Get the triple state to use
+				SDDTripleStateEnum tripleState;
+				if (difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+					// Use the approved triple state
+					tripleState = difference.getTripleResolutionState();					
+				} else {
+					// Use the automatic resolution state
+					tripleState = differenceGroup.getAutomaticResolutionState();
+				}
+				
+				// Get the triple
+				String triple = "";						
+				triple += "<" + difference.getTriple().getSubject() + "> ";
+				triple += "<" + difference.getTriple().getPredicate() + "> ";
+				if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
+					triple += "\"" + difference.getTriple().getObject() + "\" .";
+				} else {
+					triple += "<" + difference.getTriple().getObject() + "> .";
+				}
+				
+				// Add the triple to the corresponding string
+				if (tripleState.equals(SDDTripleStateEnum.ADDED) || tripleState.equals(SDDTripleStateEnum.ORIGINAL)) {
+					triplesToInsert += triple + "%n";				
+				} else if (tripleState.equals(SDDTripleStateEnum.DELETED) || tripleState.equals(SDDTripleStateEnum.NOTINCLUDED)) {
+					triplesToDelete += triple + "%n";
+				} else {
+					// Error occurred - state was not changed
+					logger.error("Triple state was used which has no internal representation.");
+				}
+			}
+		}
+		
+		// Add the string to the result list
+		list.add(String.format(triplesToInsert));
+		list.add(String.format(triplesToDelete));
+		
+		return list;
+	}	
 	
 	
 	/**

@@ -85,6 +85,7 @@ public class ApplicationUI {
 		
 		JMenuItem mntmNewMerge = new JMenuItem("New Merge");
 		mntmNewMerge.addActionListener(new ActionListener() {
+			
 			/* (non-Javadoc)
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
@@ -104,6 +105,7 @@ public class ApplicationUI {
 		
 		JButton btnNewMerge = new JButton("New MERGE");
 		btnNewMerge.addActionListener(new ActionListener() {
+			
 			/* (non-Javadoc)
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
@@ -123,6 +125,7 @@ public class ApplicationUI {
 		
 		JButton btnPush = new JButton("Push");
 		btnPush.addActionListener(new ActionListener() {
+			
 			/* (non-Javadoc)
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
@@ -134,6 +137,7 @@ public class ApplicationUI {
 		
 		JButton btGraph = new JButton("Graph");
 		btGraph.addActionListener(new ActionListener() {
+			
 			/* (non-Javadoc)
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
@@ -209,6 +213,7 @@ public class ApplicationUI {
 		treeDifferencesDivision.setModel(treeModelDifferencesDivision);
 		treeDifferencesDivision.setCellRenderer(new TreeCellRendererDifferences());
 		treeDifferencesDivision.addTreeSelectionListener(new TreeSelectionListener() {
+			
 			/* (non-Javadoc)
 			 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 			 */
@@ -273,6 +278,7 @@ public class ApplicationUI {
 		
 		JButton btnResolutionTriplesApproveSelected = new JButton("Approve selected");
 		btnResolutionTriplesApproveSelected.addActionListener(new ActionListener() {
+			
 			/* (non-Javadoc)
 			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 			 */
@@ -281,6 +287,18 @@ public class ApplicationUI {
 			}
 		});
 		toolBarResolutionTriples.add(btnResolutionTriplesApproveSelected);
+		
+		JButton btnResolutionTriplesSelectAll = new JButton("Select all");
+		btnResolutionTriplesSelectAll.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.selectAllEntriesResolutionTriples();
+			}
+		});
+		toolBarResolutionTriples.add(btnResolutionTriplesSelectAll);
 		
 		JPanel panelResolutionSemanticEnrichment = new JPanel();
 		tabbedPaneResolution.addTab("Semantic Enrichment", null, panelResolutionSemanticEnrichment, null);
