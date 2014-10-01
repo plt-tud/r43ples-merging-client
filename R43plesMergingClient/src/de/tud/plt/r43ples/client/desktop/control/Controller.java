@@ -438,6 +438,9 @@ public class Controller {
 			}
 			// Next steps
 			message += nextSteps + errorNotApprovedNextSteps + warningManuallyChangedNextSteps;
+			
+			// Set the push button enable state
+			ReportDialog.getOkButton().setEnabled(false);
 		} else if ((reportResult.getConflictsNotApproved() > 0) && (reportResult.getDifferencesResolutionChanged() == 0)) {
 			// Not approved conflicts only
 			
@@ -455,6 +458,9 @@ public class Controller {
 			}
 			// Next steps
 			message += nextSteps + errorNotApprovedNextSteps;
+			
+			// Set the push button enable state
+			ReportDialog.getOkButton().setEnabled(false);
 		} else if ((reportResult.getConflictsNotApproved() == 0) && (reportResult.getDifferencesResolutionChanged() > 0)) {
 			// Manually changed non conflicting differences only
 			
@@ -472,6 +478,9 @@ public class Controller {
 			}
 			// Next steps
 			message += nextSteps + warningManuallyChangedNextSteps;
+			
+			// Set the push button enable state
+			ReportDialog.getOkButton().setEnabled(true);
 		} else if ((reportResult.getConflictsNotApproved() == 0) && (reportResult.getDifferencesResolutionChanged() == 0)) {
 			// Info	
 			
@@ -484,10 +493,13 @@ public class Controller {
 			message += infoBody;
 			// Next steps
 			message += nextSteps + infoNextSteps;
+			
+			// Set the push button enable state
+			ReportDialog.getOkButton().setEnabled(true);
 		}
 		
 		// Show message dialog
-		JOptionPane.showMessageDialog(dialog, String.format(message), header, messageLevel);
+		JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, String.format(message), header, messageLevel);
 		
 		report.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		report.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
@@ -588,6 +600,8 @@ public class Controller {
 				String graphName = ReportDialog.getTfGraph().getText();
 				String sdd = ReportDialog.getTfSDD().getText();
 				
+				HttpResponse response = null;
+				
 				if (reportResult.getDifferencesResolutionChanged() > 0) {
 					// Get the whole dataset
 					Model wholeContentModel = Management.getWholeContentOfRevision(graphName, revisionNumberBranchA);
@@ -615,22 +629,25 @@ public class Controller {
 					logger.debug("Updated model as N-Triples: \n" + triples); 
 					
 					// Execute MERGE MANUAL query
-					HttpResponse response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.MANUAL, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
-					
-					// TODO Add user message dialog
-					
+					response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.MANUAL, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
 				} else {
 					String triples = Management.getTriplesOfMergeWithQuery(differenceModel);
 					
 					// Execute MERGE WITH query
-					HttpResponse response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
-					
-					// TODO Add user message dialog
+					response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
+				}
+				
+				// Show message dialog
+				if ((response != null) && (response.getStatusCode() == HttpURLConnection.HTTP_CREATED)) {
+					logger.info("Merge query successfully executed.");
+					String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
+					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					logger.error("Merge query could not be executed.");
+					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Maybe another user committed changes to one of the branches to merge.", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
-		// TODO Show result dialog
-		
 	}
 
 

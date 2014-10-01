@@ -52,6 +52,8 @@ public class ReportDialog extends JDialog {
 	private static JTable table;
 	/** The table model. **/
 	private static TableModelSummaryReport tableModel = new TableModelSummaryReport(new ArrayList<TableEntrySummaryReport>());
+	/** The OK/Push button. **/
+	private static JButton okButton;
 
 
 	/**
@@ -145,7 +147,7 @@ public class ReportDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("Push");
+				okButton = new JButton("Push");
 				okButton.addActionListener(new ActionListener() {
 					
 					/* (non-Javadoc)
@@ -307,5 +309,21 @@ public class ReportDialog extends JDialog {
 	 */
 	public static void setTableModel(TableModelSummaryReport tableModel) {
 		ReportDialog.tableModel = tableModel;
+	}
+
+
+	/**
+	 * @return the okButton
+	 */
+	public static JButton getOkButton() {
+		return okButton;
+	}
+
+
+	/**
+	 * @param okButton the okButton to set
+	 */
+	public static void setOkButton(JButton okButton) {
+		ReportDialog.okButton = okButton;
 	}
 }
