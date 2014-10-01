@@ -6,7 +6,7 @@ import javax.swing.table.AbstractTableModel;
 
 /**
  * Table model for resolution triples table.
- * Column 5 will contain checkboxes.
+ * Column 6 will contain checkboxes.
  * 
  * @author Stephan Hensel
  *
@@ -16,7 +16,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Resolution state"};
+	private static final String[] header = {"Conflicting", "State A (Revision)", "State B (Revision)", "Subject", "Predicate", "Object", "Resolution state"};
 	/** The row data list. **/
 	private List<TableEntry> entries;
 
@@ -45,7 +45,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int column) {
-		if (column == 5) {
+		if (column == 6) {
 			return Boolean.class;
 		}
 		return super.getColumnClass(column);		
@@ -95,7 +95,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		if (column == 5) 
+		if (column == 6) 
 			return true;
 		
 		return true;

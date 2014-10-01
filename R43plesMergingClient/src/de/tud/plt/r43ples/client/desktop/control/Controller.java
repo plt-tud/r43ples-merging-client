@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -38,7 +39,10 @@ import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ApplicationUI;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.NonEditableCellEditor;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCheckBoxRendererResolutionTriples;
 
 /**
  * The controller.
@@ -191,7 +195,16 @@ public class Controller {
 			
 			// Close dialog after execution and update UI
 			dialog.setVisible(false);
-			
+
+			// Set the cell renderer and editor
+			TableCellRendererResolutionTriples renderer = new TableCellRendererResolutionTriples();
+			NonEditableCellEditor editor = new NonEditableCellEditor(new JTextField());
+			for (int i = 0; i < ApplicationUI.getTableModelResolutionTriples().getColumnCount() - 1; i++) {
+				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
+				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellEditor(editor);
+			}
+			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCheckBoxRendererResolutionTriples());
+		
 			// Update application UI
 			updateDifferencesTree();
 			
@@ -268,16 +281,16 @@ public class Controller {
 	public static void updateTableResolutionTriples(HashMap<TreeNodeObject, TreePath> selectedElements) throws IOException {
 		// Remove the old rows
 		ApplicationUI.getTableModelResolutionTriples().removeAllElements();
-		
+		System.out.println("unsorted map: "+selectedElements);
+		selectedElements = (HashMap<TreeNodeObject, TreePath>) Management.sortMapByValue(selectedElements);
+		System.out.println("results: "+selectedElements);
 		for (TreeNodeObject nodeObject : selectedElements.keySet()) {
 			// Contains the row data
 			Object[] rowData = null;
 			if (nodeObject.getObject() != null) {
 				if (nodeObject.getObject().getClass().equals(DifferenceGroup.class)) {
 					// Difference group found
-					
-					//TODO
-					
+					// Currently do nothing
 				} else if (nodeObject.getObject().getClass().equals(Difference.class)) {
 					// Difference found
 					Difference difference = (Difference) nodeObject.getObject();
@@ -289,12 +302,19 @@ public class Controller {
 					TableEntry entry = new TableEntry(difference, nodeObject, selectedElements.get(nodeObject), rowData);
 					ApplicationUI.getTableModelResolutionTriples().addRow(entry);
 				}
-			}
-
-//			TableEntry entry = new TableEntry(difference, nodeObject, rowData);
-//			ApplicationUI.getTableModelResolutionTriples().addRow(entry);
-			
+			}		
 		}
+		//TODO
+//		// Sort rows
+//		ApplicationUI.getTableResolutionTriples().setAutoCreateRowSorter(true);
+//        // DefaultRowSorter has the sort() method
+//        DefaultRowSorter<?, ?> sorter = (DefaultRowSorter<?, ?>) ApplicationUI.getTableResolutionTriples().getRowSorter(); 
+//        ArrayList<SortKey> list = new ArrayList<SortKey>();
+//        list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
+//        sorter.setSortKeys(list);
+//        sorter.sort();
+		
+		
 		ApplicationUI.getTableResolutionTriples().updateUI();
 	}
 
@@ -315,7 +335,7 @@ public class Controller {
 			ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().setResolutionState(ResolutionState.RESOLVED);
 			((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setResolutionState(ResolutionState.RESOLVED);
 			// Propagate changes to difference model
-			Boolean checkBoxStateBool = (Boolean) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getRowData()[5];
+			Boolean checkBoxStateBool = (Boolean) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getRowData()[6];
 			if (checkBoxStateBool.booleanValue()) {
 				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setTripleResolutionState(SDDTripleStateEnum.ADDED);
 			} else {
@@ -380,10 +400,12 @@ public class Controller {
 		ReportDialog.getTfUser().setText(StartMergingDialog.getTfUser().getText());
 		ReportDialog.getTextAreaMessage().setText(StartMergingDialog.getTextAreaMessage().getText());
 		
-		// Set the cell renderer
+		// Set the cell renderer and editor
 		TableCellRendererSummaryReport renderer = new TableCellRendererSummaryReport();
+		NonEditableCellEditor editor = new NonEditableCellEditor(new JTextField());
 		for (int i = 0; i < ReportDialog.getTableModel().getColumnCount(); i++) {
 			ReportDialog.getTable().getColumnModel().getColumn(i).setCellRenderer(renderer);
+			ReportDialog.getTable().getColumnModel().getColumn(i).setCellEditor(editor);
 		}
 
 		// Create table content		

@@ -6,10 +6,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
@@ -398,7 +407,6 @@ public class Management {
 	    }
 	    
 	    logger.info("Difference model successfully read.");
-		
 	}
 	
 	
@@ -442,7 +450,6 @@ public class Management {
 	 * @return the SDD triple state
 	 */
 	public static SDDTripleStateEnum convertSDDStringToSDDTripleState(String state) {
-		
 		if (state.equals(SDDTripleStateEnum.ADDED.getSddRepresentation())) {
 			return SDDTripleStateEnum.ADDED;
 		} else if (state.equals(SDDTripleStateEnum.DELETED.getSddRepresentation())) {
@@ -454,7 +461,6 @@ public class Management {
 		} else {
 			return null;
 		}
-		
 	}
 	
 	
@@ -465,7 +471,6 @@ public class Management {
 	 * @return the string representation
 	 */
 	public static String tripleToString(Triple triple) {
-		
 		if (triple.getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
 			logger.debug(String.format("<%s> <%s> \"%s\"", triple.getSubject(), triple.getPredicate(), triple.getObject()));
 			return String.format("<%s> <%s> \"%s\"", triple.getSubject(), triple.getPredicate(), triple.getObject());
@@ -473,7 +478,6 @@ public class Management {
 			logger.debug(String.format("<%s> <%s> <%s>", triple.getSubject(), triple.getPredicate(), triple.getObject()));
 			return String.format("<%s> <%s> <%s>", triple.getSubject(), triple.getPredicate(), triple.getObject());
 		}
-		
 	}
 	
 	
@@ -487,7 +491,10 @@ public class Management {
 		
 		ArrayList<DifferenceGroup> result = new ArrayList<DifferenceGroup>();
 		
-		Iterator<String> iteDifferenceGroups = differenceModel.getDifferenceGroups().keySet().iterator();
+		// Sort by key
+		Map<String, DifferenceGroup> sortedMap = new TreeMap<String, DifferenceGroup>(differenceModel.getDifferenceGroups());
+		
+		Iterator<String> iteDifferenceGroups = sortedMap.keySet().iterator();
 		
 		while (iteDifferenceGroups.hasNext()) {
 			String currentkey = iteDifferenceGroups.next();
@@ -500,7 +507,6 @@ public class Management {
 		}
 		
 		return result;
-		
 	}
 	
 	
@@ -514,7 +520,10 @@ public class Management {
 		
 		ArrayList<DifferenceGroup> result = new ArrayList<DifferenceGroup>();
 		
-		Iterator<String> iteDifferenceGroups = differenceModel.getDifferenceGroups().keySet().iterator();
+		// Sort by key
+		Map<String, DifferenceGroup> sortedMap = new TreeMap<String, DifferenceGroup>(differenceModel.getDifferenceGroups());
+		
+		Iterator<String> iteDifferenceGroups = sortedMap.keySet().iterator();
 		
 		while (iteDifferenceGroups.hasNext()) {
 			String currentkey = iteDifferenceGroups.next();
@@ -526,7 +535,6 @@ public class Management {
 		}
 		
 		return result;
-		
 	}
 	
 	
@@ -553,7 +561,9 @@ public class Management {
 			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.CONFLICT, differenceGroup));
 			
 			// Add all differences
-			Iterator<Difference> iteDifferences = differenceGroup.getDifferences().values().iterator();
+			// Sort by key
+			Map<String, Difference> sortedMap = new TreeMap<String, Difference>(differenceGroup.getDifferences());
+			Iterator<Difference> iteDifferences = sortedMap.values().iterator();
 			while (iteDifferences.hasNext()) {
 				Difference difference = iteDifferences.next();
 				
@@ -579,7 +589,9 @@ public class Management {
 			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.DIFFERENCE, differenceGroup));
 			
 			// Add all differences
-			Iterator<Difference> iteDifferences = differenceGroup.getDifferences().values().iterator();
+			// Sort by key
+			Map<String, Difference> sortedMap = new TreeMap<String, Difference>(differenceGroup.getDifferences());
+			Iterator<Difference> iteDifferences = sortedMap.values().iterator();
 			while (iteDifferences.hasNext()) {
 				Difference difference = iteDifferences.next();
 				
@@ -596,7 +608,6 @@ public class Management {
 		refreshParentNodeStateDifferencesTree(root);
 		
 		return root;
-		
 	}
 	
 	
@@ -621,7 +632,6 @@ public class Management {
 		} else {
 			return ((TreeNodeObject) rootNode.getUserObject()).getResolutionState();
 		}
-		
 	}
 	
 	
@@ -657,7 +667,6 @@ public class Management {
 		}
 				
 		return null;
-		
 	}
 
 
@@ -669,34 +678,36 @@ public class Management {
 	 * @throws IOException 
 	 */
 	public static Object[] createRowDataResolutionTriples(Difference difference, DifferenceGroup differenceGroup) throws IOException {
-		Object[] rowData = new Object[6];
-		rowData[0] = "<" + difference.getTriple().getSubject() + ">";
-		rowData[1] = "<" + difference.getTriple().getPredicate() + ">";
-		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-			rowData[2] = "\"" + difference.getTriple().getObject() + "\"";
-		} else {
-			rowData[2] = "<" + difference.getTriple().getObject() + ">";
-		}
-			
+		Object[] rowData = new Object[7];
+		
+		rowData[0] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
+		
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[2] = differenceGroup.getTripleStateB();
 		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[1] = differenceGroup.getTripleStateA();
+			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[1] = differenceGroup.getTripleStateA();
+			rowData[2] = differenceGroup.getTripleStateB();
+		}
+		
+		rowData[3] = "<" + difference.getTriple().getSubject() + ">";
+		rowData[4] = "<" + difference.getTriple().getPredicate() + ">";
+		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
+			rowData[5] = "\"" + difference.getTriple().getObject() + "\"";
+		} else {
+			rowData[5] = "<" + difference.getTriple().getObject() + ">";
 		}
 
-		rowData[5] = difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED);
+		rowData[6] = difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED);
 		
 		return rowData;
-		
 	}
 	
 	
@@ -881,9 +892,7 @@ public class Management {
 		rowData[8] = Boolean.toString(difference.getResolutionState().equals(ResolutionState.RESOLVED)).toUpperCase();
 		
 		return rowData;
-
 	}
-	
 	
 	
 	/**
@@ -960,7 +969,6 @@ public class Management {
 		}
 		
 		return result;
-				
 	}
 	
 
@@ -1167,6 +1175,49 @@ public class Management {
 		String graphNameHeader = getHeaderGraphName(graphName);
 		
 		return response.getHeaderParameterByName(String.format(identifier, graphNameHeader)).get(0);
+	}
+	
+	
+	/**
+	 * Sort the tree node object - tree path map by tree path.
+	 * 
+	 * @param map the map to sort
+	 * @return the sorted map
+	 */
+	public static HashMap<TreeNodeObject, TreePath> sortMapByValue(Map<TreeNodeObject, TreePath> map) {
+		List<Map.Entry<TreeNodeObject, TreePath>> list = new LinkedList<Map.Entry<TreeNodeObject, TreePath>>(map.entrySet());
+		Collections.sort(list, new Comparator<Map.Entry<TreeNodeObject, TreePath>>() {
+			
+			/* (non-Javadoc)
+			 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+			 */
+			public int compare(Map.Entry<TreeNodeObject, TreePath> o1, Map.Entry<TreeNodeObject, TreePath> o2) {
+				return (treePathToString(o1.getValue())).compareTo(treePathToString(o2.getValue()));
+			}
+		});
+		
+		HashMap<TreeNodeObject, TreePath> result = new LinkedHashMap<TreeNodeObject, TreePath>();
+		for (Map.Entry<TreeNodeObject, TreePath> entry : list) {
+			result.put(entry.getKey(), entry.getValue());
+		}
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Get the string representation of a tree path.
+	 * 
+	 * @param treePath the tree path
+	 * @return the string representation
+	 */
+	public static String treePathToString(TreePath treePath) {
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < treePath.getPath().length; i++) {
+			TreeNodeObject treeNodeObject = (TreeNodeObject) ((DefaultMutableTreeNode) treePath.getPathComponent(i)).getUserObject();
+			sb.append("|").append(treeNodeObject.getText());
+		}
+		return sb.toString();
 	}
 
 }
