@@ -122,7 +122,7 @@ public class Difference {
 	/**
 	 * Set the referenced revision in B.
 	 * 
-	 * @param referencedRevisionA the referenced revision in B
+	 * @param referencedRevisionB the referenced revision in B
 	 */
 	public void setReferencedRevisionB(String referencedRevisionB) {
 		this.referencedRevisionB = referencedRevisionB;

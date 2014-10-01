@@ -1,0 +1,9 @@
+de.tud.plt.r43ples.client.desktop.control
+de.tud.plt.r43ples.client.desktop.control.enums
+de.tud.plt.r43ples.client.desktop.model.structure
+de.tud.plt.r43ples.client.desktop.model.table
+de.tud.plt.r43ples.client.desktop.model.tree
+de.tud.plt.r43ples.client.desktop.ui
+de.tud.plt.r43ples.client.desktop.ui.dialog
+de.tud.plt.r43ples.client.desktop.ui.renderer.table
+de.tud.plt.r43ples.client.desktop.ui.renderer.tree

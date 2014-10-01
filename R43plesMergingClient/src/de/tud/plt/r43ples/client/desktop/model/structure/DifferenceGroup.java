@@ -74,7 +74,7 @@ public class DifferenceGroup {
 	/**
 	 * Set the triple state of B.
 	 * 
-	 * @param tripleStateA the triple state in B
+	 * @param tripleStateB the triple state in B
 	 */
 	public void setTripleStateB(SDDTripleStateEnum tripleStateB) {
 		this.tripleStateB = tripleStateB;
@@ -145,7 +145,7 @@ public class DifferenceGroup {
 	 * Add a difference. If the difference identifier already exists the old difference will be overwritten.
 	 * 
 	 * @param identifier the identifier
-	 * @param differences the difference
+	 * @param difference the difference
 	 */
 	public void addDifference(String identifier, Difference difference) {
 		this.differences.put(identifier, difference);

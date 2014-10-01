@@ -248,7 +248,6 @@ public class Management {
 	 * 
 	 * @param differenceModelToRead the difference model to read
 	 * @param differenceModel the difference model where the result should be stored
-	 * @return the difference model in java representation
 	 * @throws IOException 
 	 */
 	public static void readDifferenceModel(String differenceModelToRead, DifferenceModel differenceModel) throws IOException {
