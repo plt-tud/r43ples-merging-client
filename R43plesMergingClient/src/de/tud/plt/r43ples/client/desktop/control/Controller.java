@@ -74,6 +74,8 @@ public class Controller {
 	private static String highlightedNodeNameB = null;
 	/** The report result. **/
 	private static ReportResult reportResult = null;
+	/** The update table flag. Recursively used for updating the table. **/
+	private static boolean updateTableFlag = false;
 	
 	
 	/**
@@ -224,8 +226,6 @@ public class Controller {
 		
 	}
 
-	
-	private static boolean updateTableFlag = false;
 
 	/**
 	 * Selection of differences tree was changed.
@@ -303,17 +303,7 @@ public class Controller {
 					ApplicationUI.getTableModelResolutionTriples().addRow(entry);
 				}
 			}		
-		}
-		//TODO
-//		// Sort rows
-//		ApplicationUI.getTableResolutionTriples().setAutoCreateRowSorter(true);
-//        // DefaultRowSorter has the sort() method
-//        DefaultRowSorter<?, ?> sorter = (DefaultRowSorter<?, ?>) ApplicationUI.getTableResolutionTriples().getRowSorter(); 
-//        ArrayList<SortKey> list = new ArrayList<SortKey>();
-//        list.add(new RowSorter.SortKey(5, SortOrder.ASCENDING));
-//        sorter.setSortKeys(list);
-//        sorter.sort();
-		
+		}	
 		
 		ApplicationUI.getTableResolutionTriples().updateUI();
 	}
@@ -358,34 +348,6 @@ public class Controller {
 		
 		ApplicationUI.getTreeDifferencesDivision().updateUI();
 	}
-		
-	
-//	TODO Maybe it is better to use a check box tree and not use selection of nodes
-//	/**
-//	 * Deselect approved entries of differences tree.
-//	 * 
-//	 * @throws IOException 
-//	 */
-//	public static void deselectApprovedEntriesOfDifferencesTree(List<Triple> tripleList) throws IOException {
-//		
-//		// Array list which stores all selected tree node objects
-//		ArrayList<TreeNodeObject> list = new ArrayList<TreeNodeObject>();
-//		
-//		// Get the selected nodes
-//		TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
-//		if (treePaths != null) {
-//			for (TreePath treePath : treePaths) {
-//				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
-//				TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
-//				if (tripleList.contains(treeNodeObject.ge)
-//				list.add(treeNodeObject);
-//			}
-//		}
-//		
-//		// Update the triple table
-//		updateTableResolutionTriples(list);
-//		
-//	}
 	
 	
 	/**
