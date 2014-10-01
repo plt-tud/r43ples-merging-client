@@ -34,10 +34,6 @@ import javax.swing.JTextArea;
  * @author Stephan Hensel
  *
  */
-/**
- * @author Stephan Hensel
- *
- */
 public class StartMergingDialog extends JDialog {
 
 	/** The default serial version UID. **/
@@ -56,7 +52,6 @@ public class StartMergingDialog extends JDialog {
 	private static JTextField tfUser;
 	/** The commit message text area. **/
 	private static JTextArea textAreaMessage;
-	
 	
 	/** The combo box model of the graph names. **/
 	private static DefaultComboBoxModel<String> cBModelGraph = new DefaultComboBoxModel<String>();
@@ -209,20 +204,30 @@ public class StartMergingDialog extends JDialog {
 	}
 	
 	
+	/**
+	 * Get the graph combo box model.
+	 * 
+	 * @return the graph combo box model 
+	 */
 	public static DefaultComboBoxModel<String> getcBModelGraph() {
 		return cBModelGraph;
 	}
 
 
-
+	/**
+	 * Set the model of graph combo box.
+	 * 
+	 * @param cBModelGraph the model of graph combo box 
+	 */
 	public static void setcBModelGraph(DefaultComboBoxModel<String> cBModelGraph) {
 		StartMergingDialog.cBModelGraph = cBModelGraph;
 	}
 
 
-
 	/**
-	 * @return the cBModelSDD
+	 * Get the SDD combo box model.
+	 * 
+	 * @return the SDD combo box model
 	 */
 	public static DefaultComboBoxModel<String> getcBModelSDD() {
 		return cBModelSDD;
@@ -230,82 +235,152 @@ public class StartMergingDialog extends JDialog {
 
 
 	/**
-	 * @param cBModelSDD the cBModelSDD to set
+	 * Set the SDD combo box model.
+	 * 
+	 * @param cBModelSDD the SDD combo box model
 	 */
 	public static void setcBModelSDD(DefaultComboBoxModel<String> cBModelSDD) {
 		StartMergingDialog.cBModelSDD = cBModelSDD;
 	}
 
 
+	/**
+	 * Get the revision A combo box model.
+	 * 
+	 * @return the revision A combo box model
+	 */
 	public static DefaultComboBoxModel<String> getcBModelRevisionA() {
 		return cBModelRevisionA;
 	}
 
 
-
+	/**
+	 * Set the revision A combo box model.
+	 * 
+	 * @param cBModelRevisionA the revision A combo box model
+	 */
 	public static void setcBModelRevisionA(DefaultComboBoxModel<String> cBModelRevisionA) {
 		StartMergingDialog.cBModelRevisionA = cBModelRevisionA;
 	}
 
 
-
+	/**
+	 * Get the revision B combo box model.
+	 * 
+	 * @return the revision B combo box model
+	 */
 	public static DefaultComboBoxModel<String> getcBModelRevisionB() {
 		return cBModelRevisionB;
 	}
 
 
-
+	/**
+	 * Set the revision B combo box model.
+	 * 
+	 * @param cBModelRevisionB the revision B combo box model
+	 */
 	public static void setcBModelRevisionB(DefaultComboBoxModel<String> cBModelRevisionB) {
 		StartMergingDialog.cBModelRevisionB = cBModelRevisionB;
 	}
 
 
+	/**
+	 * Get the merging method AUTO radio button.
+	 * 
+	 * @return the merging method AUTO radio button
+	 */
 	public static JRadioButton getRdbtnMergingMethodAUTO() {
 		return rdbtnMergingMethodAUTO;
 	}
 
 
+	/**
+	 * Set the merging method AUTO radio button.
+	 * 
+	 * @param rdbtnMergingMethodAUTO the merging method AUTO radio button
+	 */
 	public static void setRdbtnMergingMethodAUTO(JRadioButton rdbtnMergingMethodAUTO) {
 		StartMergingDialog.rdbtnMergingMethodAUTO = rdbtnMergingMethodAUTO;
 	}
 
 
+	/**
+	 * Get the merging method MANUAL radio button.
+	 * 
+	 * @return the merging method MANUAL radio button
+	 */
 	public static JRadioButton getRdbtnMergingMethodMANUAL() {
 		return rdbtnMergingMethodMANUAL;
 	}
 
 
+	/**
+	 * Set the merging method MANUAL radio button.
+	 * 
+	 * @param rdbtnMergingMethodMANUAL the merging method MANUAL radio button
+	 */
 	public static void setRdbtnMergingMethodMANUAL(JRadioButton rdbtnMergingMethodMANUAL) {
 		StartMergingDialog.rdbtnMergingMethodMANUAL = rdbtnMergingMethodMANUAL;
 	}
 
 
+	/**
+	 * Get the merging method COMMON radio button.
+	 * 
+	 * @return the merging method COMMON radio button
+	 */
 	public static JRadioButton getRdbtnMergingMethodCOMMON() {
 		return rdbtnMergingMethodCOMMON;
 	}
 
 
+	/**
+	 * Set the merging method COMMON radio button.
+	 * 
+	 * @param rdbtnMergingMethodCOMMON the merging method COMMON radio button
+	 */
 	public static void setRdbtnMergingMethodCOMMON(JRadioButton rdbtnMergingMethodCOMMON) {
 		StartMergingDialog.rdbtnMergingMethodCOMMON = rdbtnMergingMethodCOMMON;
 	}
 
 
+	/**
+	 * Get the user text field.
+	 * 
+	 * @return the user text field
+	 */
 	public static JTextField getTfUser() {
 		return tfUser;
 	}
 
 
+	/**
+	 * Set the user text field.
+	 * 
+	 * @param tfUser the user text field
+	 */
 	public static void setTfUser(JTextField tfUser) {
 		StartMergingDialog.tfUser = tfUser;
 	}
 
 
+	/**
+	 * Get the message text area.
+	 * 
+	 * @return the message text area
+	 */
 	public static JTextArea getTextAreaMessage() {
 		return textAreaMessage;
 	}
 
 
+	/**
+	 * Set the message text area.
+	 * 
+	 * @param textAreaMessage the message text area
+	 */
 	public static void setTextAreaMessage(JTextArea textAreaMessage) {
 		StartMergingDialog.textAreaMessage = textAreaMessage;
 	}
+	
 }

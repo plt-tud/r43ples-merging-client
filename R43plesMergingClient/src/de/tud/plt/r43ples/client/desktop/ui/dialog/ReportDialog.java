@@ -185,7 +185,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the tfGraph
+	 * Get the graph text field.
+	 * 
+	 * @return the graph text field
 	 */
 	public static JTextField getTfGraph() {
 		return tfGraph;
@@ -193,7 +195,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param tfGraph the tfGraph to set
+	 * Set the graph text field.
+	 * 
+	 * @param tfGraph the graph text field to set
 	 */
 	public static void setTfGraph(JTextField tfGraph) {
 		ReportDialog.tfGraph = tfGraph;
@@ -201,7 +205,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the tfSDD
+	 * Get the SDD text field.
+	 * 
+	 * @return the SDD text field
 	 */
 	public static JTextField getTfSDD() {
 		return tfSDD;
@@ -209,7 +215,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param tfSDD the tfSDD to set
+	 * Set the SDD text field.
+	 * 
+	 * @param tfSDD the SDD text field to set
 	 */
 	public static void setTfSDD(JTextField tfSDD) {
 		ReportDialog.tfSDD = tfSDD;
@@ -217,7 +225,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the tfRevisionA
+	 * Get the revision A text field.
+	 * 
+	 * @return the revision A text field
 	 */
 	public static JTextField getTfRevisionA() {
 		return tfRevisionA;
@@ -225,7 +235,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param tfRevisionA the tfRevisionA to set
+	 * Set the revision A text field.
+	 * 
+	 * @param tfRevisionA the revision A text field to set
 	 */
 	public static void setTfRevisionA(JTextField tfRevisionA) {
 		ReportDialog.tfRevisionA = tfRevisionA;
@@ -233,7 +245,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the tfRevisionB
+	 * Get the revision B text field.
+	 * 
+	 * @return the revision B text field
 	 */
 	public static JTextField getTfRevisionB() {
 		return tfRevisionB;
@@ -241,7 +255,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param tfRevisionB the tfRevisionB to set
+	 * Set the revision B text field.
+	 * 
+	 * @param tfRevisionB the revision B text field to set
 	 */
 	public static void setTfRevisionB(JTextField tfRevisionB) {
 		ReportDialog.tfRevisionB = tfRevisionB;
@@ -249,7 +265,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the tfUser
+	 * Get the user text field.
+	 * 
+	 * @return the user text field
 	 */
 	public static JTextField getTfUser() {
 		return tfUser;
@@ -257,7 +275,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param tfUser the tfUser to set
+	 * Set the user text field.
+	 * 
+	 * @param tfUser the user text field to set
 	 */
 	public static void setTfUser(JTextField tfUser) {
 		ReportDialog.tfUser = tfUser;
@@ -265,7 +285,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the textAreaMessage
+	 * Get the message text area.
+	 * 
+	 * @return the message text area
 	 */
 	public static JTextArea getTextAreaMessage() {
 		return textAreaMessage;
@@ -273,7 +295,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param textAreaMessage the textAreaMessage to set
+	 * Set the message text area.
+	 * 
+	 * @param textAreaMessage the message text area to set
 	 */
 	public static void setTextAreaMessage(JTextArea textAreaMessage) {
 		ReportDialog.textAreaMessage = textAreaMessage;
@@ -281,6 +305,8 @@ public class ReportDialog extends JDialog {
 
 
 	/**
+	 * Get the table.
+	 * 
 	 * @return the table
 	 */
 	public static JTable getTable() {
@@ -289,6 +315,8 @@ public class ReportDialog extends JDialog {
 
 
 	/**
+	 * Set the table.
+	 * 
 	 * @param table the table to set
 	 */
 	public static void setTable(JTable table) {
@@ -297,7 +325,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the tableModel
+	 * Get the table model.
+	 * 
+	 * @return the table model
 	 */
 	public static TableModelSummaryReport getTableModel() {
 		return tableModel;
@@ -305,7 +335,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param tableModel the tableModel to set
+	 * Set the table model.
+	 * 
+	 * @param tableModel the table model to set
 	 */
 	public static void setTableModel(TableModelSummaryReport tableModel) {
 		ReportDialog.tableModel = tableModel;
@@ -313,7 +345,9 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @return the okButton
+	 * Get the OK button.
+	 * 
+	 * @return the OK button
 	 */
 	public static JButton getOkButton() {
 		return okButton;
@@ -321,9 +355,12 @@ public class ReportDialog extends JDialog {
 
 
 	/**
-	 * @param okButton the okButton to set
+	 * Set the OK button.
+	 * 
+	 * @param okButton the OK button to set
 	 */
 	public static void setOkButton(JButton okButton) {
 		ReportDialog.okButton = okButton;
 	}
+	
 }
