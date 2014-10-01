@@ -29,8 +29,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.apache.jena.atlas.web.HttpException;
-
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelResolutionTriples;
@@ -120,9 +118,6 @@ public class ApplicationUI {
 		});
 		toolBar.add(btnNewMerge);
 		
-		JButton btnAutoResolve = new JButton("AUTO Resolve");
-		toolBar.add(btnAutoResolve);
-		
 		JButton btnPush = new JButton("Push");
 		btnPush.addActionListener(new ActionListener() {
 			
@@ -134,26 +129,6 @@ public class ApplicationUI {
 			}
 		});
 		toolBar.add(btnPush);
-		
-		JButton btGraph = new JButton("Graph");
-		btGraph.addActionListener(new ActionListener() {
-			
-			/* (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					Controller.createGraph("http://exampleGraph");
-				} catch (HttpException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
-		toolBar.add(btGraph);
 		
 		JSplitPane splitPaneApplication = new JSplitPane();
 		splitPaneApplication.setResizeWeight(0.3);
@@ -323,49 +298,89 @@ public class ApplicationUI {
 	}
 
 
+	/**
+	 * Get the tree differences division.
+	 * 
+	 * @return get the tree differences division
+	 */
 	public static JTree getTreeDifferencesDivision() {
 		return treeDifferencesDivision;
 	}
 
 
+	/**
+	 * Set the tree differences division.
+	 * 
+	 * @param treeDifferencesDivision the tree differences division
+	 */
 	public static void setTreeDifferencesDivision(JTree treeDifferencesDivision) {
 		ApplicationUI.treeDifferencesDivision = treeDifferencesDivision;
 	}
 
 
+	/**
+	 * Get the tree model differences division.
+	 * 
+	 * @return the tree model differences division
+	 */
 	public static DefaultTreeModel getTreeModelDifferencesDivision() {
 		return treeModelDifferencesDivision;
 	}
 
 
-	public static void setTreeModelDifferencesDivision(
-			DefaultTreeModel treeModelDifferencesDivision) {
+	/**
+	 * Set the tree model differences division.
+	 * 
+	 * @param treeModelDifferencesDivision the tree model differences division
+	 */
+	public static void setTreeModelDifferencesDivision(DefaultTreeModel treeModelDifferencesDivision) {
 		ApplicationUI.treeModelDifferencesDivision = treeModelDifferencesDivision;
 	}
 
 
+	/**
+	 * Get the table resolution triples.
+	 * 
+	 * @return the table resolution triples
+	 */
 	public static JTable getTableResolutionTriples() {
 		return tableResolutionTriples;
 	}
 
 
+	/**
+	 * Set the table resolution triples.
+	 * 
+	 * @param tableResolutionTriples the table resolution triples
+	 */
 	public static void setTableResolutionTriples(JTable tableResolutionTriples) {
 		ApplicationUI.tableResolutionTriples = tableResolutionTriples;
 	}
 
 
+	/**
+	 * Get the table model resolution triples.
+	 * 
+	 * @return the table model resolution triples
+	 */
 	public static TableModelResolutionTriples getTableModelResolutionTriples() {
 		return tableModelResolutionTriples;
 	}
 
 
-	public static void setTableModelResolutionTriples(
-			TableModelResolutionTriples tableModelResolutionTriples) {
+	/**
+	 * Set the table model resolution triples.
+	 * 
+	 * @param tableModelResolutionTriples the table model resolution triples
+	 */
+	public static void setTableModelResolutionTriples(TableModelResolutionTriples tableModelResolutionTriples) {
 		ApplicationUI.tableModelResolutionTriples = tableModelResolutionTriples;
 	}
 
 
 	/**
+	 * Get the graph scroll pane.
+	 * 
 	 * @return the scrollPaneGraph
 	 */
 	public static JScrollPane getScrollPaneGraph() {
@@ -374,6 +389,8 @@ public class ApplicationUI {
 
 
 	/**
+	 * Set the graph scroll pane.
+	 * 
 	 * @param scrollPaneGraph the scrollPaneGraph to set
 	 */
 	public static void setScrollPaneGraph(JScrollPane scrollPaneGraph) {
@@ -382,6 +399,8 @@ public class ApplicationUI {
 
 
 	/**
+	 * Get the graph panel.
+	 * 
 	 * @return the panelGraph
 	 */
 	public static JPanel getPanelGraph() {
@@ -390,6 +409,8 @@ public class ApplicationUI {
 
 
 	/**
+	 * Set the graph panel.
+	 * 
 	 * @param panelGraph the panelGraph to set
 	 */
 	public static void setPanelGraph(JPanel panelGraph) {
