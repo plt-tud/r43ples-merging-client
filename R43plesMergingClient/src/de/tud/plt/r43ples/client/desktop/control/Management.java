@@ -992,9 +992,9 @@ public class Management {
 						triple += "<" + difference.getTriple().getSubject() + "> ";
 						triple += "<" + difference.getTriple().getPredicate() + "> ";
 						if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-							triple += "\"" + difference.getTriple().getObject() + "\"";
+							triple += "\"" + difference.getTriple().getObject() + "\" .";
 						} else {
-							triple += "<" + difference.getTriple().getObject() + ">";
+							triple += "<" + difference.getTriple().getObject() + "> .";
 						}
 						triples += triple + "\n";
 					}

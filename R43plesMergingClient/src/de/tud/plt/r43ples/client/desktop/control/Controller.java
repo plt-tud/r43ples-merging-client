@@ -176,19 +176,20 @@ public class Controller {
 				// Save the current revision numbers
 				revisionNumberBranchA = Management.getRevisionNumberOfBranchAHeaderParameter(response, graphName);
 				revisionNumberBranchB = Management.getRevisionNumberOfBranchBHeaderParameter(response, graphName);
-				// TODO
+				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				// There was no conflict merged revision was created
 				logger.info("Merge query produced no conflicts. Merged revision was created.");
-				//TODO
+				// Create an empty difference model
+				differenceModel = new DifferenceModel();
+				String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
+				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				// Error occurred
-				// TODO
+				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Undefined error occurred", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
-			
-			// TODO close dialog after execution + error handling
-			
+			// Close dialog after execution and update UI
 			dialog.setVisible(false);
 			
 			// Update application UI
@@ -196,7 +197,6 @@ public class Controller {
 			
 			// Create the revision graph
 			createGraph(graphName);
-			
 		}
 	}
 	
@@ -637,11 +637,19 @@ public class Controller {
 					response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
 				}
 				
+				report.setVisible(false);
+				
 				// Show message dialog
 				if ((response != null) && (response.getStatusCode() == HttpURLConnection.HTTP_CREATED)) {
 					logger.info("Merge query successfully executed.");
 					String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
 					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
+					// Create empty difference model
+					differenceModel = new DifferenceModel();
+					// Update application UI
+					updateDifferencesTree();
+					// Create the revision graph
+					createGraph(graphName);
 				} else {
 					logger.error("Merge query could not be executed.");
 					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Maybe another user committed changes to one of the branches to merge.", "Error", JOptionPane.ERROR_MESSAGE);
