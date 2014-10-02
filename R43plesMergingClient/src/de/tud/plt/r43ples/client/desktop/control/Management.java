@@ -1218,5 +1218,40 @@ public class Management {
 		}
 		return sb.toString();
 	}
+	
+	
+	/**
+	 * Get all classes of specified revision.
+	 * 
+	 * @return the array list of class URIs
+	 * @throws IOException 
+	 */
+	public static ArrayList<String> getAllClassesOfRevision(String graphName, String revisionName) throws IOException {
+		logger.info("Get all classes of revision.");
+		
+		// Result array list
+		ArrayList<String> list = new ArrayList<String>();
+		
+    	// Query all classes
+		String query = prefixes + String.format(
+				  "SELECT ?classUri %n"
+				+ "FROM <%s> REVISION \"%s\" %n"
+				+ "WHERE { %n"
+				+ "	?classUri a ?class . %n"
+				+ "}", graphName, revisionName);
+		logger.debug(query);
+		
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		logger.debug(result);
+		
+		// Iterate over all classes
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		while (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			list.add(qs.getResource("?classUri").toString());
+		}
+
+		return list;
+	}
 
 }
