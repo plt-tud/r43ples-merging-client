@@ -23,7 +23,7 @@ public class Difference {
 	private String referencedRevisionLabelB;
 	/** The triple resolution state. **/
 	private SDDTripleStateEnum tripleResolutionState;
-	/** The resolution state of this differenced. **/
+	/** The resolution state of this difference. **/
 	private ResolutionState resolutionState;
 	
 	

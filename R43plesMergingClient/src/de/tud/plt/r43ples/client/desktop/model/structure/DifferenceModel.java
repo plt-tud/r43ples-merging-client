@@ -10,7 +10,7 @@ import java.util.HashMap;
  */
 public class DifferenceModel {
 
-	/** The array list which contains all difference groups. **/
+	/** The hash map which contains all difference groups. **/
 	private HashMap<String, DifferenceGroup> differenceGroups;
 	
 	

@@ -29,6 +29,7 @@ import com.hp.hpl.jena.update.UpdateAction;
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
+import de.tud.plt.r43ples.client.desktop.model.structure.ClassModel;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
@@ -61,7 +62,11 @@ public class Controller {
 	/** The revision number of the branch B. **/
 	private static String revisionNumberBranchB;
 	/** The difference model. **/
-	private static DifferenceModel differenceModel = new DifferenceModel();;
+	private static DifferenceModel differenceModel = new DifferenceModel();
+	/** The class model of branch A. **/
+	private static ClassModel classModelBranchA;
+	/** The class model of branch B. **/
+	private static ClassModel classModelBranchB;
 	/** The summary report dialog instance. **/
 	private static ReportDialog report = new ReportDialog();
 	/** The grappa graph which contains the revision tree. **/
@@ -182,6 +187,11 @@ public class Controller {
 				// Save the current revision numbers
 				revisionNumberBranchA = Management.getRevisionNumberOfBranchAHeaderParameter(response, graphName);
 				revisionNumberBranchB = Management.getRevisionNumberOfBranchBHeaderParameter(response, graphName);
+				
+				// Create the class models of both branches
+				classModelBranchA = Management.createClassModelOfRevision(graphName, branchNameA);
+				classModelBranchB = Management.createClassModelOfRevision(graphName, branchNameB);
+				
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				// There was no conflict merged revision was created

@@ -45,6 +45,8 @@ import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.TripleObjectTypeEnum;
+import de.tud.plt.r43ples.client.desktop.model.structure.ClassModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.ClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
@@ -1223,6 +1225,8 @@ public class Management {
 	/**
 	 * Get all classes of specified revision.
 	 * 
+	 * @param graphName the graph name
+	 * @param revisionName the revision name
 	 * @return the array list of class URIs
 	 * @throws IOException 
 	 */
@@ -1238,7 +1242,8 @@ public class Management {
 				+ "FROM <%s> REVISION \"%s\" %n"
 				+ "WHERE { %n"
 				+ "	?classUri a ?class . %n"
-				+ "}", graphName, revisionName);
+				+ "} %n"
+				+ "ORDER BY ?classUri", graphName, revisionName);
 		logger.debug(query);
 		
 		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
@@ -1252,6 +1257,86 @@ public class Management {
 		}
 
 		return list;
+	}
+	
+	
+	/**
+	 * Get all corresponding triples of specified class.
+	 * 
+	 * @param graphName the graph name
+	 * @param revisionName the revision name
+	 * @param classUri the class URI
+	 * @return the hash map of triples
+	 * @throws IOException 
+	 */
+	public static HashMap<String, Triple> getAllTriplesOfClass(String graphName, String revisionName, String classUri) throws IOException {
+		logger.info("Get all corresponding triples of specified class.");
+		
+		// Result hash map
+		HashMap<String, Triple> list = new HashMap<String, Triple>();
+		
+    	// Query all classes
+		String query = prefixes + String.format(
+				  "SELECT ?predicate ?object %n"
+				+ "FROM <%s> REVISION \"%s\" %n"
+				+ "WHERE { %n"
+				+ "	<%s> ?predicate ?object . %n"
+				+ "}"
+				+ "ORDER BY ?predicate", graphName, revisionName); //TODO order by object
+		logger.debug(query);
+		
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		logger.debug(result);
+		
+		// Iterate over all classes
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		while (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			
+	    	String predicate = qs.getResource("?predicate").toString();
+    	
+	    	// Differ between literal and resource
+			String object = "";
+			TripleObjectTypeEnum objectType = null;
+			if (qs.get("?object").isLiteral()) {
+				object = qs.getLiteral("?object").toString();
+				objectType = TripleObjectTypeEnum.LITERAL;
+			} else {
+				object = qs.getResource("?object").toString();
+				objectType = TripleObjectTypeEnum.RESOURCE;
+			}
+	    	
+			Triple triple = new Triple(classUri, predicate, object, objectType); 
+	    	list.put(tripleToString(triple), triple);
+		}
+
+		return list;
+	}
+	
+	
+	/**
+	 * Create the class model of specified revision.
+	 * 
+	 * @param graphName the graph name
+	 * @param revisionName the revision name
+	 * @return the class model
+	 * @throws IOException 
+	 */
+	public static ClassModel createClassModelOfRevision(String graphName, String revisionName) throws IOException {
+		ClassModel classModel = new ClassModel();
+		
+		ArrayList<String> classURIs = getAllClassesOfRevision(graphName, revisionName);
+		
+		Iterator<String> iteClassURIs = classURIs.iterator();
+		while (iteClassURIs.hasNext()) {
+			String currentClassUri = iteClassURIs.next();
+			HashMap<String, Triple> currentTriples = getAllTriplesOfClass(graphName, revisionName, currentClassUri);
+			ClassStructure currentClassStructure = new ClassStructure();
+			currentClassStructure.setTriples(currentTriples);
+			classModel.addClassStructure(currentClassUri, currentClassStructure);
+		}
+		
+		return classModel;
 	}
 
 }
