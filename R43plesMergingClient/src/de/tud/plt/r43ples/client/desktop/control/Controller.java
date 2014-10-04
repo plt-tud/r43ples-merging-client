@@ -11,7 +11,6 @@ import java.util.Iterator;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
@@ -30,17 +29,19 @@ import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.structure.ClassModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.ClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
 import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentAllClasses;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ApplicationUI;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
-import de.tud.plt.r43ples.client.desktop.ui.renderer.table.NonEditableCellEditor;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCheckBoxRendererResolutionTriples;
@@ -208,12 +209,10 @@ public class Controller {
 			// Close dialog after execution and update UI
 			dialog.setVisible(false);
 
-			// Set the cell renderer and editor
+			// Set the cell renderer
 			TableCellRendererResolutionTriples renderer = new TableCellRendererResolutionTriples();
-			NonEditableCellEditor editor = new NonEditableCellEditor(new JTextField());
 			for (int i = 0; i < ApplicationUI.getTableModelResolutionTriples().getColumnCount() - 1; i++) {
 				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
-				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellEditor(editor);
 			}
 			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCheckBoxRendererResolutionTriples());
 		
@@ -222,6 +221,9 @@ public class Controller {
 			
 			// Create the revision graph
 			createGraph(graphName);
+			
+			// Update the semantic enrichment
+			updateTableModelSemanticEnrichmentAllClasses();
 		}
 	}
 	
@@ -291,9 +293,9 @@ public class Controller {
 	public static void updateTableResolutionTriples(HashMap<TreeNodeObject, TreePath> selectedElements) throws IOException {
 		// Remove the old rows
 		ApplicationUI.getTableModelResolutionTriples().removeAllElements();
-		System.out.println("unsorted map: "+selectedElements);
+		logger.debug("unsorted map: " + selectedElements);
 		selectedElements = (HashMap<TreeNodeObject, TreePath>) Management.sortMapByValue(selectedElements);
-		System.out.println("results: "+selectedElements);
+		logger.debug("sorted map: " + selectedElements);
 		for (TreeNodeObject nodeObject : selectedElements.keySet()) {
 			// Contains the row data
 			Object[] rowData = null;
@@ -372,12 +374,10 @@ public class Controller {
 		ReportDialog.getTfUser().setText(StartMergingDialog.getTfUser().getText());
 		ReportDialog.getTextAreaMessage().setText(StartMergingDialog.getTextAreaMessage().getText());
 		
-		// Set the cell renderer and editor
+		// Set the cell renderer
 		TableCellRendererSummaryReport renderer = new TableCellRendererSummaryReport();
-		NonEditableCellEditor editor = new NonEditableCellEditor(new JTextField());
 		for (int i = 0; i < ReportDialog.getTableModel().getColumnCount(); i++) {
 			ReportDialog.getTable().getColumnModel().getColumn(i).setCellRenderer(renderer);
-			ReportDialog.getTable().getColumnModel().getColumn(i).setCellEditor(editor);
 		}
 
 		// Create table content		
@@ -660,6 +660,55 @@ public class Controller {
 		if (ApplicationUI.getTableModelResolutionTriples().getRowCount() > 0) {
 			ApplicationUI.getTableResolutionTriples().setRowSelectionInterval(0, ApplicationUI.getTableModelResolutionTriples().getRowCount() - 1);
 		}		
+	}
+	
+	
+	/**
+	 * Update the semantic enrichment table model all classes.
+	 */
+	public static void updateTableModelSemanticEnrichmentAllClasses() {
+		// Get the table model
+		TableModelSemanticEnrichmentAllClasses tableModel = ApplicationUI.getTableModelSemanticEnrichmentAllClasses();
+		
+		// Get key sets
+		ArrayList<String> keySetClassModelBranchA = new ArrayList<String>(classModelBranchA.getClassStructures().keySet());
+		ArrayList<String> keySetClassModelBranchB = new ArrayList<String>(classModelBranchB.getClassStructures().keySet());
+		
+		// Iterate over all class URIs of branch A
+		@SuppressWarnings("unchecked")
+		Iterator<String> iteKeySetClassModelBranchA = ((ArrayList<String>) keySetClassModelBranchA.clone()).iterator();
+		while (iteKeySetClassModelBranchA.hasNext()) {
+			String currentKeyBranchA = iteKeySetClassModelBranchA.next();
+			
+			// Add all class URIs to table model which are in both branches
+			if (keySetClassModelBranchB.contains(currentKeyBranchA)) {
+				TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(classModelBranchA.getClassStructures().get(currentKeyBranchA), classModelBranchB.getClassStructures().get(currentKeyBranchA), new Object[]{currentKeyBranchA, currentKeyBranchA});
+				tableModel.addRow(tableEntry);
+				// Remove key from branch A key set copy
+				keySetClassModelBranchA.remove(currentKeyBranchA);
+				// Remove key from branch B key set copy
+				keySetClassModelBranchB.remove(currentKeyBranchA);
+			}
+		}
+		
+		// Iterate over all class URIs of branch A (will only contain the classes which are not in B)
+		Iterator<String> iteKeySetClassModelBranchAOnly = keySetClassModelBranchA.iterator();
+		while (iteKeySetClassModelBranchAOnly.hasNext()) {
+			String currentKeyBranchA = iteKeySetClassModelBranchAOnly.next();
+			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(classModelBranchA.getClassStructures().get(currentKeyBranchA), new ClassStructure(), new Object[]{currentKeyBranchA, ""});
+			tableModel.addRow(tableEntry);
+		}
+		
+		// Iterate over all class URIs of branch B (will only contain the classes which are not in A)
+		Iterator<String> iteKeySetClassModelBranchBOnly = keySetClassModelBranchB.iterator();
+		while (iteKeySetClassModelBranchBOnly.hasNext()) {
+			String currentKeyBranchB = iteKeySetClassModelBranchBOnly.next();
+			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(new ClassStructure(), classModelBranchB.getClassStructures().get(currentKeyBranchB), new Object[]{"", currentKeyBranchB});
+			tableModel.addRow(tableEntry);
+		}
+		
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
+		
 	}
 
 }

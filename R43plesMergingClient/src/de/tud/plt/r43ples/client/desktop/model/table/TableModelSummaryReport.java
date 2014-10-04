@@ -94,7 +94,7 @@ public class TableModelSummaryReport extends AbstractTableModel {
 		if (column == 5) 
 			return true;
 		
-		return true;
+		return false;
 	}
 	
 	

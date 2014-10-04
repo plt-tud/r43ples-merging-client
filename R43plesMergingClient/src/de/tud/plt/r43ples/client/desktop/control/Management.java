@@ -1282,7 +1282,7 @@ public class Management {
 				+ "WHERE { %n"
 				+ "	<%s> ?predicate ?object . %n"
 				+ "}"
-				+ "ORDER BY ?predicate", graphName, revisionName); //TODO order by object
+				+ "ORDER BY ?predicate", graphName, revisionName, classUri); //TODO order by object
 		logger.debug(query);
 		
 		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");

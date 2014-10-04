@@ -31,8 +31,11 @@ import javax.swing.tree.TreeSelectionModel;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.tree.TreeCellRendererDifferences;
+import javax.swing.ListSelectionModel;
 
 /**
  * The application UI of the merging client.
@@ -56,6 +59,10 @@ public class ApplicationUI {
 	private static JTable tableResolutionTriples;
 	/** The resolution triples table model. **/
 	private static TableModelResolutionTriples tableModelResolutionTriples = new TableModelResolutionTriples(new ArrayList<TableEntry>());
+	/** The semantic enrichment table all classes. **/
+	private static JTable tableResolutionSemanticEnrichmentAllClasses;
+	/** The semantic enrichment table model all classes. **/
+	private static TableModelSemanticEnrichmentAllClasses tableModelSemanticEnrichmentAllClasses = new TableModelSemanticEnrichmentAllClasses(new ArrayList<TableEntrySemanticEnrichmentAllClasses>());
 	
 
 	/**
@@ -277,6 +284,20 @@ public class ApplicationUI {
 		
 		JPanel panelResolutionSemanticEnrichment = new JPanel();
 		tabbedPaneResolution.addTab("Semantic Enrichment", null, panelResolutionSemanticEnrichment, null);
+		panelResolutionSemanticEnrichment.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelResolutionSemanticEnrichmentClassTable = new JPanel();
+		panelResolutionSemanticEnrichment.add(panelResolutionSemanticEnrichmentClassTable, BorderLayout.NORTH);
+		panelResolutionSemanticEnrichmentClassTable.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPaneResolutionSemanticEnrichmentClassTable = new JScrollPane();
+		panelResolutionSemanticEnrichmentClassTable.add(scrollPaneResolutionSemanticEnrichmentClassTable);
+		
+		tableResolutionSemanticEnrichmentAllClasses = new JTable();
+		tableResolutionSemanticEnrichmentAllClasses.setPreferredScrollableViewportSize(new Dimension(450, 150));
+		tableResolutionSemanticEnrichmentAllClasses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableResolutionSemanticEnrichmentAllClasses.setModel(tableModelSemanticEnrichmentAllClasses);
+		scrollPaneResolutionSemanticEnrichmentClassTable.setViewportView(tableResolutionSemanticEnrichmentAllClasses);
 		
 		JPanel panelRevisionGraph = new JPanel();
 		splitPaneResolution.setLeftComponent(panelRevisionGraph);
@@ -415,6 +436,42 @@ public class ApplicationUI {
 	 */
 	public static void setPanelGraph(JPanel panelGraph) {
 		ApplicationUI.panelGraph = panelGraph;
+	}
+
+
+	/**
+	 * Get the table semantic enrichment all classes.
+	 * 
+	 * @return the tableResolutionSemanticEnrichmentAllClasses
+	 */
+	public static JTable getTableResolutionSemanticEnrichmentAllClasses() {
+		return tableResolutionSemanticEnrichmentAllClasses;
+	}
+
+
+	/**
+	 * Set the table semantic enrichment all classes.
+	 * 
+	 * @param tableResolutionSemanticEnrichmentAllClasses the tableResolutionSemanticEnrichmentClassTable to set
+	 */
+	public static void setTableResolutionSemanticEnrichmentAllClasses(JTable tableResolutionSemanticEnrichmentAllClasses) {
+		ApplicationUI.tableResolutionSemanticEnrichmentAllClasses = tableResolutionSemanticEnrichmentAllClasses;
+	}
+
+
+	/**
+	 * @return the tableModelSemanticEnrichmentAllClasses
+	 */
+	public static TableModelSemanticEnrichmentAllClasses getTableModelSemanticEnrichmentAllClasses() {
+		return tableModelSemanticEnrichmentAllClasses;
+	}
+
+
+	/**
+	 * @param tableModelSemanticEnrichmentAllClasses the tableModelSemanticEnrichmentAllClasses to set
+	 */
+	public static void setTableModelSemanticEnrichmentAllClasses(TableModelSemanticEnrichmentAllClasses tableModelSemanticEnrichmentAllClasses) {
+		ApplicationUI.tableModelSemanticEnrichmentAllClasses = tableModelSemanticEnrichmentAllClasses;
 	}
 
 }
