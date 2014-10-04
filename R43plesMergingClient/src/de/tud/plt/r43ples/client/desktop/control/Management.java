@@ -473,11 +473,26 @@ public class Management {
 	 */
 	public static String tripleToString(Triple triple) {
 		if (triple.getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-			logger.debug(String.format("<%s> <%s> \"%s\"", triple.getSubject(), triple.getPredicate(), triple.getObject()));
-			return String.format("<%s> <%s> \"%s\"", triple.getSubject(), triple.getPredicate(), triple.getObject());
+			logger.debug(String.format("<%s> %s \"%s\" .", triple.getSubject(), getPredicate(triple), triple.getObject()));
+			return String.format("<%s> %s \"%s\" .", triple.getSubject(), getPredicate(triple), triple.getObject());
 		} else {
-			logger.debug(String.format("<%s> <%s> <%s>", triple.getSubject(), triple.getPredicate(), triple.getObject()));
-			return String.format("<%s> <%s> <%s>", triple.getSubject(), triple.getPredicate(), triple.getObject());
+			logger.debug(String.format("<%s> %s <%s> .", triple.getSubject(), getPredicate(triple), triple.getObject()));
+			return String.format("<%s> %s <%s> .", triple.getSubject(), getPredicate(triple), triple.getObject());
+		}
+	}
+	
+	
+	/**
+	 * Get the predicate of triple. If predicate equals rdf:type 'a' will be returned.
+	 * 
+	 * @param triple the triple
+	 * @return the formatted predicate
+	 */
+	public static String getPredicate(Triple triple) {
+		if (triple.getPredicate().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")) {
+			return "a";
+		} else {
+			return "<" + triple.getPredicate() + ">";
 		}
 	}
 	
@@ -699,7 +714,7 @@ public class Management {
 		}
 		
 		rowData[3] = "<" + difference.getTriple().getSubject() + ">";
-		rowData[4] = "<" + difference.getTriple().getPredicate() + ">";
+		rowData[4] = getPredicate(difference.getTriple());
 		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
 			rowData[5] = "\"" + difference.getTriple().getObject() + "\"";
 		} else {
@@ -862,7 +877,7 @@ public class Management {
 	public static Object[] createRowDataSummaryReport(Difference difference, DifferenceGroup differenceGroup) {
 		Object[] rowData = new Object[9];
 		rowData[0] = "<" + difference.getTriple().getSubject() + ">";
-		rowData[1] = "<" + difference.getTriple().getPredicate() + ">";
+		rowData[1] = getPredicate(difference.getTriple());
 		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
 			rowData[2] = "\"" + difference.getTriple().getObject() + "\"";
 		} else {
@@ -997,14 +1012,7 @@ public class Management {
 					Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
 
 					if (difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED)) {
-						String triple = "";						
-						triple += "<" + difference.getTriple().getSubject() + "> ";
-						triple += "<" + difference.getTriple().getPredicate() + "> ";
-						if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-							triple += "\"" + difference.getTriple().getObject() + "\" .";
-						} else {
-							triple += "<" + difference.getTriple().getObject() + "> .";
-						}
+						String triple = tripleToString(difference.getTriple());						
 						triples += triple + "\n";
 					}
 				}
@@ -1072,14 +1080,7 @@ public class Management {
 				}
 				
 				// Get the triple
-				String triple = "";						
-				triple += "<" + difference.getTriple().getSubject() + "> ";
-				triple += "<" + difference.getTriple().getPredicate() + "> ";
-				if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-					triple += "\"" + difference.getTriple().getObject() + "\" .";
-				} else {
-					triple += "<" + difference.getTriple().getObject() + "> .";
-				}
+				String triple = tripleToString( difference.getTriple());					
 				
 				// Add the triple to the corresponding string
 				if (tripleState.equals(SDDTripleStateEnum.ADDED) || tripleState.equals(SDDTripleStateEnum.ORIGINAL)) {
@@ -1236,9 +1237,9 @@ public class Management {
 		// Result array list
 		ArrayList<String> list = new ArrayList<String>();
 		
-    	// Query all classes
+    	// Query all classes (DISTINCT because there can be multiple class definitions)
 		String query = prefixes + String.format(
-				  "SELECT ?classUri %n"
+				  "SELECT DISTINCT ?classUri %n"
 				+ "FROM <%s> REVISION \"%s\" %n"
 				+ "WHERE { %n"
 				+ "	?classUri a ?class . %n"
@@ -1319,10 +1320,11 @@ public class Management {
 	 * 
 	 * @param graphName the graph name
 	 * @param revisionName the revision name
+	 * @param differenceModel the difference model
 	 * @return the class model
 	 * @throws IOException 
 	 */
-	public static ClassModel createClassModelOfRevision(String graphName, String revisionName) throws IOException {
+	public static ClassModel createClassModelOfRevision(String graphName, String revisionName, DifferenceModel differenceModel) throws IOException {
 		ClassModel classModel = new ClassModel();
 		
 		ArrayList<String> classURIs = getAllClassesOfRevision(graphName, revisionName);
@@ -1333,10 +1335,38 @@ public class Management {
 			HashMap<String, Triple> currentTriples = getAllTriplesOfClass(graphName, revisionName, currentClassUri);
 			ClassStructure currentClassStructure = new ClassStructure();
 			currentClassStructure.setTriples(currentTriples);
+			
+			// TODO specify the corresponding differences of triples
+			
 			classModel.addClassStructure(currentClassUri, currentClassStructure);
 		}
 		
 		return classModel;
+	}
+	
+	
+	/**
+	 * Get difference by triple. If the difference model does not contain the triple null will be returned.
+	 * 
+	 * @param triple the triple to look for
+	 * @param differenceModel the difference model
+	 * @return the difference or null if triple is not included in difference model
+	 */
+	public static Difference getDifferenceByTriple(Triple triple, DifferenceModel differenceModel) {
+		String tripleIdentifier = tripleToString(triple);
+		
+		// Iterate over all difference groups
+		Iterator<String> iteDifferenceGroupNames = differenceModel.getDifferenceGroups().keySet().iterator();
+		while (iteDifferenceGroupNames.hasNext()) {
+			String differenceGroupName = iteDifferenceGroupNames.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupName);
+			// Check if the hash map contains the triple
+			if (differenceGroup.getDifferences().containsKey(tripleIdentifier)) {
+				return differenceGroup.getDifferences().get(tripleIdentifier);
+			};
+		}
+
+		return null;
 	}
 
 }

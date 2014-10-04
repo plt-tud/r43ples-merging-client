@@ -190,8 +190,8 @@ public class Controller {
 				revisionNumberBranchB = Management.getRevisionNumberOfBranchBHeaderParameter(response, graphName);
 				
 				// Create the class models of both branches
-				classModelBranchA = Management.createClassModelOfRevision(graphName, branchNameA);
-				classModelBranchB = Management.createClassModelOfRevision(graphName, branchNameB);
+				classModelBranchA = Management.createClassModelOfRevision(graphName, branchNameA, differenceModel);
+				classModelBranchB = Management.createClassModelOfRevision(graphName, branchNameB, differenceModel);
 				
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
