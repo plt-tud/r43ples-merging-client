@@ -53,6 +53,7 @@ import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
 import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
+import de.tud.plt.r43ples.client.desktop.model.structure.TripleClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
@@ -1267,14 +1268,15 @@ public class Management {
 	 * @param graphName the graph name
 	 * @param revisionName the revision name
 	 * @param classUri the class URI
+	 * @param differenceModel the difference model
 	 * @return the hash map of triples
 	 * @throws IOException 
 	 */
-	public static HashMap<String, Triple> getAllTriplesOfClass(String graphName, String revisionName, String classUri) throws IOException {
+	public static HashMap<String, TripleClassStructure> getAllTriplesOfClass(String graphName, String revisionName, String classUri, DifferenceModel differenceModel) throws IOException {
 		logger.info("Get all corresponding triples of specified class.");
 		
 		// Result hash map
-		HashMap<String, Triple> list = new HashMap<String, Triple>();
+		HashMap<String, TripleClassStructure> list = new HashMap<String, TripleClassStructure>();
 		
     	// Query all classes
 		String query = prefixes + String.format(
@@ -1283,7 +1285,7 @@ public class Management {
 				+ "WHERE { %n"
 				+ "	<%s> ?predicate ?object . %n"
 				+ "}"
-				+ "ORDER BY ?predicate", graphName, revisionName, classUri); //TODO order by object
+				+ "ORDER BY ?predicate ?object", graphName, revisionName, classUri);
 		logger.debug(query);
 		
 		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
@@ -1306,9 +1308,14 @@ public class Management {
 				object = qs.getResource("?object").toString();
 				objectType = TripleObjectTypeEnum.RESOURCE;
 			}
-	    	
-			Triple triple = new Triple(classUri, predicate, object, objectType); 
-	    	list.put(tripleToString(triple), triple);
+	    	// Create the triple
+			Triple triple = new Triple(classUri, predicate, object, objectType);
+			// Check if there is a corresponding difference
+			Difference difference = getDifferenceByTriple(triple, differenceModel);			
+			// Create the triple class structure
+			TripleClassStructure tripleClassStructure = new TripleClassStructure(triple, difference);
+			// Put the triple class structure
+	    	list.put(tripleToString(triple), tripleClassStructure);
 		}
 
 		return list;
@@ -1332,12 +1339,9 @@ public class Management {
 		Iterator<String> iteClassURIs = classURIs.iterator();
 		while (iteClassURIs.hasNext()) {
 			String currentClassUri = iteClassURIs.next();
-			HashMap<String, Triple> currentTriples = getAllTriplesOfClass(graphName, revisionName, currentClassUri);
+			HashMap<String, TripleClassStructure> currentTriples = getAllTriplesOfClass(graphName, revisionName, currentClassUri, differenceModel);
 			ClassStructure currentClassStructure = new ClassStructure();
-			currentClassStructure.setTriples(currentTriples);
-			
-			// TODO specify the corresponding differences of triples
-			
+			currentClassStructure.setTriples(currentTriples);		
 			classModel.addClassStructure(currentClassUri, currentClassStructure);
 		}
 		
@@ -1367,6 +1371,49 @@ public class Management {
 		}
 
 		return null;
+	}
+	
+	
+	/**
+	 * Create the row data for resolution triples.
+	 * 
+	 * @param difference the difference
+	 * @param differenceGroup the difference group
+	 * @throws IOException 
+	 */
+	public static Object[] createRowDataSemanticEnrichmentClassTriples(Difference difference, DifferenceGroup differenceGroup, String semanticDescription) throws IOException {
+		Object[] rowData = new Object[7];
+
+		rowData[0] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
+		
+		// Get the revision number if available
+		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
+			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[2] = differenceGroup.getTripleStateB();
+		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[1] = differenceGroup.getTripleStateA();
+			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else {
+			rowData[1] = differenceGroup.getTripleStateA();
+			rowData[2] = differenceGroup.getTripleStateB();
+		}
+		
+		rowData[3] = "<" + difference.getTriple().getSubject() + ">";
+		rowData[4] = getPredicate(difference.getTriple());
+		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
+			rowData[5] = "\"" + difference.getTriple().getObject() + "\"";
+		} else {
+			rowData[5] = "<" + difference.getTriple().getObject() + ">";
+		}
+
+		rowData[6] = semanticDescription;
+		// Will be a combo box - entries are generated by editor
+		rowData[7] = null;
+		
+		return rowData;
 	}
 
 }

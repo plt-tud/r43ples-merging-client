@@ -32,9 +32,12 @@ import javax.swing.tree.TreeSelectionModel;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentAllClasses;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentAllClasses;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.tree.TreeCellRendererDifferences;
+
 import javax.swing.ListSelectionModel;
 
 /**
@@ -63,6 +66,10 @@ public class ApplicationUI {
 	private static JTable tableResolutionSemanticEnrichmentAllClasses;
 	/** The semantic enrichment table model all classes. **/
 	private static TableModelSemanticEnrichmentAllClasses tableModelSemanticEnrichmentAllClasses = new TableModelSemanticEnrichmentAllClasses(new ArrayList<TableEntrySemanticEnrichmentAllClasses>());
+	/** The semantic enrichment table class triples. **/
+	private static JTable tableResolutionSemanticEnrichmentClassTriples;
+	/** The semantic enrichment table model class triples. **/
+	private static TableModelSemanticEnrichmentClassTriples tableModelSemanticEnrichmentClassTriples = new TableModelSemanticEnrichmentClassTriples(new ArrayList<TableEntrySemanticEnrichmentClassTriples>());
 	
 
 	/**
@@ -286,18 +293,39 @@ public class ApplicationUI {
 		tabbedPaneResolution.addTab("Semantic Enrichment", null, panelResolutionSemanticEnrichment, null);
 		panelResolutionSemanticEnrichment.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panelResolutionSemanticEnrichmentClassTable = new JPanel();
-		panelResolutionSemanticEnrichment.add(panelResolutionSemanticEnrichmentClassTable, BorderLayout.NORTH);
-		panelResolutionSemanticEnrichmentClassTable.setLayout(new BorderLayout(0, 0));
+		JPanel panelResolutionSemanticEnrichmentAllClasses = new JPanel();
+		panelResolutionSemanticEnrichment.add(panelResolutionSemanticEnrichmentAllClasses, BorderLayout.NORTH);
+		panelResolutionSemanticEnrichmentAllClasses.setLayout(new BorderLayout(0, 0));
 		
-		JScrollPane scrollPaneResolutionSemanticEnrichmentClassTable = new JScrollPane();
-		panelResolutionSemanticEnrichmentClassTable.add(scrollPaneResolutionSemanticEnrichmentClassTable);
+		JScrollPane scrollPaneResolutionSemanticEnrichmentAllClasses = new JScrollPane();
+		panelResolutionSemanticEnrichmentAllClasses.add(scrollPaneResolutionSemanticEnrichmentAllClasses);
 		
 		tableResolutionSemanticEnrichmentAllClasses = new JTable();
 		tableResolutionSemanticEnrichmentAllClasses.setPreferredScrollableViewportSize(new Dimension(450, 150));
 		tableResolutionSemanticEnrichmentAllClasses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableResolutionSemanticEnrichmentAllClasses.setModel(tableModelSemanticEnrichmentAllClasses);
-		scrollPaneResolutionSemanticEnrichmentClassTable.setViewportView(tableResolutionSemanticEnrichmentAllClasses);
+		tableResolutionSemanticEnrichmentAllClasses.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+			 */
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				Controller.updateTableModelSemanticEnrichmentTriples();				
+			}
+		});
+		scrollPaneResolutionSemanticEnrichmentAllClasses.setViewportView(tableResolutionSemanticEnrichmentAllClasses);
+		
+		JPanel panelResolutionSemanticEnrichmentClassTriples = new JPanel();
+		panelResolutionSemanticEnrichment.add(panelResolutionSemanticEnrichmentClassTriples, BorderLayout.CENTER);
+		panelResolutionSemanticEnrichmentClassTriples.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPaneResolutionSemanticEnrichmentClassTriples = new JScrollPane();
+		panelResolutionSemanticEnrichmentClassTriples.add(scrollPaneResolutionSemanticEnrichmentClassTriples);
+		
+		tableResolutionSemanticEnrichmentClassTriples = new JTable();
+		tableResolutionSemanticEnrichmentClassTriples.setModel(tableModelSemanticEnrichmentClassTriples);
+		scrollPaneResolutionSemanticEnrichmentClassTriples.setViewportView(tableResolutionSemanticEnrichmentClassTriples);
 		
 		JPanel panelRevisionGraph = new JPanel();
 		splitPaneResolution.setLeftComponent(panelRevisionGraph);
@@ -472,6 +500,39 @@ public class ApplicationUI {
 	 */
 	public static void setTableModelSemanticEnrichmentAllClasses(TableModelSemanticEnrichmentAllClasses tableModelSemanticEnrichmentAllClasses) {
 		ApplicationUI.tableModelSemanticEnrichmentAllClasses = tableModelSemanticEnrichmentAllClasses;
+	}
+
+
+	/**
+	 * @return the tableModelSemanticEnrichmentClassTriples
+	 */
+	public static TableModelSemanticEnrichmentClassTriples getTableModelSemanticEnrichmentClassTriples() {
+		return tableModelSemanticEnrichmentClassTriples;
+	}
+
+
+	/**
+	 * @param tableModelSemanticEnrichmentClassTriples the tableModelSemanticEnrichmentClassTriples to set
+	 */
+	public static void setTableModelSemanticEnrichmentClassTriples(TableModelSemanticEnrichmentClassTriples tableModelSemanticEnrichmentClassTriples) {
+		ApplicationUI.tableModelSemanticEnrichmentClassTriples = tableModelSemanticEnrichmentClassTriples;
+	}
+
+
+	/**
+	 * @return the tableResolutionSemanticEnrichmentClassTriples
+	 */
+	public static JTable getTableResolutionSemanticEnrichmentClassTriples() {
+		return tableResolutionSemanticEnrichmentClassTriples;
+	}
+
+
+	/**
+	 * @param tableResolutionSemanticEnrichmentClassTriples the tableResolutionSemanticEnrichmentClassTriples to set
+	 */
+	public static void setTableResolutionSemanticEnrichmentClassTriples(
+			JTable tableResolutionSemanticEnrichmentClassTriples) {
+		ApplicationUI.tableResolutionSemanticEnrichmentClassTriples = tableResolutionSemanticEnrichmentClassTriples;
 	}
 
 }

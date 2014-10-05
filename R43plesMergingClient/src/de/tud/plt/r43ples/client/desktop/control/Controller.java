@@ -708,6 +708,12 @@ public class Controller {
 		}
 		
 		ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
+	}
+	
+	
+	public static void updateTableModelSemanticEnrichmentTriples() {
+		// TODO get the selected row - classUri and update triples table
+//		String currentClassUri = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectedRow()
 		
 	}
 

@@ -11,14 +11,14 @@ import java.util.HashMap;
 public class ClassStructure {
 
 	/** The hash map which contains all corresponding triples of class. **/
-	private HashMap<String, Triple> triples;
+	private HashMap<String, TripleClassStructure> triples;
 	
 	
 	/**
 	 * The constructor.
 	 */
 	public ClassStructure() {
-		triples = new HashMap<String, Triple>();
+		triples = new HashMap<String, TripleClassStructure>();
 	}
 
 
@@ -27,7 +27,7 @@ public class ClassStructure {
 	 * 
 	 * @return the triples
 	 */
-	public HashMap<String, Triple> getTriples() {
+	public HashMap<String, TripleClassStructure> getTriples() {
 		return triples;
 	}
 
@@ -37,7 +37,7 @@ public class ClassStructure {
 	 * 
 	 * @param triples the triples to set
 	 */
-	public void setTriples(HashMap<String, Triple> triples) {
+	public void setTriples(HashMap<String, TripleClassStructure> triples) {
 		this.triples = triples;
 	}
 	
@@ -48,7 +48,7 @@ public class ClassStructure {
 	 * @param identifier the identifier (triple to string)
 	 * @param triple the triple
 	 */
-	public void addTriple(String identifier, Triple triple) {
+	public void addTriple(String identifier, TripleClassStructure triple) {
 		triples.put(identifier, triple);
 	}
 		
