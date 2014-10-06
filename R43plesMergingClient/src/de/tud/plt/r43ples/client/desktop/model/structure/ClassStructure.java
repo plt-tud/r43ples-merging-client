@@ -10,15 +10,40 @@ import java.util.HashMap;
  */
 public class ClassStructure {
 
+	/** The class URI. **/
+	private String classUri;
 	/** The hash map which contains all corresponding triples of class. **/
 	private HashMap<String, TripleClassStructure> triples;
 	
 	
 	/**
 	 * The constructor.
+	 * 
+	 * @param classUri the class URI
 	 */
-	public ClassStructure() {
+	public ClassStructure(String classUri) {
+		this.setClassUri(classUri);
 		triples = new HashMap<String, TripleClassStructure>();
+	}
+
+
+	/**
+	 * Get the class URI.
+	 * 
+	 * @return the class URI
+	 */
+	public String getClassUri() {
+		return classUri;
+	}
+
+
+	/**
+	 * Set the class URI.
+	 * 
+	 * @param classUri the class URI to set
+	 */
+	public void setClassUri(String classUri) {
+		this.classUri = classUri;
 	}
 
 

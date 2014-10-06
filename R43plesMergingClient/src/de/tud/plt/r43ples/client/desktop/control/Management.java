@@ -1340,7 +1340,7 @@ public class Management {
 		while (iteClassURIs.hasNext()) {
 			String currentClassUri = iteClassURIs.next();
 			HashMap<String, TripleClassStructure> currentTriples = getAllTriplesOfClass(graphName, revisionName, currentClassUri, differenceModel);
-			ClassStructure currentClassStructure = new ClassStructure();
+			ClassStructure currentClassStructure = new ClassStructure(currentClassUri);
 			currentClassStructure.setTriples(currentTriples);		
 			classModel.addClassStructure(currentClassUri, currentClassStructure);
 		}

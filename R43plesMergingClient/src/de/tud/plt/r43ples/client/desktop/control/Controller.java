@@ -695,7 +695,7 @@ public class Controller {
 		Iterator<String> iteKeySetClassModelBranchAOnly = keySetClassModelBranchA.iterator();
 		while (iteKeySetClassModelBranchAOnly.hasNext()) {
 			String currentKeyBranchA = iteKeySetClassModelBranchAOnly.next();
-			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(classModelBranchA.getClassStructures().get(currentKeyBranchA), new ClassStructure(), new Object[]{currentKeyBranchA, ""});
+			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(classModelBranchA.getClassStructures().get(currentKeyBranchA), new ClassStructure(null), new Object[]{currentKeyBranchA, ""});
 			tableModel.addRow(tableEntry);
 		}
 		
@@ -703,7 +703,7 @@ public class Controller {
 		Iterator<String> iteKeySetClassModelBranchBOnly = keySetClassModelBranchB.iterator();
 		while (iteKeySetClassModelBranchBOnly.hasNext()) {
 			String currentKeyBranchB = iteKeySetClassModelBranchBOnly.next();
-			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(new ClassStructure(), classModelBranchB.getClassStructures().get(currentKeyBranchB), new Object[]{"", currentKeyBranchB});
+			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(new ClassStructure(null), classModelBranchB.getClassStructures().get(currentKeyBranchB), new Object[]{"", currentKeyBranchB});
 			tableModel.addRow(tableEntry);
 		}
 		
@@ -711,9 +711,22 @@ public class Controller {
 	}
 	
 	
+	/**
+	 * Update the semantic enrichment table model triples.
+	 */
 	public static void updateTableModelSemanticEnrichmentTriples() {
-		// TODO get the selected row - classUri and update triples table
-//		String currentClassUri = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectedRow()
+		// Get the currently selected table entry
+		TableEntrySemanticEnrichmentAllClasses currentTableEntry = ApplicationUI.getTableModelSemanticEnrichmentAllClasses().getTableEntry(ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectedRow());
+		String currentClassUriA = currentTableEntry.getClassStructureA().getClassUri();
+		String currentClassUriB = currentTableEntry.getClassStructureB().getClassUri();
+		String classUri = null;
+		if (currentClassUriA != null) {
+			classUri = currentClassUriA;
+		} else {
+			classUri = currentClassUriB;
+		}
+				
+		// Update triples table
 		
 	}
 
