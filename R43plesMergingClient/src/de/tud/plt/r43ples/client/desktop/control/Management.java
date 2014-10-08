@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1105,17 +1107,14 @@ public class Management {
 	
 	/**
 	 * Get the header graph name.
-	 * Removes the http:// of the graph name because it is not permitted that a header parameter contains a colon.
+	 * Encodes the http:// of the graph name because it is not permitted that a header parameter contains a colon.
 	 * 
 	 * @param graphName the graph name
-	 * @return the header graph name
+	 * @return the encoded header graph name
+	 * @throws UnsupportedEncodingException 
 	 */
-	public static String getHeaderGraphName(String graphName) {
-		String graphNameHeader = null;
-		if (graphName.startsWith("http://")) {
-			graphNameHeader = graphName.substring(7);
-		}
-		return graphNameHeader;
+	public static String getHeaderGraphName(String graphName) throws UnsupportedEncodingException {
+		return URLEncoder.encode(graphName, "UTF-8");
 	}
 
 	
@@ -1126,7 +1125,7 @@ public class Management {
 	 * @param graphName the graph name
 	 * @return the new revision number
 	 */
-	public static String getRevisionNumberOfNewRevisionHeaderParameter(HttpResponse response, String graphName) {
+	public static String getRevisionNumberOfNewRevisionHeaderParameter(HttpResponse response, String graphName) throws UnsupportedEncodingException {
 		String identifier = "%s-revision-number";
 		String graphNameHeader = getHeaderGraphName(graphName);
 		
@@ -1141,7 +1140,7 @@ public class Management {
 	 * @param graphName the graph name
 	 * @return the MASTER revision number
 	 */
-	public static String getRevisionNumberOfMasterHeaderParameter(HttpResponse response, String graphName) {
+	public static String getRevisionNumberOfMasterHeaderParameter(HttpResponse response, String graphName) throws UnsupportedEncodingException {
 		String identifier = "%s-revision-number-of-master";
 		String graphNameHeader = getHeaderGraphName(graphName);
 		
@@ -1157,10 +1156,10 @@ public class Management {
 	 * @param graphName the graph name
 	 * @return the branch A revision number
 	 */
-	public static String getRevisionNumberOfBranchAHeaderParameter(HttpResponse response, String graphName) {
+	public static String getRevisionNumberOfBranchAHeaderParameter(HttpResponse response, String graphName) throws UnsupportedEncodingException {
 		String identifier = "%s-revision-number-of-branch-A";
 		String graphNameHeader = getHeaderGraphName(graphName);
-		
+
 		return response.getHeaderParameterByName(String.format(identifier, graphNameHeader)).get(0);
 	}
 	
@@ -1173,7 +1172,7 @@ public class Management {
 	 * @param graphName the graph name
 	 * @return the branch B revision number
 	 */
-	public static String getRevisionNumberOfBranchBHeaderParameter(HttpResponse response, String graphName) {
+	public static String getRevisionNumberOfBranchBHeaderParameter(HttpResponse response, String graphName) throws UnsupportedEncodingException {
 		String identifier = "%s-revision-number-of-branch-B";
 		String graphNameHeader = getHeaderGraphName(graphName);
 		
