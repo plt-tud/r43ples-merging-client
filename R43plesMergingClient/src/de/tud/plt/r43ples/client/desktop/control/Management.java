@@ -1381,7 +1381,7 @@ public class Management {
 	 * @throws IOException 
 	 */
 	public static Object[] createRowDataSemanticEnrichmentClassTriples(Difference difference, DifferenceGroup differenceGroup, String semanticDescription) throws IOException {
-		Object[] rowData = new Object[7];
+		Object[] rowData = new Object[8];
 
 		rowData[0] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
 		

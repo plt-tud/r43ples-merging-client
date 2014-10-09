@@ -311,7 +311,12 @@ public class ApplicationUI {
 			 */
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				Controller.updateTableModelSemanticEnrichmentTriples();				
+				try {
+					Controller.updateTableModelSemanticEnrichmentTriples();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}				
 			}
 		});
 		scrollPaneResolutionSemanticEnrichmentAllClasses.setViewportView(tableResolutionSemanticEnrichmentAllClasses);
