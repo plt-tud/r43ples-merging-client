@@ -139,6 +139,7 @@ public class ReportDialog extends JDialog {
 		contentPanel.add(scrollPaneTable, BorderLayout.CENTER);
 		
 		table = new JTable();
+		table.setRowHeight(25);
 		table.setModel(tableModel);
 		table.setRowSelectionAllowed(true);
 		scrollPaneTable.setViewportView(table);
