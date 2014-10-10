@@ -245,7 +245,6 @@ public class Controller {
 			createGraph(graphName);
 			
 			/** The semantic definitions **/
-			// TODO Add used SDD
 			new SemanticDefinitions();
 			
 			// Update the semantic enrichment
