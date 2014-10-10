@@ -76,6 +76,7 @@ public class TripleStoreInterface {
 		return body;
 	}
 	
+	
 	/**
 	 * Executes a SPARQL-query against the triple store without authorization.
 	 * 

@@ -5,5 +5,6 @@ de.tud.plt.r43ples.client.desktop.model.table
 de.tud.plt.r43ples.client.desktop.model.tree
 de.tud.plt.r43ples.client.desktop.ui
 de.tud.plt.r43ples.client.desktop.ui.dialog
+de.tud.plt.r43ples.client.desktop.ui.editor.table
 de.tud.plt.r43ples.client.desktop.ui.renderer.table
 de.tud.plt.r43ples.client.desktop.ui.renderer.tree

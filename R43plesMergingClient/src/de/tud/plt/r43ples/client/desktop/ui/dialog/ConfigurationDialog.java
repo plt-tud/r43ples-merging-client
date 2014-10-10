@@ -182,7 +182,9 @@ public class ConfigurationDialog extends JDialog {
 
 	
 	/**
-	 * @return the tfR43plesSparqlEndpoint
+	 * Get the R43ples SPARQL endpoint text field. 
+	 * 
+	 * @return the R43ples SPARQL endpoint text field
 	 */
 	public static JTextField getTfR43plesSparqlEndpoint() {
 		return tfR43plesSparqlEndpoint;
@@ -190,7 +192,9 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @param tfR43plesSparqlEndpoint the tfR43plesSparqlEndpoint to set
+	 * Set the R43ples SPARQL endpoint text field.
+	 * 
+	 * @param tfR43plesSparqlEndpoint the R43ples SPARQL endpoint text field to set
 	 */
 	public static void setTfR43plesSparqlEndpoint(JTextField tfR43plesSparqlEndpoint) {
 		ConfigurationDialog.tfR43plesSparqlEndpoint = tfR43plesSparqlEndpoint;
@@ -198,7 +202,9 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @return the tfR43plesRevisionGraph
+	 * Get the R43ples revision graph text field.
+	 * 
+	 * @return the R43ples revision graph text field
 	 */
 	public static JTextField getTfR43plesRevisionGraph() {
 		return tfR43plesRevisionGraph;
@@ -206,7 +212,9 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @param tfR43plesRevisionGraph the tfR43plesRevisionGraph to set
+	 * Set the R43ples revision graph text field.
+	 * 
+	 * @param tfR43plesRevisionGraph the R43ples revision graph text field to set
 	 */
 	public static void setTfR43plesRevisionGraph(JTextField tfR43plesRevisionGraph) {
 		ConfigurationDialog.tfR43plesRevisionGraph = tfR43plesRevisionGraph;
@@ -214,7 +222,9 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @return the tfR43plesSddGraph
+	 * Get the R43ples SDD graph text field.
+	 * 
+	 * @return the R43ples SDD graph text field
 	 */
 	public static JTextField getTfR43plesSddGraph() {
 		return tfR43plesSddGraph;
@@ -222,7 +232,9 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @param tfR43plesSddGraph the tfR43plesSddGraph to set
+	 * Set the R43ples SDD graph text field.
+	 * 
+	 * @param tfR43plesSddGraph the R43ples SDD graph text field to set
 	 */
 	public static void setTfR43plesSddGraph(JTextField tfR43plesSddGraph) {
 		ConfigurationDialog.tfR43plesSddGraph = tfR43plesSddGraph;
@@ -230,7 +242,9 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @return the tablePrefixMappings
+	 * Get the prefix mappings table.
+	 * 
+	 * @return the prefix mappings table
 	 */
 	public static JTable getTablePrefixMappings() {
 		return tablePrefixMappings;
@@ -238,7 +252,9 @@ public class ConfigurationDialog extends JDialog {
 
 	
 	/**
-	 * @param tablePrefixMappings the tablePrefixMappings to set
+	 * Set the prefix mappings table.
+	 * 
+	 * @param tablePrefixMappings the prefix mappings table to set
 	 */
 	public static void setTablePrefixMappings(JTable tablePrefixMappings) {
 		ConfigurationDialog.tablePrefixMappings = tablePrefixMappings;
@@ -246,7 +262,9 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @return the tableModelPrefixMappings
+	 * Get the prefix mappings table model.
+	 * 
+	 * @return the prefix mappings table model
 	 */
 	public static DefaultTableModel getTableModelPrefixMappings() {
 		return tableModelPrefixMappings;
@@ -254,9 +272,12 @@ public class ConfigurationDialog extends JDialog {
 
 
 	/**
-	 * @param tableModelPrefixMappings the tableModelPrefixMappings to set
+	 * Set the prefix mappings table model.
+	 * 
+	 * @param tableModelPrefixMappings the prefix mappings table model to set
 	 */
 	public static void setTableModelPrefixMappings(DefaultTableModel tableModelPrefixMappings) {
 		ConfigurationDialog.tableModelPrefixMappings = tableModelPrefixMappings;
 	}
+	
 }

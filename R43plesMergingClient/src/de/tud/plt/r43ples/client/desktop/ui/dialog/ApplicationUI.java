@@ -466,7 +466,7 @@ public class ApplicationUI {
 	/**
 	 * Get the graph scroll pane.
 	 * 
-	 * @return the scrollPaneGraph
+	 * @return the graph scroll pane
 	 */
 	public static JScrollPane getScrollPaneGraph() {
 		return scrollPaneGraph;
@@ -476,7 +476,7 @@ public class ApplicationUI {
 	/**
 	 * Set the graph scroll pane.
 	 * 
-	 * @param scrollPaneGraph the scrollPaneGraph to set
+	 * @param scrollPaneGraph the graph scroll pane to set
 	 */
 	public static void setScrollPaneGraph(JScrollPane scrollPaneGraph) {
 		ApplicationUI.scrollPaneGraph = scrollPaneGraph;
@@ -486,7 +486,7 @@ public class ApplicationUI {
 	/**
 	 * Get the graph panel.
 	 * 
-	 * @return the panelGraph
+	 * @return the graph panel
 	 */
 	public static JPanel getPanelGraph() {
 		return panelGraph;
@@ -496,7 +496,7 @@ public class ApplicationUI {
 	/**
 	 * Set the graph panel.
 	 * 
-	 * @param panelGraph the panelGraph to set
+	 * @param panelGraph the graph panel to set
 	 */
 	public static void setPanelGraph(JPanel panelGraph) {
 		ApplicationUI.panelGraph = panelGraph;
@@ -506,7 +506,7 @@ public class ApplicationUI {
 	/**
 	 * Get the table semantic enrichment all classes.
 	 * 
-	 * @return the tableResolutionSemanticEnrichmentAllClasses
+	 * @return the table semantic enrichment all classes
 	 */
 	public static JTable getTableResolutionSemanticEnrichmentAllClasses() {
 		return tableResolutionSemanticEnrichmentAllClasses;
@@ -516,7 +516,7 @@ public class ApplicationUI {
 	/**
 	 * Set the table semantic enrichment all classes.
 	 * 
-	 * @param tableResolutionSemanticEnrichmentAllClasses the tableResolutionSemanticEnrichmentClassTable to set
+	 * @param tableResolutionSemanticEnrichmentAllClasses the table semantic enrichment all classes to set
 	 */
 	public static void setTableResolutionSemanticEnrichmentAllClasses(JTable tableResolutionSemanticEnrichmentAllClasses) {
 		ApplicationUI.tableResolutionSemanticEnrichmentAllClasses = tableResolutionSemanticEnrichmentAllClasses;
@@ -524,7 +524,9 @@ public class ApplicationUI {
 
 
 	/**
-	 * @return the tableModelSemanticEnrichmentAllClasses
+	 * Get the table model semantic enrichment all classes.
+	 * 
+	 * @return the table model semantic enrichment all classes
 	 */
 	public static TableModelSemanticEnrichmentAllClasses getTableModelSemanticEnrichmentAllClasses() {
 		return tableModelSemanticEnrichmentAllClasses;
@@ -532,7 +534,9 @@ public class ApplicationUI {
 
 
 	/**
-	 * @param tableModelSemanticEnrichmentAllClasses the tableModelSemanticEnrichmentAllClasses to set
+	 * Set the table model semantic enrichment all classes.
+	 * 
+	 * @param tableModelSemanticEnrichmentAllClasses the table model semantic enrichment all classes to set
 	 */
 	public static void setTableModelSemanticEnrichmentAllClasses(TableModelSemanticEnrichmentAllClasses tableModelSemanticEnrichmentAllClasses) {
 		ApplicationUI.tableModelSemanticEnrichmentAllClasses = tableModelSemanticEnrichmentAllClasses;
@@ -540,7 +544,9 @@ public class ApplicationUI {
 
 
 	/**
-	 * @return the tableModelSemanticEnrichmentClassTriples
+	 * Get the table model semantic enrichment class triples.
+	 * 
+	 * @return the table model semantic enrichment class triples
 	 */
 	public static TableModelSemanticEnrichmentClassTriples getTableModelSemanticEnrichmentClassTriples() {
 		return tableModelSemanticEnrichmentClassTriples;
@@ -548,7 +554,9 @@ public class ApplicationUI {
 
 
 	/**
-	 * @param tableModelSemanticEnrichmentClassTriples the tableModelSemanticEnrichmentClassTriples to set
+	 * Set the table model semantic enrichment class triples.
+	 * 
+	 * @param tableModelSemanticEnrichmentClassTriples the table model semantic enrichment class triples to set
 	 */
 	public static void setTableModelSemanticEnrichmentClassTriples(TableModelSemanticEnrichmentClassTriples tableModelSemanticEnrichmentClassTriples) {
 		ApplicationUI.tableModelSemanticEnrichmentClassTriples = tableModelSemanticEnrichmentClassTriples;
@@ -556,7 +564,9 @@ public class ApplicationUI {
 
 
 	/**
-	 * @return the tableResolutionSemanticEnrichmentClassTriples
+	 * Get the table semantic enrichment class triples.
+	 * 
+	 * @return the table model semantic enrichment class triples
 	 */
 	public static JTable getTableResolutionSemanticEnrichmentClassTriples() {
 		return tableResolutionSemanticEnrichmentClassTriples;
@@ -564,10 +574,11 @@ public class ApplicationUI {
 
 
 	/**
-	 * @param tableResolutionSemanticEnrichmentClassTriples the tableResolutionSemanticEnrichmentClassTriples to set
+	 * Set table semantic enrichment class triples.
+	 * 
+	 * @param tableResolutionSemanticEnrichmentClassTriples the table semantic enrichment class triples to set
 	 */
-	public static void setTableResolutionSemanticEnrichmentClassTriples(
-			JTable tableResolutionSemanticEnrichmentClassTriples) {
+	public static void setTableResolutionSemanticEnrichmentClassTriples(JTable tableResolutionSemanticEnrichmentClassTriples) {
 		ApplicationUI.tableResolutionSemanticEnrichmentClassTriples = tableResolutionSemanticEnrichmentClassTriples;
 	}
 

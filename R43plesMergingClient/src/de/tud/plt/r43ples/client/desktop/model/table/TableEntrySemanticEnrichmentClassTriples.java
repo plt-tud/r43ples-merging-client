@@ -129,7 +129,7 @@ public class TableEntrySemanticEnrichmentClassTriples {
 	/**
 	 * Get the selected semantic resolution option.
 	 * 
-	 * @return
+	 * @return the selected semantic resolution option
 	 */
 	public int getSelectedSemanticResolutionOption() {
 		return selectedSemanticResolutionOption;
