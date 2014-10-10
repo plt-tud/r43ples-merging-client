@@ -118,6 +118,17 @@ public class SemanticDefinitions {
 
 
 	/**
+	 * Check the identifier existence in all class maps.
+	 * 
+	 * @param identifier the identifier (STATE-STATE) to check
+	 * @return true when identifier is contained in all maps
+	 */
+	public static boolean checkIdentifierExistenceInClassMaps(String identifier) {
+		return definitionMapClassDescriptions.containsKey(identifier) && definitionMapClassResolutionOptions.containsKey(identifier) && definitionMapClassDefaultResolutionOptions.containsKey(identifier);
+	}
+	
+	
+	/**
 	 * Get the semantic definition result.
 	 * 
 	 * @param difference the difference
@@ -130,12 +141,14 @@ public class SemanticDefinitions {
 		
 		// Check if triple is a class triple
 		if (Management.getPredicate(difference.getTriple()).equals("a")) {
-			return new SemanticDefinitionResult(getClassDescription(identifier), getClassResolutionOptions(identifier), getClassDefaultResolutionOptions(identifier));
+			if (checkIdentifierExistenceInClassMaps(identifier)) {
+				return new SemanticDefinitionResult(getClassDescription(identifier), getClassResolutionOptions(identifier), getClassDefaultResolutionOptions(identifier));
+			}
 		}
 		
 		// Return empty semantic definition result - ERROR
 		ArrayList<String> emptyList = new ArrayList<String>();
-		return new SemanticDefinitionResult("ERROR", emptyList, 0);
+		return new SemanticDefinitionResult("ERROR", emptyList, -1);
 	}
 	
 }

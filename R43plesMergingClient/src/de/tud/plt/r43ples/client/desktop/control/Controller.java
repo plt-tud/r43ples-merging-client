@@ -795,7 +795,14 @@ public class Controller {
 					// Remove key from branch B key set copy
 					keySetTriplesBranchB.remove(currentKeyBranchA);
 				} else {
-					// TODO Add solution for no difference is specified for current triple
+					// No difference is specified for current triple
+					TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, -1, 
+																					Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
+					tableModel.addRow(tableEntry);
+					// Remove key from branch A key set copy
+					keySetTriplesBranchA.remove(currentKeyBranchA);
+					// Remove key from branch B key set copy
+					keySetTriplesBranchB.remove(currentKeyBranchA);
 				}
 			}
 		}
@@ -806,16 +813,23 @@ public class Controller {
 			String currentKeyBranchA = iteKeySetTriplesBranchAOnly.next();
 			TripleClassStructure currentTriple = classModelBranchA.getClassStructures().get(classUri).getTriples().get(currentKeyBranchA);
 			Difference difference = currentTriple.getDifference();
-			DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
-			SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
-			TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(
-																			difference,
-																			semanticDefinitionResult.getSemanticDescription(),
-																			semanticDefinitionResult.getSemanticResolutionOptions(),
-																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
-																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
-																			Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
-			tableModel.addRow(tableEntry);
+			if (difference != null) {
+				DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
+				SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
+				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(
+																				difference,
+																				semanticDefinitionResult.getSemanticDescription(),
+																				semanticDefinitionResult.getSemanticResolutionOptions(),
+																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																				Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
+				tableModel.addRow(tableEntry);
+			} else {
+				// No difference is specified for current triple
+				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, -1, 
+																				Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
+				tableModel.addRow(tableEntry);
+			}
 		}
 		
 		// Iterate over all triples of branch B (will only contain the triples which are not in A)
@@ -824,16 +838,23 @@ public class Controller {
 			String currentKeyBranchB = iteKeySetTriplesBranchBOnly.next();
 			TripleClassStructure currentTriple = classModelBranchB.getClassStructures().get(classUri).getTriples().get(currentKeyBranchB);
 			Difference difference = currentTriple.getDifference();
-			DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
-			SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
-			TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(
-																			difference,
-																			semanticDefinitionResult.getSemanticDescription(),
-																			semanticDefinitionResult.getSemanticResolutionOptions(),
-																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
-																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
-																			Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
-			tableModel.addRow(tableEntry);
+			if (difference != null) {
+				DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
+				SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
+				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(
+																				difference,
+																				semanticDefinitionResult.getSemanticDescription(),
+																				semanticDefinitionResult.getSemanticResolutionOptions(),
+																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																				Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
+				tableModel.addRow(tableEntry);
+			} else {
+				// No difference is specified for current triple
+				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, -1, 
+																				Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
+				tableModel.addRow(tableEntry);
+			}
 		}
 
 		// Update triples table
