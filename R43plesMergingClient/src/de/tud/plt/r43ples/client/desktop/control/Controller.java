@@ -11,9 +11,12 @@ import java.util.Iterator;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
 
@@ -45,6 +48,7 @@ import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmen
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.StartMergingDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ApplicationUI;
+import de.tud.plt.r43ples.client.desktop.ui.dialog.ConfigurationDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.editor.table.CustomComboBoxEditor;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
@@ -61,6 +65,8 @@ public class Controller {
 
 	/** The logger. */
 	private static Logger logger = Logger.getLogger(Controller.class);
+	/** The configuration dialog. **/
+	private static ConfigurationDialog configDialog = new ConfigurationDialog();
 	/** The start merging dialog instance. **/
 	private static StartMergingDialog dialog = new StartMergingDialog();
 	/** The revision number of the branch A. **/
@@ -826,6 +832,108 @@ public class Controller {
 
 		// Update triples table
 		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+	}
+	
+	
+	/**
+	 * Update the table model of the configuration prefix mapping.
+	 */
+	private static void updateTableModelConfigurationPrefixMapping() {
+		DefaultTableModel tableModel = ConfigurationDialog.getTableModelPrefixMappings();
+		// Clear the table
+		tableModel.setColumnCount(0);
+		tableModel.getDataVector().removeAllElements();
+		// Add the columns
+		tableModel.addColumn("Prefix");
+		tableModel.addColumn("Mapping");
+		
+		HashMap<String, String> mappings = Config.prefixMappings;
+		Iterator<String> iteMappingKeys = mappings.keySet().iterator();
+		while (iteMappingKeys.hasNext()) {
+			String currentPrefix = iteMappingKeys.next();
+			String currentMapping = mappings.get(currentPrefix);
+			tableModel.addRow(new Object[]{currentPrefix, currentMapping});
+		}		
+		ConfigurationDialog.getTablePrefixMappings().updateUI();
+	}
+
+
+	/**
+	 * Show the configuation dialog.
+	 */
+	public static void showConfigurationDialog() {
+		// Update the remote text fields
+		ConfigurationDialog.getTfR43plesSparqlEndpoint().setText(Config.r43ples_sparql_endpoint);
+		ConfigurationDialog.getTfR43plesRevisionGraph().setText(Config.r43ples_revision_graph);
+		ConfigurationDialog.getTfR43plesSddGraph().setText(Config.r43ples_sdd_graph);		
+		// Update the local table
+		updateTableModelConfigurationPrefixMapping();
+		
+		configDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		configDialog.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
+		configDialog.setModal(true);
+		configDialog.setVisible(true);
+	}
+
+
+	/**
+	 * Create a new prefix mapping entry in corresponding table.
+	 */
+	public static void createNewPrefixMappingEntry() {
+		DefaultTableModel tableModel = ConfigurationDialog.getTableModelPrefixMappings();
+		tableModel.addRow(new Object[]{"", ""});
+		ConfigurationDialog.getTablePrefixMappings().updateUI();
+	}
+
+
+	/**
+	 * Delete the selected prefix mapping from corresponding table.
+	 */
+	public static void deleteSelectedPrefixMapping() {
+		JTable table = ConfigurationDialog.getTablePrefixMappings();
+		int[] selectedRows = table.getSelectedRows();
+		// Sort the array
+		Arrays.sort(selectedRows);
+		for (int i = selectedRows.length - 1; i >= 0; i--) {
+			int selectedRow = table.convertRowIndexToModel(selectedRows[i]);
+			ConfigurationDialog.getTableModelPrefixMappings().removeRow(selectedRow);
+		}
+		table.updateUI();
+	}
+
+
+	/**
+	 * Write the current configuration to file.
+	 * 
+	 * @throws ConfigurationException 
+	 */
+	public static void writeConfigurationToFile() throws ConfigurationException {
+		// Store the current configuration properties
+		Config.r43ples_sparql_endpoint = ConfigurationDialog.getTfR43plesSparqlEndpoint().getText();
+		Config.r43ples_revision_graph = ConfigurationDialog.getTfR43plesRevisionGraph().getText();
+		Config.r43ples_sdd_graph = ConfigurationDialog.getTfR43plesSddGraph().getText();
+		// Convert table model to hash map
+		HashMap<String, String> map = Config.prefixMappings;
+		map.clear();
+		DefaultTableModel tableModel = ConfigurationDialog.getTableModelPrefixMappings();
+		int rowCount = ConfigurationDialog.getTableModelPrefixMappings().getRowCount();
+		for (int r = 0; r < rowCount; r++) {
+			String key = (String) tableModel.getValueAt(r, 0);
+			String value = (String) tableModel.getValueAt(r, 1);
+			if (!key.equals("") && !value.equals("")) {
+				map.put(key, value);
+			}
+		}
+		Config.writeConfig("client.conf");
+		configDialog.setVisible(false);
+	}
+
+
+	/**
+	 * Close configuration dialog without changes.
+	 */
+	public static void closeConfigurationDialog() {
+		configDialog.setVisible(false);
 	}
 
 }

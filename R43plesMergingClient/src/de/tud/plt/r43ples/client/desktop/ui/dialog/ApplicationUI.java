@@ -112,6 +112,21 @@ public class ApplicationUI {
 		});
 		mnMenu.add(mntmNewMerge);
 		
+		JMenu mnEdit = new JMenu("Edit");
+		menuBar.add(mnEdit);
+		
+		JMenuItem mntmProperties = new JMenuItem("Properties");
+		mntmProperties.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.showConfigurationDialog();
+			}
+		});
+		mnEdit.add(mntmProperties);
+		
 		JToolBar toolBar = new JToolBar();
 		frmRplesMergingClient.getContentPane().add(toolBar, BorderLayout.NORTH);
 		
