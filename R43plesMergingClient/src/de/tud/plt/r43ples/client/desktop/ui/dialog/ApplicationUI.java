@@ -249,6 +249,7 @@ public class ApplicationUI {
 		panelResolutionTriples.add(scrollPaneResolutionTriples, BorderLayout.CENTER);
 		
 		tableResolutionTriples = new JTable();
+		tableResolutionTriples.setRowHeight(25);
 		tableResolutionTriples.setModel(tableModelResolutionTriples);
 		tableResolutionTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
@@ -302,6 +303,7 @@ public class ApplicationUI {
 		
 		tableResolutionSemanticEnrichmentAllClasses = new JTable();
 		tableResolutionSemanticEnrichmentAllClasses.setPreferredScrollableViewportSize(new Dimension(450, 150));
+		tableResolutionSemanticEnrichmentAllClasses.setRowHeight(25);
 		tableResolutionSemanticEnrichmentAllClasses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableResolutionSemanticEnrichmentAllClasses.setModel(tableModelSemanticEnrichmentAllClasses);
 		tableResolutionSemanticEnrichmentAllClasses.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -329,6 +331,7 @@ public class ApplicationUI {
 		panelResolutionSemanticEnrichmentClassTriples.add(scrollPaneResolutionSemanticEnrichmentClassTriples);
 		
 		tableResolutionSemanticEnrichmentClassTriples = new JTable();
+		tableResolutionSemanticEnrichmentClassTriples.setRowHeight(25);
 		tableResolutionSemanticEnrichmentClassTriples.setModel(tableModelSemanticEnrichmentClassTriples);
 		scrollPaneResolutionSemanticEnrichmentClassTriples.setViewportView(tableResolutionSemanticEnrichmentClassTriples);
 		

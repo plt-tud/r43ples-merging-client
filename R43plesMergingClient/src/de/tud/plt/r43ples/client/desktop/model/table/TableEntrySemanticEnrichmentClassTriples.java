@@ -20,21 +20,28 @@ public class TableEntrySemanticEnrichmentClassTriples {
 	private ArrayList<String> semanticResolutionOptions;
 	/** The default semantic resolution option. **/
 	private int defaultSemanticResolutionOption;
+	/** The selected semantic resolution option. **/
+	private int selectedSemanticResolutionOption;
 	/** The row data. **/
 	private Object[] rowData;
-	
-		
+
+
 	/**
 	 * The constructor.
 	 * 
 	 * @param difference the difference
+	 * @param semanticDescription the semantic description
+	 * @param semanticResolutionOptions the semantic resolution options
+	 * @param defaultSemanticResolutionOption the default semantic resolution option
+	 * @param selectedSemanticResolutionOption the selected semantic resolution option
 	 * @param rowData the row data
 	 */
-	public TableEntrySemanticEnrichmentClassTriples(Difference difference, String semanticDescription, ArrayList<String> semanticResolutionOptions, int defaultSemanticResolutionOption, Object[] rowData) {
+	public TableEntrySemanticEnrichmentClassTriples(Difference difference, String semanticDescription, ArrayList<String> semanticResolutionOptions, int defaultSemanticResolutionOption, int selectedSemanticResolutionOption, Object[] rowData) {
 		this.setDifference(difference);
 		this.setSemanticDescription(semanticDescription);
 		this.setSemanticResolutionOptions(semanticResolutionOptions);
 		this.setDefaultSemanticResolutionOption(defaultSemanticResolutionOption);
+		this.setSelectedSemanticResolutionOption(selectedSemanticResolutionOption);
 		this.setRowData(rowData);
 	}
 
@@ -116,6 +123,26 @@ public class TableEntrySemanticEnrichmentClassTriples {
 	 */
 	public void setDefaultSemanticResolutionOption(int defaultSemanticResolutionOption) {
 		this.defaultSemanticResolutionOption = defaultSemanticResolutionOption;
+	}
+	
+	
+	/**
+	 * Get the selected semantic resolution option.
+	 * 
+	 * @return
+	 */
+	public int getSelectedSemanticResolutionOption() {
+		return selectedSemanticResolutionOption;
+	}
+	
+	
+	/**
+	 * Set the selected semantic resolution option.
+	 * 
+	 * @param selectedSemanticResolutionOption the selected semantic resolution option to set
+	 */
+	public void setSelectedSemanticResolutionOption(int selectedSemanticResolutionOption) {
+		this.selectedSemanticResolutionOption = selectedSemanticResolutionOption;
 	}
 
 

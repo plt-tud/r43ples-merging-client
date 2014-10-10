@@ -73,6 +73,13 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		TableEntrySemanticEnrichmentClassTriples entry = entries.get(rowIndex);
+		
+		if (columnIndex == 7) {
+			if (!entry.getSemanticResolutionOptions().isEmpty()) {
+				return entry.getSemanticResolutionOptions().get(entry.getSelectedSemanticResolutionOption());
+			}
+		}
+
 		return entry.getRowData()[columnIndex];
 	}
 	

@@ -1,6 +1,8 @@
 package de.tud.plt.r43ples.client.desktop.ui.editor.table;
 
 import java.awt.Component;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -24,6 +26,10 @@ public class CustomComboBoxEditor extends DefaultCellEditor {
 	private static final long serialVersionUID = 1L;
 	/** The combo box model. **/
 	private DefaultComboBoxModel<String> model;
+	/** The combo box. **/
+	private JComboBox<String> comboBox;
+	/** The table entry. **/
+	private TableEntrySemanticEnrichmentClassTriples tableEntry;
 	
 	
 	/**
@@ -33,6 +39,7 @@ public class CustomComboBoxEditor extends DefaultCellEditor {
 	public CustomComboBoxEditor() {
 		super(new JComboBox<String>());
 		this.model = (DefaultComboBoxModel<String>)((JComboBox<String>)getComponent()).getModel();
+		this.comboBox = (JComboBox<String>)getComponent();
 	}
 	
 	
@@ -41,18 +48,38 @@ public class CustomComboBoxEditor extends DefaultCellEditor {
 	 */
 	@Override
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+		// Remove all entries
+		model.removeAllElements();		
 		// Get current table entry
-		TableEntrySemanticEnrichmentClassTriples tableEntry = ((TableModelSemanticEnrichmentClassTriples) table.getModel()).getTableEntry(row);
+		tableEntry = ((TableModelSemanticEnrichmentClassTriples) table.getModel()).getTableEntry(row);
 		// Add options to model
 		ArrayList<String> options = tableEntry.getSemanticResolutionOptions();
-		Iterator<String> iteOptions = options.iterator();
-		while (iteOptions.hasNext()) {
-			String currentOptions = iteOptions.next();
-			model.addElement(currentOptions);
+		if (!options.isEmpty()) {
+			Iterator<String> iteOptions = options.iterator();
+			while (iteOptions.hasNext()) {
+				String currentOptions = iteOptions.next();
+				model.addElement(currentOptions);
+			}
+			comboBox.setSelectedIndex(tableEntry.getSelectedSemanticResolutionOption());
+			table.setValueAt(options.get(tableEntry.getDefaultSemanticResolutionOption()), row, column);
 		}
-		model.setSelectedItem(options.get(tableEntry.getDefaultSemanticResolutionOption()));
-
+		
+		// Add listener
+		comboBox.addItemListener(new ItemListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+			 */
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				int selectedIndex = comboBox.getSelectedIndex();
+				if (selectedIndex != -1) {
+					tableEntry.setSelectedSemanticResolutionOption(comboBox.getSelectedIndex());
+				}
+			}
+		});
+		
 		return super.getTableCellEditorComponent(table, value, isSelected, row, column);
-	} 
+	}
 
 }

@@ -221,6 +221,8 @@ public class Controller {
 			}
 			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCheckBoxRendererResolutionTriples());
 			
+//			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellRenderer(new TableComboBoxRendererSemanticEnrichmentClassTriples());
+			
 			// Set the cell editor
 			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellEditor(new CustomComboBoxEditor());
 		
@@ -773,6 +775,7 @@ public class Controller {
 																					semanticDefinitionResult.getSemanticDescription(),
 																					semanticDefinitionResult.getSemanticResolutionOptions(),
 																					semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																					semanticDefinitionResult.getDefaultSemanticResolutionOption(),
 																					Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 					tableModel.addRow(tableEntry);
 					// Remove key from branch A key set copy
@@ -798,6 +801,7 @@ public class Controller {
 																			semanticDefinitionResult.getSemanticDescription(),
 																			semanticDefinitionResult.getSemanticResolutionOptions(),
 																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
 																			Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 			tableModel.addRow(tableEntry);
 		}
@@ -814,6 +818,7 @@ public class Controller {
 																			difference,
 																			semanticDefinitionResult.getSemanticDescription(),
 																			semanticDefinitionResult.getSemanticResolutionOptions(),
+																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
 																			semanticDefinitionResult.getDefaultSemanticResolutionOption(),
 																			Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 			tableModel.addRow(tableEntry);
