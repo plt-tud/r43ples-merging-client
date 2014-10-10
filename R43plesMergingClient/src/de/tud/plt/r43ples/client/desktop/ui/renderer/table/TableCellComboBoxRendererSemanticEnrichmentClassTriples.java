@@ -16,19 +16,11 @@ import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmen
  * @author Stephan Hensel
  *
  */
-public class TableComboBoxRendererSemanticEnrichmentClassTriples extends JComboBox<String> implements TableCellRenderer {
+public class TableCellComboBoxRendererSemanticEnrichmentClassTriples extends JComboBox<String> implements TableCellRenderer {
 
 	/** The default serial version. **/
 	private static final long serialVersionUID = 1L;
-
 	
-	/**
-	 * The constructor.
-	 */
-	public TableComboBoxRendererSemanticEnrichmentClassTriples() {
-
-	}
-
 
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)

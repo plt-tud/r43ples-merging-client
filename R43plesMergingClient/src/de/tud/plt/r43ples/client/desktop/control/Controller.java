@@ -52,6 +52,7 @@ import de.tud.plt.r43ples.client.desktop.ui.dialog.ConfigurationDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.editor.table.CustomComboBoxEditor;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCheckBoxRendererResolutionTriples;
 
@@ -228,6 +229,11 @@ public class Controller {
 			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCheckBoxRendererResolutionTriples());
 			
 //			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellRenderer(new TableComboBoxRendererSemanticEnrichmentClassTriples());
+			
+			TableCellRendererSemanticEnrichmentClassTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentClassTriples();
+			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getColumnCount() - 1; i++) {
+				ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
+			}
 			
 			// Set the cell editor
 			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellEditor(new CustomComboBoxEditor());
@@ -850,8 +856,8 @@ public class Controller {
 		HashMap<String, String> mappings = Config.prefixMappings;
 		Iterator<String> iteMappingKeys = mappings.keySet().iterator();
 		while (iteMappingKeys.hasNext()) {
-			String currentPrefix = iteMappingKeys.next();
-			String currentMapping = mappings.get(currentPrefix);
+			String currentMapping = iteMappingKeys.next();
+			String currentPrefix = mappings.get(currentMapping);
 			tableModel.addRow(new Object[]{currentPrefix, currentMapping});
 		}		
 		ConfigurationDialog.getTablePrefixMappings().updateUI();
@@ -918,8 +924,8 @@ public class Controller {
 		DefaultTableModel tableModel = ConfigurationDialog.getTableModelPrefixMappings();
 		int rowCount = ConfigurationDialog.getTableModelPrefixMappings().getRowCount();
 		for (int r = 0; r < rowCount; r++) {
-			String key = (String) tableModel.getValueAt(r, 0);
-			String value = (String) tableModel.getValueAt(r, 1);
+			String key = (String) tableModel.getValueAt(r, 1);
+			String value = (String) tableModel.getValueAt(r, 0);
 			if (!key.equals("") && !value.equals("")) {
 				map.put(key, value);
 			}

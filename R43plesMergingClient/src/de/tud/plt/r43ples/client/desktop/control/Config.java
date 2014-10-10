@@ -23,7 +23,7 @@ public class Config {
 	public static String r43ples_revision_graph;
 	/** The R43ples SDD graph. **/
 	public static String r43ples_sdd_graph;
-	/** The client prefix mappings. **/
+	/** The client prefix mappings. (key: mapping, value: prefix) **/
 	public static HashMap<String, String> prefixMappings = new HashMap<String, String>();
 	
 	
@@ -44,7 +44,7 @@ public class Config {
 		for (int i = 0; i < prefixMappingsArray.length; i++) {
 			String mapping = prefixMappingsArray[i];
 			String[] parts = mapping.split("\\|");
-			prefixMappings.put(parts[0], parts[1]);
+			prefixMappings.put(parts[1], parts[0]);
 		}
 	}
 	
@@ -63,7 +63,7 @@ public class Config {
 		while (itePrefixMappingsKeys.hasNext()) {
 			String currentKey = itePrefixMappingsKeys.next();
 			String currentValue = prefixMappings.get(currentKey);
-			prefixMappingsArray[index] = currentKey + "|" + currentValue;
+			prefixMappingsArray[index] = currentValue + "|" + currentKey;
 			index++;			
 		}
 		config.clearProperty("client.prefixmapping");

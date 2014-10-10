@@ -8,6 +8,7 @@ import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import de.tud.plt.r43ples.client.desktop.control.Management;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
 
@@ -50,7 +51,15 @@ public class TableCellRendererSummaryReport extends DefaultTableCellRenderer {
 				// Create top border
 				cellComponent.setBorder(new MatteBorder(2, 0, 0, 0, Color.BLACK));
 			}
-		}		
+		}
+		
+		// Replace URI by prefix if available
+		if ((column >= 0) && (column <= 2)) {
+			// Column 0 -> subject
+			// Column 1 -> predicate
+			// Column 2 -> object
+			setValue(Management.convertTripleStringToPrefixTripleString((String) value)); 
+		}
 		
 		return cellComponent;
 	}

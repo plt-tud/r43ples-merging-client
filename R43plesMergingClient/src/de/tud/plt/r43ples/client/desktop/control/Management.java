@@ -1414,5 +1414,39 @@ public class Management {
 		
 		return rowData;
 	}
+	
+	
+	/**
+	 * Converts a triple string to a string in which URIs are replaced by prefixes which were specified in the configuration.
+	 * If no prefix was found or if input string is a literal the input string will be returned.
+	 * 
+	 * @param tripleString the triple string (subject or predicate or object) to convert
+	 * @return the converted triple string or input string
+	 */
+	public static String convertTripleStringToPrefixTripleString(String tripleString) {
+		if (tripleString.contains("<") && tripleString.contains(">")) {
+			tripleString = tripleString.trim().replaceAll("<", "").replaceAll(">", "");
+			int lastIndexSlash = tripleString.lastIndexOf("/");
+			int lastIndexHash = tripleString.lastIndexOf("#");
+			if ((lastIndexSlash == -1) && (lastIndexHash == -1)) {
+				return tripleString;
+			} else {
+				int index = 0;
+				if (lastIndexSlash > lastIndexHash) {
+					// Slash separator found
+					index = lastIndexSlash + 1;
+				} else {
+					// Hash separator found
+					index = lastIndexHash + 1;
+				}
+				String subString = tripleString.substring(0, index);
+				// Try to find the prefix
+				if (Config.prefixMappings.containsKey(subString)) {
+					return Config.prefixMappings.get(subString) + ":" + tripleString.substring(index, tripleString.length());
+				}
+			}
+		}
+		return tripleString;
+	}
 
 }
