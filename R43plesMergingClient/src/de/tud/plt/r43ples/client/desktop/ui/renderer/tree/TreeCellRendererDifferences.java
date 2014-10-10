@@ -50,7 +50,7 @@ public class TreeCellRendererDifferences extends DefaultTreeCellRenderer {
 			String subject = Management.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getSubject() + ">");
 			String predicate = Management.convertTripleStringToPrefixTripleString(Management.getPredicate(difference.getTriple()));
 			String object = Management.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getObject() + ">");
-			setText(subject + " " + predicate + " " + object);
+			setText(subject + " " + predicate + " " + object + " .");
 		} else {
 			setText(treeNodeObject.getText());
 		}

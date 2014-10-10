@@ -348,6 +348,16 @@ public class ApplicationUI {
 		tableResolutionSemanticEnrichmentClassTriples = new JTable();
 		tableResolutionSemanticEnrichmentClassTriples.setRowHeight(25);
 		tableResolutionSemanticEnrichmentClassTriples.setModel(tableModelSemanticEnrichmentClassTriples);
+		tableResolutionSemanticEnrichmentClassTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+			 */
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				Controller.tableResolutionSemanticEnrichmentClassTriplesSelectionChanged();
+			}
+		});
 		scrollPaneResolutionSemanticEnrichmentClassTriples.setViewportView(tableResolutionSemanticEnrichmentClassTriples);
 		
 		JPanel panelRevisionGraph = new JPanel();
