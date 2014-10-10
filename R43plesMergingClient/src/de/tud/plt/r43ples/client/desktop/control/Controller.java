@@ -973,25 +973,27 @@ public class Controller {
 		if (rows.length == 1) {
 			int index = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().convertRowIndexToModel(rows[0]);
 			TableEntrySemanticEnrichmentClassTriples entry = ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getTableEntry(index);
-			logger.debug("Selected Entry: A - " + entry.getDifference().getReferencedRevisionA());
-			logger.debug("Selected Entry: B - " + entry.getDifference().getReferencedRevisionB());
-			
-			// Remove highlighting of already highlighted nodes
-			Management.removeHighlighting(graph, highlightedNodeNameA);
-			Management.removeHighlighting(graph, highlightedNodeNameB);
-			
-			// Highlight the new currently selected nodes and save them to currently selected node name variables
-			highlightedNodeNameA = entry.getDifference().getReferencedRevisionA();
-			highlightedNodeNameB = entry.getDifference().getReferencedRevisionB();
-			
-			Color color = Color.RED;
-			DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(entry.getDifference(), differenceModel);
-			if (!differenceGroup.isConflicting()) {
-				color = Color.ORANGE;
+			if (entry.getDifference() != null) {
+				logger.debug("Selected Entry: A - " + entry.getDifference().getReferencedRevisionA());
+				logger.debug("Selected Entry: B - " + entry.getDifference().getReferencedRevisionB());
+				
+				// Remove highlighting of already highlighted nodes
+				Management.removeHighlighting(graph, highlightedNodeNameA);
+				Management.removeHighlighting(graph, highlightedNodeNameB);
+				
+				// Highlight the new currently selected nodes and save them to currently selected node name variables
+				highlightedNodeNameA = entry.getDifference().getReferencedRevisionA();
+				highlightedNodeNameB = entry.getDifference().getReferencedRevisionB();
+				
+				Color color = Color.RED;
+				DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(entry.getDifference(), differenceModel);
+				if (!differenceGroup.isConflicting()) {
+					color = Color.ORANGE;
+				}
+				
+				Management.highlightNode(graph, highlightedNodeNameA, color);
+				Management.highlightNode(graph, highlightedNodeNameB, color);
 			}
-			
-			Management.highlightNode(graph, highlightedNodeNameA, color);
-			Management.highlightNode(graph, highlightedNodeNameB, color);
 		} else {
 			// Remove highlighting of already highlighted nodes
 			Management.removeHighlighting(graph, highlightedNodeNameA);
