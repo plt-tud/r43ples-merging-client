@@ -140,6 +140,7 @@ public class ReportDialog extends JDialog {
 		
 		table = new JTable();
 		table.setRowHeight(25);
+		table.getTableHeader().setReorderingAllowed(false);
 		table.setModel(tableModel);
 		table.setRowSelectionAllowed(true);
 		scrollPaneTable.setViewportView(table);

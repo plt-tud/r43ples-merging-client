@@ -110,6 +110,7 @@ public class ConfigurationDialog extends JDialog {
 		
 		tablePrefixMappings = new JTable();
 		tablePrefixMappings.setRowHeight(25);
+		tablePrefixMappings.getTableHeader().setReorderingAllowed(false);
 		tablePrefixMappings.setModel(tableModelPrefixMappings);
 		scrollPanePrefixMappings.setViewportView(tablePrefixMappings);
 		

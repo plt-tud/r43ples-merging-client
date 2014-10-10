@@ -265,6 +265,7 @@ public class ApplicationUI {
 		
 		tableResolutionTriples = new JTable();
 		tableResolutionTriples.setRowHeight(25);
+		tableResolutionTriples.getTableHeader().setReorderingAllowed(false);
 		tableResolutionTriples.setModel(tableModelResolutionTriples);
 		tableResolutionTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
@@ -319,6 +320,7 @@ public class ApplicationUI {
 		tableResolutionSemanticEnrichmentAllClasses = new JTable();
 		tableResolutionSemanticEnrichmentAllClasses.setPreferredScrollableViewportSize(new Dimension(450, 150));
 		tableResolutionSemanticEnrichmentAllClasses.setRowHeight(25);
+		tableResolutionSemanticEnrichmentAllClasses.getTableHeader().setReorderingAllowed(false);
 		tableResolutionSemanticEnrichmentAllClasses.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableResolutionSemanticEnrichmentAllClasses.setModel(tableModelSemanticEnrichmentAllClasses);
 		tableResolutionSemanticEnrichmentAllClasses.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -347,6 +349,7 @@ public class ApplicationUI {
 		
 		tableResolutionSemanticEnrichmentClassTriples = new JTable();
 		tableResolutionSemanticEnrichmentClassTriples.setRowHeight(25);
+		tableResolutionSemanticEnrichmentClassTriples.getTableHeader().setReorderingAllowed(false);
 		tableResolutionSemanticEnrichmentClassTriples.setModel(tableModelSemanticEnrichmentClassTriples);
 		tableResolutionSemanticEnrichmentClassTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
