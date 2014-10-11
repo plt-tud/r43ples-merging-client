@@ -363,6 +363,33 @@ public class ApplicationUI {
 		});
 		scrollPaneResolutionSemanticEnrichmentClassTriples.setViewportView(tableResolutionSemanticEnrichmentClassTriples);
 		
+		JToolBar toolBarResolutionSemanticEnrichmentClassTriples = new JToolBar();
+		panelResolutionSemanticEnrichmentClassTriples.add(toolBarResolutionSemanticEnrichmentClassTriples, BorderLayout.NORTH);
+		
+		JButton btnResolutionSemanticEnrichmentClassTriplesApproveSelected = new JButton("Approve selected");
+		btnResolutionSemanticEnrichmentClassTriplesApproveSelected.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.approveSelectedEntriesResolutionSemanticEnrichmentClassTriples();
+			}
+		});
+		toolBarResolutionSemanticEnrichmentClassTriples.add(btnResolutionSemanticEnrichmentClassTriplesApproveSelected);
+		
+		JButton btnResolutionSemanticEnrichmentClassTriplesSelectAll = new JButton("Select all");
+		btnResolutionSemanticEnrichmentClassTriplesSelectAll.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent e) {
+				Controller.selectAllEntriesResolutionSemanticEnrichmentClassTriples();
+			}
+		});
+		toolBarResolutionSemanticEnrichmentClassTriples.add(btnResolutionSemanticEnrichmentClassTriplesSelectAll);
+		
 		JPanel panelRevisionGraph = new JPanel();
 		splitPaneResolution.setLeftComponent(panelRevisionGraph);
 		panelRevisionGraph.setLayout(new BorderLayout(0, 0));
@@ -376,6 +403,7 @@ public class ApplicationUI {
 		panelRevisionGraphHeader.add(lblRevisionGraphHeader);
 		
 		scrollPaneGraph = new JScrollPane();
+		scrollPaneGraph.setPreferredSize(new Dimension(2, 100));
 		panelRevisionGraph.add(scrollPaneGraph, BorderLayout.CENTER);
 		
 		panelGraph = new JPanel();

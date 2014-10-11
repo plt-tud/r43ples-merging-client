@@ -1002,4 +1002,42 @@ public class Controller {
 		gp.updateUI();
 	}
 
+
+	/**
+	 * Approve selected entries of resolution semantic enrichment class triples table.
+	 */
+	public static void approveSelectedEntriesResolutionSemanticEnrichmentClassTriples() {
+		int[] selectedRows = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectedRows();
+		// Sort the array
+		Arrays.sort(selectedRows);
+		
+		for (int i = selectedRows.length - 1; i >= 0; i--) {
+			int selectedRow = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().convertRowIndexToModel(selectedRows[i]);
+			Difference difference = ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getTableEntry(selectedRow).getDifference();
+			difference.setResolutionState(ResolutionState.RESOLVED);
+			// Propagate changes to difference model
+			int selectedOption = ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getTableEntry(selectedRow).getSelectedSemanticResolutionOption();
+			if (selectedOption == 1) {
+				difference.setTripleResolutionState(SDDTripleStateEnum.ADDED);
+			} else {
+				difference.setTripleResolutionState(SDDTripleStateEnum.DELETED);
+			}
+		}
+		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+		
+		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
+		
+		ApplicationUI.getTreeDifferencesDivision().updateUI();
+	}
+	
+	
+	/**
+	 * Select all entries of resolution semantic enrichment class triples table.
+	 */
+	public static void selectAllEntriesResolutionSemanticEnrichmentClassTriples() {
+		if (ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getRowCount() > 0) {
+			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().setRowSelectionInterval(0, ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getRowCount() - 1);
+		}		
+	}
+
 }

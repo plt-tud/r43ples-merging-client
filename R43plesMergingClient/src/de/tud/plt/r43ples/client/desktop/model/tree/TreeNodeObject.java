@@ -1,6 +1,7 @@
 package de.tud.plt.r43ples.client.desktop.model.tree;
 
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
+import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 
 /**
  * Tree node object. Stores the tree node data.
@@ -27,8 +28,8 @@ public class TreeNodeObject {
 	 */
 	public TreeNodeObject(String text, ResolutionState resolutionState, Object object) {
 		this.setText(text);
+		this.setObject(object);
 		this.setResolutionState(resolutionState);
-		this.object = object;
 	}
 
 
@@ -58,6 +59,11 @@ public class TreeNodeObject {
 	 * @return the resolution state
 	 */
 	public ResolutionState getResolutionState() {
+		if (object != null) {
+			if (object.getClass().equals(Difference.class)) {
+				return ((Difference) object).getResolutionState();
+			}
+		}
 		return resolutionState;
 	}
 
@@ -68,6 +74,11 @@ public class TreeNodeObject {
 	 * @param resolutionState the resolution state
 	 */
 	public void setResolutionState(ResolutionState resolutionState) {
+		if (object != null) {
+			if (object.getClass().equals(Difference.class)) {
+				((Difference) object).setResolutionState(resolutionState);
+			}
+		}
 		this.resolutionState = resolutionState;
 	}
 
