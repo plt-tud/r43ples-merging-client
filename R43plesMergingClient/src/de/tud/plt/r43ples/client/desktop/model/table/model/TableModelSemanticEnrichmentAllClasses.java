@@ -1,24 +1,25 @@
-package de.tud.plt.r43ples.client.desktop.model.table;
+package de.tud.plt.r43ples.client.desktop.model.table.model;
 
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllClasses;
+
 /**
- * Table model for resolution triples table.
- * Column 6 will contain checkboxes.
+ * Table model for semantic enrichment table which contains all classes.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelResolutionTriples extends AbstractTableModel {
+public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Conflicting", "State A (Revision)", "State B (Revision)", "Subject", "Predicate", "Object", "Resolution state"};
+	private static final String[] header = {"Classes branch A", "Classes branch B"};
 	/** The row data list. **/
-	private List<TableEntry> entries;
+	private List<TableEntrySemanticEnrichmentAllClasses> entries;
 
 	
 	/**
@@ -26,7 +27,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelResolutionTriples(List<TableEntry> entries) {
+	public TableModelSemanticEnrichmentAllClasses(List<TableEntrySemanticEnrichmentAllClasses> entries) {
 		this.entries = entries;
 	}
 	
@@ -45,9 +46,6 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int column) {
-		if (column == 6) {
-			return Boolean.class;
-		}
 		return super.getColumnClass(column);		
 	}
 
@@ -75,7 +73,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntry entry = entries.get(rowIndex);
+		TableEntrySemanticEnrichmentAllClasses entry = entries.get(rowIndex);
 		return entry.getRowData()[columnIndex];
 	}
 	
@@ -95,9 +93,6 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		if (column == 6) 
-			return true;
-		
 		return false;
 	}
 	
@@ -107,7 +102,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntry entry) {
+	public void addRow(TableEntrySemanticEnrichmentAllClasses entry) {
 		entries.add(entry);
 	}
 	
@@ -136,7 +131,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntry getTableEntry(int rowIndex) {
+	public TableEntrySemanticEnrichmentAllClasses getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
 	}
 

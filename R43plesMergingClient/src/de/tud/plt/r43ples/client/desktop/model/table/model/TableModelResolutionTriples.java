@@ -1,25 +1,26 @@
-package de.tud.plt.r43ples.client.desktop.model.table;
+package de.tud.plt.r43ples.client.desktop.model.table.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
+
 /**
- * Table model for filter table.
- * Column 0 will contain checkboxes.
+ * Table model for resolution triples table.
+ * Column 6 will contain checkboxes.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelFilter extends AbstractTableModel {
+public class TableModelResolutionTriples extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Property"};
+	private static final String[] header = {"Conflicting", "State A (Revision)", "State B (Revision)", "Subject", "Predicate", "Object", "Resolution state"};
 	/** The row data list. **/
-	private List<TableEntryFilter> entries;
+	private List<TableEntry> entries;
 
 	
 	/**
@@ -27,7 +28,7 @@ public class TableModelFilter extends AbstractTableModel {
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelFilter(List<TableEntryFilter> entries) {
+	public TableModelResolutionTriples(List<TableEntry> entries) {
 		this.entries = entries;
 	}
 	
@@ -46,7 +47,7 @@ public class TableModelFilter extends AbstractTableModel {
 	 */
 	@Override
 	public Class<?> getColumnClass(int column) {
-		if (column == 0) {
+		if (column == 6) {
 			return Boolean.class;
 		}
 		return super.getColumnClass(column);		
@@ -76,9 +77,9 @@ public class TableModelFilter extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntryFilter entry = entries.get(rowIndex);
-		return entry.isChecked();
-	}	
+		TableEntry entry = entries.get(rowIndex);
+		return entry.getRowData()[columnIndex];
+	}
 	
 	
 	/* (non-Javadoc)
@@ -86,7 +87,7 @@ public class TableModelFilter extends AbstractTableModel {
 	 */
 	@Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		entries.get(rowIndex).setChecked((Boolean) aValue);
+        entries.get(rowIndex).getRowData()[columnIndex] = aValue;
         fireTableCellUpdated(rowIndex, columnIndex);// notify listeners
     }
 	
@@ -96,7 +97,7 @@ public class TableModelFilter extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		if (column == 0) 
+		if (column == 6) 
 			return true;
 		
 		return false;
@@ -108,7 +109,7 @@ public class TableModelFilter extends AbstractTableModel {
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntryFilter entry) {
+	public void addRow(TableEntry entry) {
 		entries.add(entry);
 	}
 	
@@ -137,24 +138,8 @@ public class TableModelFilter extends AbstractTableModel {
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntryFilter getTableEntry(int rowIndex) {
+	public TableEntry getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
-	}
-	
-	
-	/**
-	 * Get the activated filters.
-	 * 
-	 * @return the array list of activated filters
-	 */
-	public ArrayList<String> getActivatedFilters() {
-		ArrayList<String> activatedFilters = new ArrayList<String>();
-		for (TableEntryFilter entry : entries) {
-			if (entry.isChecked()) {
-				activatedFilters.add(entry.getText());
-			}
-		}
-		return activatedFilters;
 	}
 
 }

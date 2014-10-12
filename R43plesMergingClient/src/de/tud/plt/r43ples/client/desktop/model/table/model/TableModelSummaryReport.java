@@ -1,23 +1,25 @@
-package de.tud.plt.r43ples.client.desktop.model.table;
+package de.tud.plt.r43ples.client.desktop.model.table.model;
 
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySummaryReport;
+
 /**
- * Table model for semantic enrichment table which contains all classes.
+ * Table model for summary report table.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
+public class TableModelSummaryReport extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Classes branch A", "Classes branch B"};
+	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Conflicting", "Automatic resolution state", "Resolution state", "Approved"};
 	/** The row data list. **/
-	private List<TableEntrySemanticEnrichmentAllClasses> entries;
+	private List<TableEntrySummaryReport> entries;
 
 	
 	/**
@@ -25,7 +27,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelSemanticEnrichmentAllClasses(List<TableEntrySemanticEnrichmentAllClasses> entries) {
+	public TableModelSummaryReport(List<TableEntrySummaryReport> entries) {
 		this.entries = entries;
 	}
 	
@@ -71,7 +73,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntrySemanticEnrichmentAllClasses entry = entries.get(rowIndex);
+		TableEntrySummaryReport entry = entries.get(rowIndex);
 		return entry.getRowData()[columnIndex];
 	}
 	
@@ -91,6 +93,9 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int row, int column) {
+		if (column == 5) 
+			return true;
+		
 		return false;
 	}
 	
@@ -100,7 +105,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntrySemanticEnrichmentAllClasses entry) {
+	public void addRow(TableEntrySummaryReport entry) {
 		entries.add(entry);
 	}
 	
@@ -129,7 +134,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntrySemanticEnrichmentAllClasses getTableEntry(int rowIndex) {
+	public TableEntrySummaryReport getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
 	}
 

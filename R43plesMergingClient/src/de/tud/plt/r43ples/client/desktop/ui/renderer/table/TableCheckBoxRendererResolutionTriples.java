@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.TableCellRenderer;
 
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
 
 /**
  * The table check box renderer of resolution triples table.

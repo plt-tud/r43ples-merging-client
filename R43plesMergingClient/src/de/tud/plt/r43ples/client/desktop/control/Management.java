@@ -56,8 +56,8 @@ import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
 import de.tud.plt.r43ples.client.desktop.model.structure.TripleClassStructure;
-import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 
 /**

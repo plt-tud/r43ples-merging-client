@@ -1,4 +1,4 @@
-package de.tud.plt.r43ples.client.desktop.ui;
+package de.tud.plt.r43ples.client.desktop.ui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

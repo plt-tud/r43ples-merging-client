@@ -1,4 +1,4 @@
-package de.tud.plt.r43ples.client.desktop.model.table;
+package de.tud.plt.r43ples.client.desktop.model.table.entry;
 
 /**
  * Table entry of filter table.

@@ -8,8 +8,8 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.Management;
-import de.tud.plt.r43ples.client.desktop.model.table.TableEntryFilter;
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelFilter;
 
 /**
  * The table check box renderer of filter table.

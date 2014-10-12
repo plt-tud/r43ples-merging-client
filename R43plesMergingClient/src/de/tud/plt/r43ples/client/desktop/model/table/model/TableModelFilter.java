@@ -1,24 +1,27 @@
-package de.tud.plt.r43ples.client.desktop.model.table;
+package de.tud.plt.r43ples.client.desktop.model.table.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
+
 /**
- * Table model for semantic enrichment table which contains all triples of selected class.
- * Column 7 will contain combo boxes.
+ * Table model for filter table.
+ * Column 0 will contain checkboxes.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel {
+public class TableModelFilter extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Conflicting", "State A (Revision)", "State B (Revision)", "Subject", "Predicate", "Object", "Semantic description", "Semantic resolution"};
+	private static final String[] header = {"Property"};
 	/** The row data list. **/
-	private List<TableEntrySemanticEnrichmentClassTriples> entries;
+	private List<TableEntryFilter> entries;
 
 	
 	/**
@@ -26,7 +29,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelSemanticEnrichmentClassTriples(List<TableEntrySemanticEnrichmentClassTriples> entries) {
+	public TableModelFilter(List<TableEntryFilter> entries) {
 		this.entries = entries;
 	}
 	
@@ -45,6 +48,9 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 */
 	@Override
 	public Class<?> getColumnClass(int column) {
+		if (column == 0) {
+			return Boolean.class;
+		}
 		return super.getColumnClass(column);		
 	}
 
@@ -72,16 +78,9 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntrySemanticEnrichmentClassTriples entry = entries.get(rowIndex);
-		
-		if (columnIndex == 7) {
-			if (!entry.getSemanticResolutionOptions().isEmpty()) {
-				return entry.getSemanticResolutionOptions().get(entry.getSelectedSemanticResolutionOption());
-			}
-		}
-
-		return entry.getRowData()[columnIndex];
-	}
+		TableEntryFilter entry = entries.get(rowIndex);
+		return entry.isChecked();
+	}	
 	
 	
 	/* (non-Javadoc)
@@ -89,7 +88,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 */
 	@Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        entries.get(rowIndex).getRowData()[columnIndex] = aValue;
+		entries.get(rowIndex).setChecked((Boolean) aValue);
         fireTableCellUpdated(rowIndex, columnIndex);// notify listeners
     }
 	
@@ -99,7 +98,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 */
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		if (column == 7) 
+		if (column == 0) 
 			return true;
 		
 		return false;
@@ -111,7 +110,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntrySemanticEnrichmentClassTriples entry) {
+	public void addRow(TableEntryFilter entry) {
 		entries.add(entry);
 	}
 	
@@ -140,8 +139,24 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntrySemanticEnrichmentClassTriples getTableEntry(int rowIndex) {
+	public TableEntryFilter getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
+	}
+	
+	
+	/**
+	 * Get the activated filters.
+	 * 
+	 * @return the array list of activated filters
+	 */
+	public ArrayList<String> getActivatedFilters() {
+		ArrayList<String> activatedFilters = new ArrayList<String>();
+		for (TableEntryFilter entry : entries) {
+			if (entry.isChecked()) {
+				activatedFilters.add(entry.getText());
+			}
+		}
+		return activatedFilters;
 	}
 
 }

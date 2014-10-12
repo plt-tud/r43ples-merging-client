@@ -20,8 +20,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
-import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySummaryReport;
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelSummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySummaryReport;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSummaryReport;
 
 /**
  * Report dialog displays the resolution state.

@@ -30,17 +30,18 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
-import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
-import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentAllClasses;
-import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentClassTriples;
-import de.tud.plt.r43ples.client.desktop.model.table.TableEntryFilter;
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelFilter;
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelResolutionTriples;
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentAllClasses;
-import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllClasses;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentAllClasses;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.tree.TreeCellRendererDifferences;
 
 import javax.swing.ListSelectionModel;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;

@@ -1,23 +1,26 @@
-package de.tud.plt.r43ples.client.desktop.model.table;
+package de.tud.plt.r43ples.client.desktop.model.table.model;
 
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
+
 /**
- * Table model for summary report table.
+ * Table model for semantic enrichment table which contains all triples of selected class.
+ * Column 7 will contain combo boxes.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelSummaryReport extends AbstractTableModel {
+public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Conflicting", "Automatic resolution state", "Resolution state", "Approved"};
+	private static final String[] header = {"Conflicting", "State A (Revision)", "State B (Revision)", "Subject", "Predicate", "Object", "Semantic description", "Semantic resolution"};
 	/** The row data list. **/
-	private List<TableEntrySummaryReport> entries;
+	private List<TableEntrySemanticEnrichmentClassTriples> entries;
 
 	
 	/**
@@ -25,7 +28,7 @@ public class TableModelSummaryReport extends AbstractTableModel {
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelSummaryReport(List<TableEntrySummaryReport> entries) {
+	public TableModelSemanticEnrichmentClassTriples(List<TableEntrySemanticEnrichmentClassTriples> entries) {
 		this.entries = entries;
 	}
 	
@@ -71,7 +74,14 @@ public class TableModelSummaryReport extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntrySummaryReport entry = entries.get(rowIndex);
+		TableEntrySemanticEnrichmentClassTriples entry = entries.get(rowIndex);
+		
+		if (columnIndex == 7) {
+			if (!entry.getSemanticResolutionOptions().isEmpty()) {
+				return entry.getSemanticResolutionOptions().get(entry.getSelectedSemanticResolutionOption());
+			}
+		}
+
 		return entry.getRowData()[columnIndex];
 	}
 	
@@ -91,7 +101,7 @@ public class TableModelSummaryReport extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		if (column == 5) 
+		if (column == 7) 
 			return true;
 		
 		return false;
@@ -103,7 +113,7 @@ public class TableModelSummaryReport extends AbstractTableModel {
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntrySummaryReport entry) {
+	public void addRow(TableEntrySemanticEnrichmentClassTriples entry) {
 		entries.add(entry);
 	}
 	
@@ -132,7 +142,7 @@ public class TableModelSummaryReport extends AbstractTableModel {
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntrySummaryReport getTableEntry(int rowIndex) {
+	public TableEntrySemanticEnrichmentClassTriples getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
 	}
 
