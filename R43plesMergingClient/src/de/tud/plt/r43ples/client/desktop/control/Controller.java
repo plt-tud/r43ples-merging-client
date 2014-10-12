@@ -41,8 +41,10 @@ import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.SemanticDefinitionResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.TripleClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntryFilter;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelFilter;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
@@ -51,6 +53,7 @@ import de.tud.plt.r43ples.client.desktop.ui.dialog.ApplicationUI;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ConfigurationDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.editor.table.CustomComboBoxEditor;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererFilter;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
@@ -94,6 +97,8 @@ public class Controller {
 	private static ReportResult reportResult = null;
 	/** The update table flag. Recursively used for updating the table. **/
 	private static boolean updateTableFlag = false;
+	/** The properties array list. **/
+	private static ArrayList<String> propertyList;
 	
 	
 	/**
@@ -205,12 +210,17 @@ public class Controller {
 				classModelBranchA = Management.createClassModelOfRevision(graphName, branchNameA, differenceModel);
 				classModelBranchB = Management.createClassModelOfRevision(graphName, branchNameB, differenceModel);
 				
+				// Create the property list of revision
+				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
+				
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				// There was no conflict merged revision was created
 				logger.info("Merge query produced no conflicts. Merged revision was created.");
 				// Create an empty difference model
 				differenceModel = new DifferenceModel();
+				// Create an empty property list
+				propertyList = new ArrayList<String>();
 				String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else {
@@ -234,10 +244,16 @@ public class Controller {
 			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getColumnCount() - 1; i++) {
 				ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
 			}
+
+			TableCellRendererFilter rendererFilter = new TableCellRendererFilter();
+			ApplicationUI.getTableFilter().getColumnModel().getColumn(0).setCellRenderer(rendererFilter);
 			
 			// Set the cell editor
 			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellEditor(new CustomComboBoxEditor());
 		
+			// Update filter table
+			updateTableModelFilter();
+			
 			// Update application UI
 			updateDifferencesTree();
 			
@@ -257,10 +273,12 @@ public class Controller {
 	 * Update the differences tree.
 	 */
 	public static void updateDifferencesTree() {
-		
 		DefaultMutableTreeNode rootNode = Management.createDifferencesTree(differenceModel);
 		ApplicationUI.getTreeModelDifferencesDivision().setRoot(rootNode);
-		
+		for (int i = 0; i < ApplicationUI.getTreeDifferencesDivision().getRowCount(); i++) {
+			ApplicationUI.getTreeDifferencesDivision().expandRow(i);
+		}
+		ApplicationUI.getTreeDifferencesDivision().updateUI();		
 	}
 
 
@@ -1038,6 +1056,35 @@ public class Controller {
 		if (ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getRowCount() > 0) {
 			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().setRowSelectionInterval(0, ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getRowCount() - 1);
 		}		
+	}
+	
+	
+	/**
+	 * Update the filter table model.
+	 */
+	public static void updateTableModelFilter() {
+		// Get the table model
+		TableModelFilter tableModel = ApplicationUI.getTableModelFilter();
+		
+		// Iterate over all property URIs
+		Iterator<String> iteProperties = propertyList.iterator();
+		while (iteProperties.hasNext()) {
+			String currentProperty = iteProperties.next();
+			TableEntryFilter tableEntry = new TableEntryFilter(currentProperty, true);
+			tableModel.addRow(tableEntry);			
+		}
+		
+		ApplicationUI.getTableFilter().updateUI();
+	}
+	
+	
+	/**
+	 * Get the currently activated filters.
+	 * 
+	 * @return the array list of activated filters
+	 */
+	public static ArrayList<String> getActivatedFilters() {
+		return ApplicationUI.getTableModelFilter().getActivatedFilters();
 	}
 
 }

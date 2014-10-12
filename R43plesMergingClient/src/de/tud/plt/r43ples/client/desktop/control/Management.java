@@ -587,7 +587,10 @@ public class Management {
 				Difference difference = iteDifferences.next();
 				
 				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.CONFLICT, difference));
-				differenceGroupNode.add(differenceNode);
+				// Check filter
+				if (Controller.getActivatedFilters().contains(difference.getTriple().getPredicate())) {
+					differenceGroupNode.add(differenceNode);
+				}
 			}
 			
 			conflictsNode.add(differenceGroupNode);
@@ -615,7 +618,10 @@ public class Management {
 				Difference difference = iteDifferences.next();
 				
 				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.DIFFERENCE, difference));
-				differenceGroupNode.add(differenceNode);
+				// Check filter
+				if (Controller.getActivatedFilters().contains(difference.getTriple().getPredicate())) {
+					differenceGroupNode.add(differenceNode);
+				}
 			}
 			
 			differencesNode.add(differenceGroupNode);
@@ -1475,6 +1481,77 @@ public class Management {
 			}
 		}
 		return tripleString;
+	}
+	
+	
+	/**
+	 * Get all properties of specified revision.
+	 * 
+	 * @param graphName the graph name
+	 * @param branchNameA the branch name A
+	 * @param branchNameB the branch name B
+	 * @return the array list of property URIs
+	 * @throws IOException 
+	 */
+	public static ArrayList<String> getPropertiesOfRevision(String graphName, String branchNameA, String branchNameB) throws IOException {
+		logger.info("Get all properties of branches.");
+		
+		// Result array list
+		ArrayList<String> list = new ArrayList<String>();
+		
+		// Get the revision numbers of branches
+		// TODO workaround - remove after corresponding issue was fixed
+		branchNameA = getRevisionNumber(graphName, branchNameA);
+		branchNameB = getRevisionNumber(graphName, branchNameB);
+
+    	// Query all properties (DISTINCT because there can be multiple property occurrences)
+		String query = String.format(
+				  "OPTION r43ples:SPARQL_JOIN %n"
+				+ "SELECT DISTINCT ?propertyUri %n"
+				+ "FROM <%s> REVISION \"%s\" %n"
+				+ "FROM <%s> REVISION \"%s\" %n"
+				+ "WHERE { %n"
+				+ "	?subject ?propertyUri ?object . %n"
+				+ "} %n"
+				+ "ORDER BY ?propertyUri", graphName, branchNameA, graphName, branchNameB);
+		logger.debug(query);
+		
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		logger.debug(result);
+		
+		// Iterate over all properties
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		while (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			list.add(qs.getResource("?propertyUri").toString());
+		}
+
+		return list;
+	}
+	
+	
+	/**
+	 * Get the revision number of a given reference name.
+	 * 
+	 * @param graphName the graph name
+	 * @param referenceName the reference name
+	 * @return the revision number of given reference name
+	 * @throws IOException
+	 */
+	public static String getRevisionNumber(final String graphName, final String referenceName) throws IOException {
+		String query = prefixes
+				+ String.format(
+						"SELECT ?revNumber WHERE { GRAPH <%s> {"
+								+ "	?rev a rmo:Revision; rmo:revisionNumber ?revNumber; rmo:revisionOf <%s>."
+								+ "	{?rev rmo:revisionNumber \"%s\".} UNION {?ref a rmo:Reference; rmo:references ?rev; rdfs:label \"%s\".}"
+								+ "} }", Config.r43ples_revision_graph, graphName, referenceName, referenceName);
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		if (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			return qs.getLiteral("?revNumber").toString();
+		}
+		return referenceName;
 	}
 
 }

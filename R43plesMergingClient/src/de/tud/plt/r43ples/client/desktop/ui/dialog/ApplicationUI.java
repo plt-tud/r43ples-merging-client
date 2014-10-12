@@ -33,12 +33,18 @@ import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.TableEntrySemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.TableEntryFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.TableModelFilter;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.TableModelSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.tree.TreeCellRendererDifferences;
 
 import javax.swing.ListSelectionModel;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * The application UI of the merging client.
@@ -70,6 +76,10 @@ public class ApplicationUI {
 	private static JTable tableResolutionSemanticEnrichmentClassTriples;
 	/** The semantic enrichment table model class triples. **/
 	private static TableModelSemanticEnrichmentClassTriples tableModelSemanticEnrichmentClassTriples = new TableModelSemanticEnrichmentClassTriples(new ArrayList<TableEntrySemanticEnrichmentClassTriples>());
+	/** The filter table. **/
+	private static JTable tableFilter;
+	/** The filter table model. **/
+	private static TableModelFilter tableModelFilter = new TableModelFilter(new ArrayList<TableEntryFilter>());
 	
 
 	/**
@@ -184,9 +194,60 @@ public class ApplicationUI {
 		panelFilter.add(panelFilterContent, BorderLayout.CENTER);
 		panelFilterContent.setLayout(new BorderLayout(0, 0));
 		
-//		CheckBoxTree tree = new CheckBoxTree();
-//		panelFilterContent.add(tree);
-//		tree.getCheckBoxTreeSelectionModel().setDigIn(true);
+		JScrollPane scrollPaneFilterContent = new JScrollPane();
+		panelFilterContent.add(scrollPaneFilterContent, BorderLayout.CENTER);
+		
+		tableFilter = new JTable();
+		tableFilter.addMouseListener(new MouseAdapter() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+			 */
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				Controller.updateDifferencesTree();
+			}
+		});
+		tableFilter.addKeyListener(new KeyAdapter() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.KeyAdapter#keyTyped(java.awt.event.KeyEvent)
+			 */
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				Controller.updateDifferencesTree();
+			}
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.KeyAdapter#keyReleased(java.awt.event.KeyEvent)
+			 */
+			@Override
+			public void keyReleased(KeyEvent e) {
+				Controller.updateDifferencesTree();
+			}
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.KeyAdapter#keyPressed(java.awt.event.KeyEvent)
+			 */
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+		});
+		tableFilter.setPreferredScrollableViewportSize(new Dimension(100, 150));
+		tableFilter.setRowHeight(25);
+		tableFilter.getTableHeader().setReorderingAllowed(false);
+		tableFilter.setModel(tableModelFilter);
+		tableFilter.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+			 */
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				Controller.updateDifferencesTree();
+			}
+		});
+		scrollPaneFilterContent.setViewportView(tableFilter);
 		
 		JPanel panelDifferences = new JPanel();
 		splitPanePreferences.setLeftComponent(panelDifferences);
@@ -608,6 +669,46 @@ public class ApplicationUI {
 	 */
 	public static void setTableResolutionSemanticEnrichmentClassTriples(JTable tableResolutionSemanticEnrichmentClassTriples) {
 		ApplicationUI.tableResolutionSemanticEnrichmentClassTriples = tableResolutionSemanticEnrichmentClassTriples;
+	}
+
+
+	/**
+	 * Get the filter table.
+	 * 
+	 * @return the filter table
+	 */
+	public static JTable getTableFilter() {
+		return tableFilter;
+	}
+
+
+	/**
+	 * Set the filter table
+	 * 
+	 * @param tableFilter the filter table to set
+	 */
+	public static void setTableFilter(JTable tableFilter) {
+		ApplicationUI.tableFilter = tableFilter;
+	}
+
+
+	/**
+	 * Get the filter table model.
+	 * 
+	 * @return the filter table model
+	 */
+	public static TableModelFilter getTableModelFilter() {
+		return tableModelFilter;
+	}
+
+
+	/**
+	 * Set the filter table model.
+	 * 
+	 * @param tableModelFilter the filter table model to set
+	 */
+	public static void setTableModelFilter(TableModelFilter tableModelFilter) {
+		ApplicationUI.tableModelFilter = tableModelFilter;
 	}
 
 }
