@@ -262,12 +262,8 @@ public class ApplicationUI {
 		lblDifferenceHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panelDifferenceHeader.add(lblDifferenceHeader);
 		
-		JTabbedPane tabbedPaneDifferences = new JTabbedPane(JTabbedPane.BOTTOM);
-		tabbedPaneDifferences.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panelDifferences.add(tabbedPaneDifferences, BorderLayout.CENTER);
-		
 		JPanel panelDifferencesDivision = new JPanel();
-		tabbedPaneDifferences.addTab("Division", null, panelDifferencesDivision, null);
+		panelDifferences.add(panelDifferencesDivision, BorderLayout.CENTER);
 		panelDifferencesDivision.setLayout(new BorderLayout(0, 0));
 		
 		JScrollPane scrollPaneDifferencesDivision = new JScrollPane();
@@ -294,9 +290,6 @@ public class ApplicationUI {
 			}
 		});	
 		scrollPaneDifferencesDivision.setViewportView(treeDifferencesDivision);
-		
-		JPanel panelDifferencesTriples = new JPanel();
-		tabbedPaneDifferences.addTab("Triples", null, panelDifferencesTriples, null);
 		
 		JSplitPane splitPaneResolution = new JSplitPane();
 		splitPaneResolution.setResizeWeight(0.5);
