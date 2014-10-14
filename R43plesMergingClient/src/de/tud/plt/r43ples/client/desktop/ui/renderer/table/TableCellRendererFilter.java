@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import de.tud.plt.r43ples.client.desktop.control.Management;
+import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelFilter;
 
@@ -51,7 +51,7 @@ public class TableCellRendererFilter extends JCheckBox implements TableCellRende
 		// Get the entry
 		TableEntryFilter entry = tableModel.getTableEntry(row);
 		
-		setText(Management.convertTripleStringToPrefixTripleString("<" + entry.getText() + ">"));
+		setText(Controller.convertTripleStringToPrefixTripleString("<" + entry.getText() + ">"));
 		
 		return this;
     }

@@ -21,10 +21,13 @@ import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.combobox.ComboBoxRendererStartMergingDialogGraph;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.combobox.ComboBoxRendererStartMergingDialogSDD;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 
@@ -80,23 +83,24 @@ public class StartMergingDialog extends JDialog {
 		contentPanel.add(panelMergingMethod);
 		panelMergingMethod.setLayout(new GridLayout(0, 3, 0, 0));
 		
+		rdbtnMergingMethodCOMMON = new JRadioButton("Common");
+		rdbtnMergingMethodCOMMON.setSelected(true);
+		buttonGroupMergingMethod.add(rdbtnMergingMethodCOMMON);
+		panelMergingMethod.add(rdbtnMergingMethodCOMMON);
+		
 		rdbtnMergingMethodAUTO = new JRadioButton("AUTO");
 		buttonGroupMergingMethod.add(rdbtnMergingMethodAUTO);
-		rdbtnMergingMethodAUTO.setSelected(true);
 		panelMergingMethod.add(rdbtnMergingMethodAUTO);
 		
 		rdbtnMergingMethodMANUAL = new JRadioButton("MANUAL");
+		rdbtnMergingMethodMANUAL.setVisible(false);
 		rdbtnMergingMethodMANUAL.setEnabled(false);
 		buttonGroupMergingMethod.add(rdbtnMergingMethodMANUAL);
 		panelMergingMethod.add(rdbtnMergingMethodMANUAL);
 		
-		rdbtnMergingMethodCOMMON = new JRadioButton("Common");
-		buttonGroupMergingMethod.add(rdbtnMergingMethodCOMMON);
-		panelMergingMethod.add(rdbtnMergingMethodCOMMON);
-		
-		JLabel lblSelectGraph = new JLabel("Select the graph");
-		lblSelectGraph.setBounds(13, 72, 96, 20);
-		contentPanel.add(lblSelectGraph);
+		JLabel lblGraph = new JLabel("GRAPH");
+		lblGraph.setBounds(13, 72, 96, 20);
+		contentPanel.add(lblGraph);
 		
 		JComboBox<String> cBGraph = new JComboBox<String>();
 		cBGraph.addActionListener(new ActionListener() {
@@ -114,20 +118,22 @@ public class StartMergingDialog extends JDialog {
 			}
 		});
 		cBGraph.setBounds(119, 72, 305, 20);
+		cBGraph.setRenderer(new ComboBoxRendererStartMergingDialogGraph());
 		cBGraph.setModel(cBModelGraph);
 		contentPanel.add(cBGraph);
 		
-		JLabel lblSelectSDD = new JLabel("Select the SDD");
-		lblSelectSDD.setBounds(13, 103, 96, 20);
-		contentPanel.add(lblSelectSDD);
+		JLabel lblSDD = new JLabel("SDD");
+		lblSDD.setBounds(13, 103, 96, 20);
+		contentPanel.add(lblSDD);
 		
 		JComboBox<String> cBSDD = new JComboBox<String>();
 		cBSDD.setBounds(119, 103, 305, 20);
+		cBSDD.setRenderer(new ComboBoxRendererStartMergingDialogSDD());
 		cBSDD.setModel(cBModelSDD);
 		contentPanel.add(cBSDD);
 		
 		JLabel lblMerge = new JLabel("MERGE");
-		lblMerge.setBounds(13, 134, 60, 20);
+		lblMerge.setBounds(13, 134, 96, 20);
 		contentPanel.add(lblMerge);
 		
 		JComboBox<String> comboBoxRevisionA = new JComboBox<String>();
@@ -146,7 +152,7 @@ public class StartMergingDialog extends JDialog {
 		contentPanel.add(comboBoxRevisionB);
 		
 		JLabel lblUser = new JLabel("USER");
-		lblUser.setBounds(13, 165, 60, 20);
+		lblUser.setBounds(13, 165, 96, 20);
 		contentPanel.add(lblUser);
 		
 		tfUser = new JTextField();
@@ -155,7 +161,7 @@ public class StartMergingDialog extends JDialog {
 		tfUser.setColumns(10);
 		
 		JLabel lblMessage = new JLabel("MESSAGE");
-		lblMessage.setBounds(13, 196, 60, 20);
+		lblMessage.setBounds(13, 196, 96, 20);
 		contentPanel.add(lblMessage);
 		
 		textAreaMessage = new JTextArea();

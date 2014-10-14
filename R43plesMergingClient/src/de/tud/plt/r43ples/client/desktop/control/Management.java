@@ -172,7 +172,8 @@ public class Management {
 					+ "		rdfs:label ?label . %n"
 					+ "	?rev rmo:revisionOfBranch ?branch ;"
 					+ "		rmo:revisionOf <%s> . %n"
-					+ "}", Config.r43ples_revision_graph, graphName);
+					+ "} %n"
+					+ "ORDER BY ?label", Config.r43ples_revision_graph, graphName);
 	
 			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
 			logger.debug(result);

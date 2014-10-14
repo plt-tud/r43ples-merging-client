@@ -8,7 +8,7 @@ import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import de.tud.plt.r43ples.client.desktop.control.Management;
+import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSummaryReport;
 
@@ -58,7 +58,7 @@ public class TableCellRendererSummaryReport extends DefaultTableCellRenderer {
 			// Column 0 -> subject
 			// Column 1 -> predicate
 			// Column 2 -> object
-			setValue(Management.convertTripleStringToPrefixTripleString((String) value)); 
+			setValue(Controller.convertTripleStringToPrefixTripleString((String) value)); 
 		}
 		
 		return cellComponent;

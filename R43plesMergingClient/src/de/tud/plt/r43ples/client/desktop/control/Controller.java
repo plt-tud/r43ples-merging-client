@@ -39,6 +39,7 @@ import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
 import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.SemanticDefinitionResult;
+import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
 import de.tud.plt.r43ples.client.desktop.model.structure.TripleClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
@@ -1085,6 +1086,29 @@ public class Controller {
 	 */
 	public static ArrayList<String> getActivatedFilters() {
 		return ApplicationUI.getTableModelFilter().getActivatedFilters();
+	}
+	
+	
+	/**
+	 * Converts a triple string to a string in which URIs are replaced by prefixes which were specified in the configuration.
+	 * If no prefix was found or if input string is a literal the input string will be returned.
+	 * 
+	 * @param tripleString the triple string (subject or predicate or object) to convert
+	 * @return the converted triple string or input string
+	 */
+	public static String convertTripleStringToPrefixTripleString(String tripleString) {
+		return Management.convertTripleStringToPrefixTripleString(tripleString);
+	}
+	
+	
+	/**
+	 * Get the predicate of triple. If predicate equals rdf:type 'a' will be returned.
+	 * 
+	 * @param triple the triple
+	 * @return the formatted predicate
+	 */
+	public static String getPredicate(Triple triple) {
+		return Management.getPredicate(triple);
 	}
 
 }

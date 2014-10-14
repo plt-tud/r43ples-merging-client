@@ -8,7 +8,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import de.tud.plt.r43ples.client.desktop.control.Management;
+import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
@@ -47,9 +47,9 @@ public class TreeCellRendererDifferences extends DefaultTreeCellRenderer {
 		
 		if ((treeNodeObject.getObject() != null) && (treeNodeObject.getObject().getClass().equals(Difference.class))) {
 			Difference difference = (Difference) treeNodeObject.getObject();
-			String subject = Management.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getSubject() + ">");
-			String predicate = Management.convertTripleStringToPrefixTripleString(Management.getPredicate(difference.getTriple()));
-			String object = Management.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getObject() + ">");
+			String subject = Controller.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getSubject() + ">");
+			String predicate = Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(difference.getTriple()));
+			String object = Controller.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getObject() + ">");
 			setText(subject + " " + predicate + " " + object + " .");		
 		} else {
 			setText(treeNodeObject.getText());

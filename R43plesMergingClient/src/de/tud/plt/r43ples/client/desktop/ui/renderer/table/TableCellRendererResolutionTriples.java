@@ -8,7 +8,7 @@ import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import de.tud.plt.r43ples.client.desktop.control.Management;
+import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
 
 /**
@@ -45,7 +45,7 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 			// Column 3 -> subject
 			// Column 4 -> predicate
 			// Column 5 -> object
-			setValue(Management.convertTripleStringToPrefixTripleString((String) value)); 
+			setValue(Controller.convertTripleStringToPrefixTripleString((String) value)); 
 		}
 		
 		return cellComponent;
