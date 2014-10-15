@@ -18,7 +18,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Conflicting", "State A (Revision)", "State B (Revision)", "Subject", "Predicate", "Object", "Semantic description", "Semantic resolution"};
+	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Conflicting", "Semantic description", "Semantic resolution"};
 	/** The row data list. **/
 	private List<TableEntrySemanticEnrichmentClassTriples> entries;
 

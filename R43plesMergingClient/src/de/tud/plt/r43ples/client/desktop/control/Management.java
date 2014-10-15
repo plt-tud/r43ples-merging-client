@@ -736,30 +736,26 @@ public class Management {
 	public static Object[] createRowDataResolutionTriples(Difference difference, DifferenceGroup differenceGroup) throws IOException {
 		Object[] rowData = new Object[7];
 		
-		rowData[0] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
+		rowData[0] = getSubject(difference.getTriple());
+		rowData[1] = getPredicate(difference.getTriple());
+		rowData[2] = getObject(difference.getTriple());
 		
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[2] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB();
 		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[1] = differenceGroup.getTripleStateA();
-			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else {
-			rowData[1] = differenceGroup.getTripleStateA();
-			rowData[2] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB();
 		}
 		
-		rowData[3] = "<" + difference.getTriple().getSubject() + ">";
-		rowData[4] = getPredicate(difference.getTriple());
-		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-			rowData[5] = "\"" + difference.getTriple().getObject() + "\"";
-		} else {
-			rowData[5] = "<" + difference.getTriple().getObject() + ">";
-		}
+		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
 
 		rowData[6] = difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED);
 		
@@ -916,13 +912,10 @@ public class Management {
 	 */
 	public static Object[] createRowDataSummaryReport(Difference difference, DifferenceGroup differenceGroup) {
 		Object[] rowData = new Object[9];
-		rowData[0] = "<" + difference.getTriple().getSubject() + ">";
+		
+		rowData[0] = getSubject(difference.getTriple());
 		rowData[1] = getPredicate(difference.getTriple());
-		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-			rowData[2] = "\"" + difference.getTriple().getObject() + "\"";
-		} else {
-			rowData[2] = "<" + difference.getTriple().getObject() + ">";
-		}
+		rowData[2] = getObject(difference.getTriple());
 			
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
@@ -1419,30 +1412,26 @@ public class Management {
 	public static Object[] createRowDataSemanticEnrichmentClassTriples(Difference difference, DifferenceGroup differenceGroup, String semanticDescription) {
 		Object[] rowData = new Object[8];
 
-		rowData[0] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
+		rowData[0] = getSubject(difference.getTriple());
+		rowData[1] = getPredicate(difference.getTriple());
+		rowData[2] = getObject(difference.getTriple());
 		
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[2] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB();
 		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[1] = differenceGroup.getTripleStateA();
-			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[1] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[2] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else {
-			rowData[1] = differenceGroup.getTripleStateA();
-			rowData[2] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA();
+			rowData[4] = differenceGroup.getTripleStateB();
 		}
-		
-		rowData[3] = "<" + difference.getTriple().getSubject() + ">";
-		rowData[4] = getPredicate(difference.getTriple());
-		if (difference.getTriple().getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-			rowData[5] = "\"" + difference.getTriple().getObject() + "\"";
-		} else {
-			rowData[5] = "<" + difference.getTriple().getObject() + ">";
-		}
+
+		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
 
 		rowData[6] = semanticDescription;
 		// Will be a combo box - entries are generated by editor
@@ -1465,13 +1454,9 @@ public class Management {
 		rowData[1] = "";
 		rowData[2] = "";
 		
-		rowData[3] = "<" + triple.getSubject() + ">";
+		rowData[3] = getSubject(triple);
 		rowData[4] = getPredicate(triple);
-		if (triple.getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
-			rowData[5] = "\"" + triple.getObject() + "\"";
-		} else {
-			rowData[5] = "<" + triple.getObject() + ">";
-		}
+		rowData[5] = getObject(triple);
 
 		rowData[6] = "";
 		// Will be a combo box - entries are generated by editor
