@@ -605,6 +605,7 @@ public class Controller {
 			logger.debug("Format result of graph: " + formatResult);
 			formatProcess.getOutputStream().close();
 		}
+		// TODO: Add Dot also for Linux
 		
 		StringWriter sw = new StringWriter();
 		graph.printGraph(sw);
