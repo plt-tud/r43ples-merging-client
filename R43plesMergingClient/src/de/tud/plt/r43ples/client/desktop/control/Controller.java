@@ -970,6 +970,14 @@ public class Controller {
 			}
 		}
 		Config.writeConfig("client.conf");
+		
+		// Update the corresponding tables and trees
+		ApplicationUI.getTreeDifferencesDivision().updateUI();
+		ApplicationUI.getTableResolutionTriples().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+		ApplicationUI.getTableFilter().updateUI();
+		
 		configDialog.setVisible(false);
 	}
 
