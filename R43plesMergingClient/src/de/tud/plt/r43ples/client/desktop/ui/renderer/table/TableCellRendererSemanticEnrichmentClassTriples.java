@@ -41,13 +41,13 @@ public class TableCellRendererSemanticEnrichmentClassTriples extends DefaultTabl
 			Triple triple = tableEntry.getDifference().getTriple();
 			
 			// Replace URI by prefix if available
-			if (column == 3) {
+			if (column == 0) {
 				// Subject
 				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
-			} else if (column == 4) {
+			} else if (column == 1) {
 				// Predicate
 				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
-			} else if (column == 5) {
+			} else if (column == 2) {
 				// Object
 				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 			}

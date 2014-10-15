@@ -18,7 +18,7 @@ public class TableModelResolutionTriples extends AbstractTableModel {
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Conflicting", "State A (Revision)", "State B (Revision)", "Subject", "Predicate", "Object", "Resolution state"};
+	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Conflicting", "Resolution state"};
 	/** The row data list. **/
 	private List<TableEntry> entries;
 
