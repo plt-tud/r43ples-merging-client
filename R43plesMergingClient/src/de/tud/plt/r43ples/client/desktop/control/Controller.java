@@ -1115,6 +1115,17 @@ public class Controller {
 	
 	
 	/**
+	 * Get the subject of triple.
+	 * 
+	 * @param triple the triple
+	 * @return the formatted subject
+	 */
+	public static String getSubject(Triple triple) {
+		return Management.getSubject(triple);
+	}
+	
+	
+	/**
 	 * Get the predicate of triple. If predicate equals rdf:type 'a' will be returned.
 	 * 
 	 * @param triple the triple
@@ -1122,6 +1133,17 @@ public class Controller {
 	 */
 	public static String getPredicate(Triple triple) {
 		return Management.getPredicate(triple);
+	}
+	
+	
+	/**
+	 * Get the object of triple.
+	 * 
+	 * @param triple the triple
+	 * @return the formatted object
+	 */
+	public static String getObject(Triple triple) {
+		return Management.getObject(triple);
 	}
 
 }

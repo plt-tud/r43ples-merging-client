@@ -9,6 +9,8 @@ import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
+import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
 
 /**
@@ -40,12 +42,22 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 			}
 		}
 		
+		// Get the table entry
+		TableEntry tableEntry =  tableModel.getTableEntry(row);
+				
+		// Get the triple
+		Triple triple = tableEntry.getDifference().getTriple();
+		
 		// Replace URI by prefix if available
-		if ((column >= 3) && (column <= 5)) {
-			// Column 3 -> subject
-			// Column 4 -> predicate
-			// Column 5 -> object
-			setValue(Controller.convertTripleStringToPrefixTripleString((String) value)); 
+		if (column == 3) {
+			// Subject
+			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
+		} else if (column == 4) {
+			// Predicate
+			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
+		} else if (column == 5) {
+			// Object
+			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 		}
 		
 		return cellComponent;

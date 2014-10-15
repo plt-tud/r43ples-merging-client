@@ -7,6 +7,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
+import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentClassTriples;
 
 /**
  * The table renderer of semantic enrichment class triples table.
@@ -27,12 +30,27 @@ public class TableCellRendererSemanticEnrichmentClassTriples extends DefaultTabl
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		JComponent cellComponent = (JComponent) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		
-		// Replace URI by prefix if available
-		if ((column >= 3) && (column <= 5)) {
-			// Column 3 -> subject
-			// Column 4 -> predicate
-			// Column 5 -> object
-			setValue(Controller.convertTripleStringToPrefixTripleString((String) value)); 
+		// Get the table model
+		TableModelSemanticEnrichmentClassTriples tableModel = (TableModelSemanticEnrichmentClassTriples) table.getModel();
+		
+		// Get the table entry
+		TableEntrySemanticEnrichmentClassTriples tableEntry =  tableModel.getTableEntry(row);
+				
+		// Get the triple
+		if (tableEntry.getDifference() != null) {
+			Triple triple = tableEntry.getDifference().getTriple();
+			
+			// Replace URI by prefix if available
+			if (column == 3) {
+				// Subject
+				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
+			} else if (column == 4) {
+				// Predicate
+				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
+			} else if (column == 5) {
+				// Object
+				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
+			}
 		}
 		
 		return cellComponent;

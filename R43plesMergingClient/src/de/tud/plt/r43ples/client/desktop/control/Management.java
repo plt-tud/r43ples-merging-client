@@ -487,6 +487,17 @@ public class Management {
 	
 	
 	/**
+	 * Get the subject of triple.
+	 * 
+	 * @param triple the triple
+	 * @return the formatted subject
+	 */
+	public static String getSubject(Triple triple) {
+		return "<" + triple.getSubject() + ">";
+	}
+
+	
+	/**
 	 * Get the predicate of triple. If predicate equals rdf:type 'a' will be returned.
 	 * 
 	 * @param triple the triple
@@ -497,6 +508,25 @@ public class Management {
 			return "a";
 		} else {
 			return "<" + triple.getPredicate() + ">";
+		}
+	}
+	
+	
+	/**
+	 * Get the object of triple.
+	 * 
+	 * @param triple the triple
+	 * @return the formatted object
+	 */
+	public static String getObject(Triple triple) {
+		if (triple.getObjectType().equals(TripleObjectTypeEnum.LITERAL)) {
+			if (triple.getObject().contains("@")) {
+				return "\"" + triple.getObject().substring(0, triple.getObject().lastIndexOf("@")) + "\"@" + triple.getObject().substring(triple.getObject().lastIndexOf("@") + 1, triple.getObject().length());
+			} else {
+				return "\"" + triple.getObject() + "\"";
+			}
+		} else {
+			return "<" + triple.getObject() + ">";		
 		}
 	}
 	
@@ -1460,9 +1490,9 @@ public class Management {
 	 */
 	public static String convertTripleStringToPrefixTripleString(String tripleString) {
 		if (tripleString.contains("<") && tripleString.contains(">")) {
-			tripleString = tripleString.trim().replaceAll("<", "").replaceAll(">", "");
-			int lastIndexSlash = tripleString.lastIndexOf("/");
-			int lastIndexHash = tripleString.lastIndexOf("#");
+			String tripleStringConverted = tripleString.trim().replaceAll("<", "").replaceAll(">", "");
+			int lastIndexSlash = tripleStringConverted.lastIndexOf("/");
+			int lastIndexHash = tripleStringConverted.lastIndexOf("#");
 			if ((lastIndexSlash == -1) && (lastIndexHash == -1)) {
 				return tripleString;
 			} else {
@@ -1474,10 +1504,10 @@ public class Management {
 					// Hash separator found
 					index = lastIndexHash + 1;
 				}
-				String subString = tripleString.substring(0, index);
+				String subString = tripleStringConverted.substring(0, index);
 				// Try to find the prefix
 				if (Config.prefixMappings.containsKey(subString)) {
-					return Config.prefixMappings.get(subString) + ":" + tripleString.substring(index, tripleString.length());
+					return Config.prefixMappings.get(subString) + ":" + tripleStringConverted.substring(index, tripleStringConverted.length());
 				}
 			}
 		}

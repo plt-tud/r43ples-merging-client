@@ -47,9 +47,9 @@ public class TreeCellRendererDifferences extends DefaultTreeCellRenderer {
 		
 		if ((treeNodeObject.getObject() != null) && (treeNodeObject.getObject().getClass().equals(Difference.class))) {
 			Difference difference = (Difference) treeNodeObject.getObject();
-			String subject = Controller.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getSubject() + ">");
+			String subject = Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(difference.getTriple()));
 			String predicate = Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(difference.getTriple()));
-			String object = Controller.convertTripleStringToPrefixTripleString("<" + difference.getTriple().getObject() + ">");
+			String object = Controller.convertTripleStringToPrefixTripleString(Controller.getObject(difference.getTriple()));
 			setText(subject + " " + predicate + " " + object + " .");		
 		} else {
 			setText(treeNodeObject.getText());
