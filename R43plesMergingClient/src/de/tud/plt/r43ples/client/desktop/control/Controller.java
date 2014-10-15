@@ -17,6 +17,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.SystemUtils;
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
 
@@ -595,11 +596,15 @@ public class Controller {
 		
 		graph = Management.getDotGraph(graphName);	
 
-		// Layout the graph
-		String [] processArgs = {"app/dot"};
-		Process formatProcess = Runtime.getRuntime().exec(processArgs, null, null);
-		System.out.println(GrappaSupport.filterGraph(graph, formatProcess));
-		formatProcess.getOutputStream().close();
+		// Generate layout of the graph is only available at windows OS
+		// GraphViz version 2.20 is needed
+		if (SystemUtils.IS_OS_WINDOWS) {
+			String [] processArgs = {"app/dot"};
+			Process formatProcess = Runtime.getRuntime().exec(processArgs, null, null);
+			boolean formatResult = GrappaSupport.filterGraph(graph, formatProcess);
+			logger.debug("Format result of graph: " + formatResult);
+			formatProcess.getOutputStream().close();
+		}
 		
 		StringWriter sw = new StringWriter();
 		graph.printGraph(sw);
