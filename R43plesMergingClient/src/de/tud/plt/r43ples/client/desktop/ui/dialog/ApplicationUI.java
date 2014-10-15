@@ -64,7 +64,9 @@ public class ApplicationUI {
 	/** The graph scroll pane. **/
 	private static JScrollPane scrollPaneGraph;
 	/** The graph panel. **/
-	private static JPanel panelGraph;	
+	private static JPanel panelGraph;
+	/** The resolution tabbed pane. **/
+	private static JTabbedPane tabbedPaneResolution;	
 	/** The resolution triples table. **/
 	private static JTable tableResolutionTriples;
 	/** The resolution triples table model. **/
@@ -308,7 +310,7 @@ public class ApplicationUI {
 		JLabel lblResolutionHeader = new JLabel(" Resolution");
 		panelResolutionHeader.add(lblResolutionHeader, BorderLayout.NORTH);
 		
-		JTabbedPane tabbedPaneResolution = new JTabbedPane(JTabbedPane.BOTTOM);
+		tabbedPaneResolution = new JTabbedPane(JTabbedPane.BOTTOM);
 		panelResolution.add(tabbedPaneResolution, BorderLayout.CENTER);
 		
 		JPanel panelResolutionTriples = new JPanel();
@@ -583,6 +585,26 @@ public class ApplicationUI {
 	 */
 	public static void setPanelGraph(JPanel panelGraph) {
 		ApplicationUI.panelGraph = panelGraph;
+	}
+
+
+	/**
+	 * Get the resolution tabbed pane.
+	 * 
+	 * @return the resolution tabbed pane
+	 */
+	public static JTabbedPane getTabbedPaneResolution() {
+		return tabbedPaneResolution;
+	}
+
+
+	/**
+	 * Set the resolution tabbed pane.
+	 * 
+	 * @param tabbedPaneResolution the resolution tabbed pane to set
+	 */
+	public static void setTabbedPaneResolution(JTabbedPane tabbedPaneResolution) {
+		ApplicationUI.tabbedPaneResolution = tabbedPaneResolution;
 	}
 
 

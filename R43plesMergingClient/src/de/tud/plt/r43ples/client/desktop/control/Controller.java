@@ -212,7 +212,18 @@ public class Controller {
 				classModelBranchA = Management.createClassModelOfRevision(graphName, branchNameA, differenceModel);
 				classModelBranchB = Management.createClassModelOfRevision(graphName, branchNameB, differenceModel);
 				
-				// Create the property list of revision
+				// Check existence of classes
+				if (classModelBranchA.getClassStructures().isEmpty() && classModelBranchB.getClassStructures().isEmpty()) {
+					// Disable semantic enrichment individuals tab
+					ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
+					ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
+				} else {
+					// Enable semantic enrichment individuals tab
+					ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, true);
+				}
+				
+				
+				// Create the property list of revisions
 				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
 				
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
