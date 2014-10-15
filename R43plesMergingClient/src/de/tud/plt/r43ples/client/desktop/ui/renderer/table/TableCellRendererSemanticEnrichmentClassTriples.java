@@ -1,9 +1,11 @@
 package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
@@ -35,7 +37,7 @@ public class TableCellRendererSemanticEnrichmentClassTriples extends DefaultTabl
 		
 		// Get the table entry
 		TableEntrySemanticEnrichmentClassTriples tableEntry =  tableModel.getTableEntry(row);
-				
+		
 		// Get the triple
 		if (tableEntry.getDifference() != null) {
 			Triple triple = tableEntry.getDifference().getTriple();
@@ -52,6 +54,33 @@ public class TableCellRendererSemanticEnrichmentClassTriples extends DefaultTabl
 				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 			}
 		}
+		
+		// Border definitions
+		int top = 0;
+		int left = 0;
+		int bottom = 0;
+		int right = 0;
+		
+		// Set the border between conflicting differences and non conflicting differences
+		if ((row != tableModel.getRowCount() - 1) && (row > 0)) {
+			if (!tableModel.getValueAt(row, 5).equals(tableModel.getValueAt(row - 1, 5))) {
+				// Create top border
+				top = 2;
+			}
+		}
+		
+		// Set border right to object column
+		if (column == 2) {
+			right = 2;
+		}
+		
+		// Set border right to conflicting column
+		if (column == 6) {
+			right = 2;
+		}
+		
+		// Set border
+		cellComponent.setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
 		
 		return cellComponent;
     }

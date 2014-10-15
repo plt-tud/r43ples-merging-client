@@ -33,14 +33,6 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 
 		// Get the table model
 		TableModelResolutionTriples tableModel = (TableModelResolutionTriples) table.getModel();
-						
-		// Set the border between conflicting differences and non conflicting differences
-		if ((row != tableModel.getRowCount() - 1) && (row > 0)) {
-			if (!tableModel.getValueAt(row, 0).equals(tableModel.getValueAt(row - 1, 0))) {
-				// Create top border
-				cellComponent.setBorder(new MatteBorder(2, 0, 0, 0, Color.BLACK));
-			}
-		}
 		
 		// Get the table entry
 		TableEntry tableEntry =  tableModel.getTableEntry(row);
@@ -59,6 +51,33 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 			// Object
 			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 		}
+		
+		// Border definitions
+		int top = 0;
+		int left = 0;
+		int bottom = 0;
+		int right = 0;
+		
+		// Set the border between conflicting differences and non conflicting differences
+		if ((row != tableModel.getRowCount()) && (row > 0)) {
+			if (!tableModel.getValueAt(row, 5).equals(tableModel.getValueAt(row - 1, 5))) {
+				// Create top border
+				top = 2;
+			}
+		}
+		
+		// Set border right to object column
+		if (column == 2) {
+			right = 2;
+		}
+		
+		// Set border right to conflicting column
+		if (column == 5) {
+			right = 2;
+		}
+		
+		// Set border
+		cellComponent.setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
 		
 		return cellComponent;
 	}

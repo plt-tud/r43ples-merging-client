@@ -49,17 +49,22 @@ public class TableCheckBoxRendererResolutionTriples extends JCheckBox implements
 		// Get the table model
 		TableModelResolutionTriples tableModel = (TableModelResolutionTriples) table.getModel();
 		
+		// Border definitions
+		int top = 0;
+		int left = 0;
+		int bottom = 0;
+		int right = 0;
+		
 		// Set the border between conflicting differences and non conflicting differences
-		if ((row != tableModel.getRowCount() - 1) && (row > 0)) {
-			if (!tableModel.getValueAt(row, 0).equals(tableModel.getValueAt(row - 1, 0))) {
+		if ((row != tableModel.getRowCount()) && (row > 0)) {
+			if (!tableModel.getValueAt(row, 5).equals(tableModel.getValueAt(row - 1, 5))) {
 				// Create top border
-				setBorder(new MatteBorder(2, 0, 0, 0, Color.BLACK));
-			} else {
-				setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
+				top = 2;
 			}
-		} else {
-			setBorder(new MatteBorder(0, 0, 0, 0, Color.BLACK));
 		}
+		
+		// Set border
+		setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
 		
 		return this;
     }
