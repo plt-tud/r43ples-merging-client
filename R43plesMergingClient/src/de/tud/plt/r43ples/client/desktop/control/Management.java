@@ -1499,11 +1499,6 @@ public class Management {
 		
 		// Result array list
 		ArrayList<String> list = new ArrayList<String>();
-		
-		// Get the revision numbers of branches
-		// TODO workaround - remove after corresponding issue was fixed
-		branchNameA = getRevisionNumber(graphName, branchNameA);
-		branchNameB = getRevisionNumber(graphName, branchNameB);
 
     	// Query all properties (DISTINCT because there can be multiple property occurrences)
 		String query = String.format(
