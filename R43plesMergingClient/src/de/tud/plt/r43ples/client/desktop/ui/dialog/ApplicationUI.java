@@ -22,6 +22,8 @@ import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -83,6 +85,10 @@ public class ApplicationUI {
 	private static JTable tableFilter;
 	/** The filter table model. **/
 	private static TableModelFilter tableModelFilter = new TableModelFilter(new ArrayList<TableEntryFilter>());
+	/** The application split pane. **/
+	private static JSplitPane splitPaneApplication;
+	/** The preferences split pane. **/
+	private static JSplitPane splitPanePreferences;
 	
 
 	/**
@@ -172,11 +178,11 @@ public class ApplicationUI {
 		});
 		toolBar.add(btnPush);
 		
-		JSplitPane splitPaneApplication = new JSplitPane();
+		splitPaneApplication = new JSplitPane();
 		splitPaneApplication.setResizeWeight(0.3);
 		frmRplesMergingClient.getContentPane().add(splitPaneApplication, BorderLayout.CENTER);
 		
-		JSplitPane splitPanePreferences = new JSplitPane();
+		splitPanePreferences = new JSplitPane();
 		splitPanePreferences.setResizeWeight(0.5);
 		splitPanePreferences.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPaneApplication.setLeftComponent(splitPanePreferences);
@@ -311,6 +317,16 @@ public class ApplicationUI {
 		panelResolutionHeader.add(lblResolutionHeader, BorderLayout.NORTH);
 		
 		tabbedPaneResolution = new JTabbedPane(JTabbedPane.BOTTOM);
+		tabbedPaneResolution.addChangeListener(new ChangeListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+			 */
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				Controller.resolutionTabSelectionChanged();
+			}
+		});
 		panelResolution.add(tabbedPaneResolution, BorderLayout.CENTER);
 		
 		JPanel panelResolutionTriples = new JPanel();
@@ -725,6 +741,26 @@ public class ApplicationUI {
 	 */
 	public static void setTableModelFilter(TableModelFilter tableModelFilter) {
 		ApplicationUI.tableModelFilter = tableModelFilter;
+	}
+
+
+	/**
+	 * Get the application split pane.
+	 * 
+	 * @return the application split pane
+	 */
+	public static JSplitPane getSplitPaneApplication() {
+		return splitPaneApplication;
+	}
+	
+	
+	/**
+	 * Get the preferences split pane.
+	 * 
+	 * @return the preferences split pane
+	 */
+	public static JSplitPane getSplitPanePreferences() {
+		return splitPanePreferences;
 	}
 
 }

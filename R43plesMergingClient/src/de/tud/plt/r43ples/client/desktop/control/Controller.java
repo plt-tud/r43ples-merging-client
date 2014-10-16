@@ -105,7 +105,9 @@ public class Controller {
 	/** The wait cursor. **/
 	private static Cursor waitCursor = new Cursor(Cursor.WAIT_CURSOR);
 	/** The default cursor. **/
-	private static Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);	
+	private static Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);
+	/** The divider location of application split pane. **/
+	private static int dividerLocationSplitPaneApplication = 300;
 	
 	
 	/**
@@ -1168,6 +1170,24 @@ public class Controller {
 	 */
 	public static String getObject(Triple triple) {
 		return Management.getObject(triple);
+	}
+
+
+	/**
+	 * The resolution tab selection changed. Update corresponding UI - disable tree and filter.
+	 */
+	public static void resolutionTabSelectionChanged() {
+		if (ApplicationUI.getTabbedPaneResolution().getSelectedIndex() == 0) {
+			if (dividerLocationSplitPaneApplication != -1) {
+				ApplicationUI.getSplitPaneApplication().setDividerLocation(dividerLocationSplitPaneApplication);
+			}
+			ApplicationUI.getSplitPanePreferences().setVisible(true);
+			dividerLocationSplitPaneApplication = -1;
+		} else {
+			dividerLocationSplitPaneApplication = ApplicationUI.getSplitPaneApplication().getDividerLocation();
+			ApplicationUI.getSplitPaneApplication().setDividerLocation(0);
+			ApplicationUI.getSplitPanePreferences().setVisible(false);
+		}
 	}
 
 }
