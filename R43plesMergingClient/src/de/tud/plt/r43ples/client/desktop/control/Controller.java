@@ -1,6 +1,7 @@
 package de.tud.plt.r43ples.client.desktop.control;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -101,6 +102,10 @@ public class Controller {
 	private static boolean updateTableFlag = false;
 	/** The properties array list. **/
 	private static ArrayList<String> propertyList;
+	/** The wait cursor. **/
+	private static Cursor waitCursor = new Cursor(Cursor.WAIT_CURSOR);
+	/** The default cursor. **/
+	private static Cursor defaultCursor = new Cursor(Cursor.DEFAULT_CURSOR);	
 	
 	
 	/**
@@ -109,7 +114,7 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void showStartMergingDialog() throws IOException {
-		
+		ApplicationUI.frmRplesMergingClient.setCursor(waitCursor);
 		// Get all possible graphs under revision control
 		ArrayList<String> elements = Management.getAllGraphsUnderRevisionControl();
 		// Remove all existing elements
@@ -134,6 +139,7 @@ public class Controller {
 		dialog.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
 		dialog.setModal(true);
 		dialog.setVisible(true);
+		ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
 	}
 
 	
@@ -143,6 +149,7 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void updateRevisionComboBoxes() throws IOException {
+		dialog.setCursor(waitCursor);
 		// Get the selected graph
 		String graphName = (String) StartMergingDialog.getcBModelGraph().getSelectedItem();
 		// Get all branch names
@@ -157,6 +164,7 @@ public class Controller {
 			StartMergingDialog.getcBModelRevisionA().addElement(currentElement);
 			StartMergingDialog.getcBModelRevisionB().addElement(currentElement);
 		}
+		dialog.setCursor(defaultCursor);
 	}
 
 
@@ -166,7 +174,6 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void startNewMergeProcess() throws IOException {
-		
 		if (StartMergingDialog.getcBModelRevisionA().getSelectedItem().equals(StartMergingDialog.getcBModelRevisionB().getSelectedItem())) {
 			// Show error message dialog when selected branches are equal
 			JOptionPane.showMessageDialog(dialog, "The selected branches must be different!", "Error: Selected branches are equal.", JOptionPane.ERROR_MESSAGE);
@@ -178,6 +185,7 @@ public class Controller {
 			JOptionPane.showMessageDialog(dialog, "An empty message is not allowed!", "Error: No message specified.", JOptionPane.ERROR_MESSAGE);
 		} else {
 			// Start new merging process
+			dialog.setCursor(waitCursor);
 			// Get the selected graph
 			String graphName = (String) StartMergingDialog.getcBModelGraph().getSelectedItem();
 			String sdd = (String) StartMergingDialog.getcBModelSDD().getSelectedItem();
@@ -225,7 +233,7 @@ public class Controller {
 				
 				// Create the property list of revisions
 				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
-				
+				dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				// There was no conflict merged revision was created
@@ -235,15 +243,17 @@ public class Controller {
 				// Create an empty property list
 				propertyList = new ArrayList<String>();
 				String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
+				dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				// Error occurred
+				dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Undefined error occurred", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
 			// Close dialog after execution and update UI
 			dialog.setVisible(false);
-
+			ApplicationUI.frmRplesMergingClient.setCursor(waitCursor);
 			// Set the cell renderer
 			TableCellRendererResolutionTriples renderer = new TableCellRendererResolutionTriples();
 			for (int i = 0; i < ApplicationUI.getTableModelResolutionTriples().getColumnCount() - 1; i++) {
@@ -278,6 +288,8 @@ public class Controller {
 			
 			// Update the semantic enrichment
 			updateTableModelSemanticEnrichmentAllClasses();
+			
+			ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
 		}
 	}
 	
@@ -301,7 +313,6 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void selectionChangedDifferencesTree() throws IOException {
-		
 		// Set the update flag
 		updateTableFlag = true;
 		
@@ -381,7 +392,6 @@ public class Controller {
 	 * Approve selected entries of resolution triples table.
 	 */
 	public static void approveSelectedEntriesResolutionTriples() {
-		
 		int[] selectedRows = ApplicationUI.getTableResolutionTriples().getSelectedRows();
 		// Sort the array
 		Arrays.sort(selectedRows);
@@ -604,7 +614,6 @@ public class Controller {
 	 * @throws IOException
 	 */
 	public static void createGraph(String graphName) throws HttpException, IOException {
-		
 		graph = Management.getDotGraph(graphName);	
 
 		// Generate layout of the graph is only available at windows OS
@@ -647,6 +656,7 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void pushToRemoteRepository() throws IOException {
+		report.setCursor(waitCursor);
 		if (reportResult != null) {
 			if (reportResult.getConflictsNotApproved() == 0) {
 				// Get the definitions
@@ -691,7 +701,7 @@ public class Controller {
 					// Execute MERGE WITH query
 					response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
 				}
-				
+				report.setCursor(defaultCursor);
 				report.setVisible(false);
 				
 				// Show message dialog
@@ -699,12 +709,14 @@ public class Controller {
 					logger.info("Merge query successfully executed.");
 					String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
 					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
+					report.setCursor(waitCursor);
 					// Create empty difference model
 					differenceModel = new DifferenceModel();
 					// Update application UI
 					updateDifferencesTree();
 					// Create the revision graph
 					createGraph(graphName);
+					report.setCursor(defaultCursor);
 				} else {
 					logger.error("Merge query could not be executed.");
 					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Maybe another user committed changes to one of the branches to merge.", "Error", JOptionPane.ERROR_MESSAGE);
