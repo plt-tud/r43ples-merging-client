@@ -61,7 +61,7 @@ public class CustomComboBoxEditor extends DefaultCellEditor {
 				model.addElement(currentOptions);
 			}
 			comboBox.setSelectedIndex(tableEntry.getSelectedSemanticResolutionOption());
-			table.setValueAt(options.get(tableEntry.getDefaultSemanticResolutionOption()), row, column);
+			table.setValueAt(options.get(tableEntry.getSelectedSemanticResolutionOption()), row, column);
 		}
 		
 		// Add listener

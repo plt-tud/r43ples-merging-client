@@ -18,8 +18,6 @@ public class TableEntrySemanticEnrichmentClassTriples {
 	private String semanticDescription;
 	/** The semantic resolution options. **/
 	private ArrayList<String> semanticResolutionOptions;
-	/** The default semantic resolution option. **/
-	private int defaultSemanticResolutionOption;
 	/** The selected semantic resolution option. **/
 	private int selectedSemanticResolutionOption;
 	/** The row data. **/
@@ -36,11 +34,10 @@ public class TableEntrySemanticEnrichmentClassTriples {
 	 * @param selectedSemanticResolutionOption the selected semantic resolution option
 	 * @param rowData the row data
 	 */
-	public TableEntrySemanticEnrichmentClassTriples(Difference difference, String semanticDescription, ArrayList<String> semanticResolutionOptions, int defaultSemanticResolutionOption, int selectedSemanticResolutionOption, Object[] rowData) {
+	public TableEntrySemanticEnrichmentClassTriples(Difference difference, String semanticDescription, ArrayList<String> semanticResolutionOptions, int selectedSemanticResolutionOption, Object[] rowData) {
 		this.setDifference(difference);
 		this.setSemanticDescription(semanticDescription);
 		this.setSemanticResolutionOptions(semanticResolutionOptions);
-		this.setDefaultSemanticResolutionOption(defaultSemanticResolutionOption);
 		this.setSelectedSemanticResolutionOption(selectedSemanticResolutionOption);
 		this.setRowData(rowData);
 	}
@@ -103,26 +100,6 @@ public class TableEntrySemanticEnrichmentClassTriples {
 	 */
 	public void setSemanticResolutionOptions(ArrayList<String> semanticResolutionOptions) {
 		this.semanticResolutionOptions = semanticResolutionOptions;
-	}
-
-
-	/**
-	 * Get the default semantic resolution option.
-	 * 
-	 * @return the default semantic resolution option
-	 */
-	public int getDefaultSemanticResolutionOption() {
-		return defaultSemanticResolutionOption;
-	}
-
-
-	/**
-	 * Set the default semantic resolution option.
-	 * 
-	 * @param defaultSemanticResolutionOption the default semantic resolution option to set
-	 */
-	public void setDefaultSemanticResolutionOption(int defaultSemanticResolutionOption) {
-		this.defaultSemanticResolutionOption = defaultSemanticResolutionOption;
 	}
 	
 	

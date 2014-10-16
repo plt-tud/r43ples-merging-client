@@ -56,6 +56,7 @@ import de.tud.plt.r43ples.client.desktop.ui.dialog.ConfigurationDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.StartMergingDialog;
 import de.tud.plt.r43ples.client.desktop.ui.editor.table.CustomComboBoxEditor;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellComboBoxRendererSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererFilter;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentClassTriples;
@@ -263,7 +264,7 @@ public class Controller {
 			}
 			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCheckBoxRendererResolutionTriples());
 			
-//			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellRenderer(new TableComboBoxRendererSemanticEnrichmentClassTriples());
+			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentClassTriples());
 			
 			TableCellRendererSemanticEnrichmentClassTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentClassTriples();
 			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getColumnCount() - 1; i++) {
@@ -835,8 +836,7 @@ public class Controller {
 																					difference,
 																					semanticDefinitionResult.getSemanticDescription(),
 																					semanticDefinitionResult.getSemanticResolutionOptions(),
-																					semanticDefinitionResult.getDefaultSemanticResolutionOption(),
-																					semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																					semanticDefinitionResult.getSelectedSemanticResolutionOption(),
 																					Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 					tableModel.addRow(tableEntry);
 					// Remove key from branch A key set copy
@@ -845,7 +845,7 @@ public class Controller {
 					keySetTriplesBranchB.remove(currentKeyBranchA);
 				} else {
 					// No difference is specified for current triple
-					TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, -1, 
+					TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, 
 																					Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
 					tableModel.addRow(tableEntry);
 					// Remove key from branch A key set copy
@@ -869,13 +869,12 @@ public class Controller {
 																				difference,
 																				semanticDefinitionResult.getSemanticDescription(),
 																				semanticDefinitionResult.getSemanticResolutionOptions(),
-																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
-																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																				semanticDefinitionResult.getSelectedSemanticResolutionOption(),
 																				Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 				tableModel.addRow(tableEntry);
 			} else {
 				// No difference is specified for current triple
-				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, -1, 
+				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, 
 																				Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
 				tableModel.addRow(tableEntry);
 			}
@@ -894,18 +893,20 @@ public class Controller {
 																				difference,
 																				semanticDefinitionResult.getSemanticDescription(),
 																				semanticDefinitionResult.getSemanticResolutionOptions(),
-																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
-																				semanticDefinitionResult.getDefaultSemanticResolutionOption(),
+																				semanticDefinitionResult.getSelectedSemanticResolutionOption(),
 																				Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 				tableModel.addRow(tableEntry);
 			} else {
 				// No difference is specified for current triple
-				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, -1, 
+				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, 
 																				Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
 				tableModel.addRow(tableEntry);
 			}
 		}
 
+		// Clear selection
+		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectionModel().clearSelection();
+		
 		// Update triples table
 		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
 	}

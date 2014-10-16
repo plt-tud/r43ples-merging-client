@@ -2,7 +2,9 @@ package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -21,6 +23,15 @@ public class TableCellComboBoxRendererSemanticEnrichmentClassTriples extends JCo
 	/** The default serial version. **/
 	private static final long serialVersionUID = 1L;
 	
+	
+	/**
+	 * The constructor.
+	 */
+	public TableCellComboBoxRendererSemanticEnrichmentClassTriples() {
+		super();
+		setOpaque(true);
+	}
+	
 
 	/* (non-Javadoc)
 	 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
@@ -35,15 +46,33 @@ public class TableCellComboBoxRendererSemanticEnrichmentClassTriples extends JCo
 			setForeground(table.getForeground());
 			setBackground(table.getBackground());
 		}
-
-		// Get current table entry
+		
+		// Get the combo box
+		JComboBox<String> comboBox = (JComboBox<String>) this;
+		
+		// Get the table entry
 		TableEntrySemanticEnrichmentClassTriples tableEntry = ((TableModelSemanticEnrichmentClassTriples) table.getModel()).getTableEntry(row);
+		
+		// Get the combo box model
+		DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) comboBox.getModel();
+		
+		// Remove all entries
+		model.removeAllElements();		
+		// Get current table entry
+		tableEntry = ((TableModelSemanticEnrichmentClassTriples) table.getModel()).getTableEntry(row);
+		// Add options to model
 		ArrayList<String> options = tableEntry.getSemanticResolutionOptions();
 		if (!options.isEmpty()) {
-			table.setValueAt(options.get(tableEntry.getDefaultSemanticResolutionOption()), row, column);
+			Iterator<String> iteOptions = options.iterator();
+			while (iteOptions.hasNext()) {
+				String currentOptions = iteOptions.next();
+				model.addElement(currentOptions);
+			}
+			comboBox.setSelectedIndex(tableEntry.getSelectedSemanticResolutionOption());
+			//table.setValueAt(options.get(tableEntry.getDefaultSemanticResolutionOption()), row, column);
 		}
-		
-		return this;
+
+		return comboBox;
     }
 
 }

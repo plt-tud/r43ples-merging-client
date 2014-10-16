@@ -14,8 +14,8 @@ public class SemanticDefinitionResult {
 	private String semanticDescription;
 	/** The semantic resolution options. **/
 	private ArrayList<String> semanticResolutionOptions;
-	/** The default semantic resolution option. **/
-	private int defaultSemanticResolutionOption;
+	/** The selected semantic resolution option. **/
+	private int selectedSemanticResolutionOption;
 	
 	
 	/**
@@ -23,12 +23,12 @@ public class SemanticDefinitionResult {
 	 * 
 	 * @param semanticDescription the semantic description
 	 * @param semanticResolutionOptions the semantic resolution options
-	 * @param defaultSemanticResolutionOption the default semantic resolution option
+	 * @param selectedSemanticResolutionOption the selected semantic resolution option
 	 */
-	public SemanticDefinitionResult(String semanticDescription, ArrayList<String> semanticResolutionOptions, int defaultSemanticResolutionOption) {
+	public SemanticDefinitionResult(String semanticDescription, ArrayList<String> semanticResolutionOptions, int selectedSemanticResolutionOption) {
 		this.semanticDescription = semanticDescription;
 		this.semanticResolutionOptions = semanticResolutionOptions;
-		this.defaultSemanticResolutionOption = defaultSemanticResolutionOption;
+		this.selectedSemanticResolutionOption = selectedSemanticResolutionOption;
 	}
 
 
@@ -74,22 +74,22 @@ public class SemanticDefinitionResult {
 
 
 	/**
-	 * Get the default semantic resolution option.
+	 * Get the selected semantic resolution option.
 	 * 
-	 * @return the default semantic resolution option
+	 * @return the selected semantic resolution option
 	 */
-	public int getDefaultSemanticResolutionOption() {
-		return defaultSemanticResolutionOption;
+	public int getSelectedSemanticResolutionOption() {
+		return selectedSemanticResolutionOption;
 	}
 
 
 	/**
-	 * Set the default semantic resolution option.
+	 * Set the selected semantic resolution option.
 	 * 
-	 * @param defaultSemanticResolutionOption the default semantic resolution option to set
+	 * @param selectedSemanticResolutionOption the selected semantic resolution option to set
 	 */
-	public void setDefaultSemanticResolutionOption(int defaultSemanticResolutionOption) {
-		this.defaultSemanticResolutionOption = defaultSemanticResolutionOption;
+	public void setSelectedSemanticResolutionOption(int selectedSemanticResolutionOption) {
+		this.selectedSemanticResolutionOption = selectedSemanticResolutionOption;
 	}
 	
 }

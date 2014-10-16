@@ -3,6 +3,7 @@ package de.tud.plt.r43ples.client.desktop.control;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
@@ -274,16 +275,28 @@ public class SemanticDefinitions {
 	
 	
 	/**
-	 * Get the default resolution option by difference group.
+	 * Get the selected resolution option by difference group.
 	 * 
+	 * @param difference the difference
 	 * @param differenceGroup the difference group
-	 * @return the default resolution option
+	 * @return the selected resolution option
 	 */
-	public static int getDefaultResolutionOptions(DifferenceGroup differenceGroup) {
-		if (differenceGroup.getAutomaticResolutionState().equals(SDDTripleStateEnum.ADDED)) {
-			return 1;
+	public static int getSelectedResolutionOption(Difference difference, DifferenceGroup differenceGroup) {
+		// Generate the selected index
+		if (difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+			// Difference was already approved - use the approved state
+			if (difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED)) {
+				return 1;
+			} else {
+				return 0;
+			}
 		} else {
-			return 0;
+			// Difference was not already approved - use the default resolution state characterized by automatic resolution state
+			if (differenceGroup.getAutomaticResolutionState().equals(SDDTripleStateEnum.ADDED)) {
+				return 1;
+			} else {
+				return 0;
+			}
 		}
 	}
 
@@ -324,11 +337,11 @@ public class SemanticDefinitions {
 		// Check if triple is a class triple
 		if (Management.getPredicate(difference.getTriple()).equals("a")) {
 			if (checkIdentifierExistenceInClassMaps(identifier)) {
-				return new SemanticDefinitionResult(getClassDescription(identifier), getClassResolutionOptions(identifier), getDefaultResolutionOptions(differenceGroup));
+				return new SemanticDefinitionResult(getClassDescription(identifier), getClassResolutionOptions(identifier), getSelectedResolutionOption(difference, differenceGroup));
 			}
 		} else {
 			if (checkIdentifierExistenceInPropertyMaps(identifier)) {
-				return new SemanticDefinitionResult(getPropertyDescription(identifier), getPropertyResolutionOptions(identifier), getDefaultResolutionOptions(differenceGroup));
+				return new SemanticDefinitionResult(getPropertyDescription(identifier), getPropertyResolutionOptions(identifier), getSelectedResolutionOption(difference, differenceGroup));
 			}
 		}
 		
