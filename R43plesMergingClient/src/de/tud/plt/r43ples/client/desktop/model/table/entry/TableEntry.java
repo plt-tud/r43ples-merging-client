@@ -31,7 +31,7 @@ public class TableEntry {
 	 * @param treePath the tree path
 	 * @param rowData the row data
 	 */
-	public TableEntry(Difference difference, TreeNodeObject nodeObject, TreePath treePath , Object[] rowData) {
+	public TableEntry(Difference difference, TreeNodeObject nodeObject, TreePath treePath, Object[] rowData) {
 		this.setDifference(difference);
 		this.setNodeObject(nodeObject);
 		this.setTreePath(treePath);

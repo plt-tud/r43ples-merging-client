@@ -52,6 +52,8 @@ import de.tud.plt.r43ples.client.desktop.model.structure.ClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.HighLevelChangeModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.HighLevelChangeRenaming;
 import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
@@ -731,6 +733,7 @@ public class Management {
 	 * 
 	 * @param difference the difference
 	 * @param differenceGroup the difference group
+	 * @return the row data
 	 * @throws IOException 
 	 */
 	public static Object[] createRowDataResolutionTriples(Difference difference, DifferenceGroup differenceGroup) throws IOException {
@@ -909,6 +912,7 @@ public class Management {
 	 * 
 	 * @param difference the difference
 	 * @param differenceGroup the difference group
+	 * @return the row data
 	 */
 	public static Object[] createRowDataSummaryReport(Difference difference, DifferenceGroup differenceGroup) {
 		Object[] rowData = new Object[9];
@@ -1408,6 +1412,7 @@ public class Management {
 	 * 
 	 * @param difference the difference
 	 * @param differenceGroup the difference group
+	 * @return the row data
 	 */
 	public static Object[] createRowDataSemanticEnrichmentClassTriples(Difference difference, DifferenceGroup differenceGroup, String semanticDescription) {
 		Object[] rowData = new Object[8];
@@ -1445,6 +1450,7 @@ public class Management {
 	 * Create the row data for resolution triples without difference.
 	 * 
 	 * @param triple the triple
+	 * @return the row data
 	 */
 	public static Object[] createRowDataSemanticEnrichmentClassTriplesWithoutDifference(Triple triple) {
 		Object[] rowData = new Object[8];
@@ -1563,6 +1569,155 @@ public class Management {
 			return qs.getLiteral("?revNumber").toString();
 		}
 		return referenceName;
+	}
+	
+	
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## High level change generation.                                                                                                                                        ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */
+	
+	
+	/**
+	 * Create the high level change renaming model.
+	 * 
+	 * @param highLevelChangeModel the high level change model
+	 * @param differenceModel the difference model
+	 */
+	public static void createHighLevelChangeRenamingModel(HighLevelChangeModel highLevelChangeModel, DifferenceModel differenceModel) {
+		// Get all differences of state combination DELETED-ORIGINAL
+		DifferenceGroup delOrig = differenceModel.getDifferenceGroups().get(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ORIGINAL);
+		
+		// Get all differences of state combination DELETED-ADDED
+		DifferenceGroup delAdd = differenceModel.getDifferenceGroups().get(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ADDED);
+		
+		// Get all differences of state combination ADDED-NOTINCLUDED
+		DifferenceGroup addNotInc = differenceModel.getDifferenceGroups().get(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.NOTINCLUDED);
+
+		if ((addNotInc != null) && ((delOrig != null) || (delAdd != null))) {
+			// Get all possible prefixes
+			HashMap<String, Difference> possiblePrefixes = getAllPrefixesOfDifferenceMap(addNotInc.getDifferences());
+			// Iterate over all possible prefixes
+			Iterator<String> itePossiblePrefixes = possiblePrefixes.keySet().iterator();
+			while (itePossiblePrefixes.hasNext()) {
+				String currentPrefix = itePossiblePrefixes.next();
+				// Get possible mappings of DELETED-ORIGINAL map
+				ArrayList<Difference> mappingsDelOrig = new ArrayList<Difference>();
+				if (delOrig != null) {
+					mappingsDelOrig = getAllDifferencesByPrefix(currentPrefix, delOrig.getDifferences());	
+				}
+				// Get possible mappings of DELETED-ADDED map
+				ArrayList<Difference> mappingsDelAdd = new ArrayList<Difference>();
+				if (delAdd != null) {
+					mappingsDelAdd = getAllDifferencesByPrefix(currentPrefix, delAdd.getDifferences());
+				}
+				
+				HighLevelChangeRenaming highLevelChangeRenaming = null;
+				
+				if ((mappingsDelOrig.size() == 1) && mappingsDelAdd.isEmpty()) {
+					// Original found
+					highLevelChangeRenaming = new HighLevelChangeRenaming(mappingsDelOrig.get(0), possiblePrefixes.get(currentPrefix));
+				} else if (mappingsDelOrig.isEmpty() && (mappingsDelAdd.size() == 1)) {
+					// Added found
+					highLevelChangeRenaming = new HighLevelChangeRenaming(mappingsDelAdd.get(0), possiblePrefixes.get(currentPrefix));
+				}	
+	
+				if (highLevelChangeRenaming != null) {
+					highLevelChangeModel.addHighLevelChangeRenaming(tripleToString(highLevelChangeRenaming.getAdditionDifference().getTriple()), highLevelChangeRenaming);
+				}		
+			}
+		}
+	}
+
+	
+	/**
+	 * Get all prefixes of difference map and corresponding difference. Prefix is equal to triple string which contains only subject and predicate.
+	 * Object must be a literal and the difference should not be approved.
+	 * 
+	 * @param differenceMap the difference map
+	 * @return return distinct map of prefix difference combinations
+	 */
+	public static HashMap<String, Difference> getAllPrefixesOfDifferenceMap(HashMap<String, Difference> differenceMap) {
+		// Create the result array list
+		HashMap<String, Difference> resultList = new HashMap<String, Difference>();
+		
+		// Iterate over all differences
+		Iterator<String> iteDifferences = differenceMap.keySet().iterator();
+		while (iteDifferences.hasNext()) {
+			String currentKey = iteDifferences.next();
+			Difference currentDifference = differenceMap.get(currentKey);
+			Triple currentTriple = currentDifference.getTriple();
+			String currentPrefix = "<" + currentTriple.getSubject() + "> <" + currentTriple.getPredicate() + "> ";
+			if (!resultList.containsKey(currentPrefix) && currentTriple.getObjectType().equals(TripleObjectTypeEnum.LITERAL) && !currentDifference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+				resultList.put(currentPrefix, currentDifference);
+			}
+		}
+		
+		return resultList;
+	}
+	
+	
+	/**
+	 * Get all differences by specified prefix.
+	 * Object must be a literal and the difference should not be approved.
+	 * 
+	 * @param prefix the prefix
+	 * @param differenceMap the difference map
+	 * @return the differences which could be identified by specified prefix
+	 */
+	public static ArrayList<Difference> getAllDifferencesByPrefix(String prefix, HashMap<String, Difference> differenceMap) {
+		// The result list
+		ArrayList<Difference> result = new ArrayList<Difference>();
+		// Tree map for sorting entries of hash map
+		TreeMap<String, Difference> treeMap = new TreeMap<String, Difference>();
+		treeMap.putAll(differenceMap);
+		// Tail the tree map
+		TreeMap<String,Difference> tailMap = (TreeMap<String, Difference>) treeMap.tailMap(prefix);
+		if (!tailMap.isEmpty() && tailMap.firstKey().startsWith(prefix)) {
+			Iterator<String> iteTailMap = tailMap.keySet().iterator();
+			while (iteTailMap.hasNext()) {
+				String currentKey = iteTailMap.next();
+				if (currentKey.startsWith(prefix)) {
+					Difference currentDifference = tailMap.get(currentKey);
+					Triple currentTriple = currentDifference.getTriple();
+					if (currentTriple.getObjectType().equals(TripleObjectTypeEnum.LITERAL) && !currentDifference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+						// Add corresponding difference to result list
+						result.add(currentDifference);
+					}
+				} else {
+					// Return the result map because there are no further keys which will start with the specified prefix
+					return result;
+				}
+			}
+		}
+		
+		return result;
+	}
+
+
+	/**
+	 * Create the row data for resolution high level changes.
+	 * 
+	 * @param highLevelChangeRenaming the high level changes (renaming)
+	 * @return the row data
+	 */
+	public static Object[] createRowDataResolutionHighLevelChanges(HighLevelChangeRenaming highLevelChangeRenaming) {
+		Object[] rowData = new Object[7];
+				
+		rowData[0] = getSubject(highLevelChangeRenaming.getDeletionDifference().getTriple());
+		rowData[1] = getPredicate(highLevelChangeRenaming.getDeletionDifference().getTriple());
+		
+		rowData[2] = getObject(highLevelChangeRenaming.getDeletionDifference().getTriple());
+		rowData[3] = getObject(highLevelChangeRenaming.getAdditionDifference().getTriple());
+		
+		rowData[4] = highLevelChangeRenaming.getAdditionDifference().getTripleResolutionState().equals(SDDTripleStateEnum.ADDED);
+		
+		return rowData;
 	}
 
 }

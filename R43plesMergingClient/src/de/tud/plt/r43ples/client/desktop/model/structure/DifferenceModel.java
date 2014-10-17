@@ -46,10 +46,10 @@ public class DifferenceModel {
 	 * Add a difference group. If the difference group identifier already exists the old difference group will be overwritten.
 	 * 
 	 * @param identifier the identifier
-	 * @param differencegroup the difference group
+	 * @param differenceGroup the difference group
 	 */
-	public void addDifferenceGroup(String identifier, DifferenceGroup differencegroup) {
-		this.differenceGroups.put(identifier, differencegroup);
+	public void addDifferenceGroup(String identifier, DifferenceGroup differenceGroup) {
+		this.differenceGroups.put(identifier, differenceGroup);
 	}
 	
 	

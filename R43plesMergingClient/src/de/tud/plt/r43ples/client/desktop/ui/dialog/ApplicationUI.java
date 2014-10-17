@@ -34,9 +34,11 @@ import javax.swing.tree.TreeSelectionModel;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentClassTriples;
@@ -48,6 +50,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * The application UI of the merging client.
@@ -81,6 +85,10 @@ public class ApplicationUI {
 	private static JTable tableResolutionSemanticEnrichmentClassTriples;
 	/** The semantic enrichment table model class triples. **/
 	private static TableModelSemanticEnrichmentClassTriples tableModelSemanticEnrichmentClassTriples = new TableModelSemanticEnrichmentClassTriples(new ArrayList<TableEntrySemanticEnrichmentClassTriples>());
+	/** The resolution high level changes table. **/
+	private static JTable tableResolutionHighLevelChanges;
+	/** The resolution high level changes table model. **/
+	private static TableModelResolutionHighLevelChanges tableModelResolutionHighLevelChanges = new TableModelResolutionHighLevelChanges(new ArrayList<TableEntryHighLevelChanges>());
 	/** The filter table. **/
 	private static JTable tableFilter;
 	/** The filter table model. **/
@@ -180,6 +188,16 @@ public class ApplicationUI {
 		
 		splitPaneApplication = new JSplitPane();
 		splitPaneApplication.setResizeWeight(0.3);
+		splitPaneApplication.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+			 */
+			@Override
+			public void propertyChange(PropertyChangeEvent pce) {
+				Controller.splitPaneApplicationDividerLocationChanged();
+			}
+		});
 		frmRplesMergingClient.getContentPane().add(splitPaneApplication, BorderLayout.CENTER);
 		
 		splitPanePreferences = new JSplitPane();
@@ -463,6 +481,56 @@ public class ApplicationUI {
 		});
 		toolBarResolutionSemanticEnrichmentClassTriples.add(btnResolutionSemanticEnrichmentClassTriplesSelectAll);
 		
+		JPanel panelResolutionHighLevelChanges = new JPanel();
+		tabbedPaneResolution.addTab("High level changes", null, panelResolutionHighLevelChanges, null);
+		panelResolutionHighLevelChanges.setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPaneResolutionHighLevelChanges = new JScrollPane();
+		panelResolutionHighLevelChanges.add(scrollPaneResolutionHighLevelChanges, BorderLayout.CENTER);
+		
+		tableResolutionHighLevelChanges = new JTable();
+		tableResolutionHighLevelChanges.setRowHeight(25);
+		tableResolutionHighLevelChanges.getTableHeader().setReorderingAllowed(false);
+		tableResolutionHighLevelChanges.setModel(tableModelResolutionTriples);
+		tableResolutionHighLevelChanges.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+			 */
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				Controller.tableResolutionHighLevelChangesSelectionChanged();				
+			}
+		});
+		scrollPaneResolutionHighLevelChanges.setViewportView(tableResolutionHighLevelChanges);
+		
+		JToolBar toolBarResolutionHighLevelChanges = new JToolBar();
+		panelResolutionHighLevelChanges.add(toolBarResolutionHighLevelChanges, BorderLayout.NORTH);
+		
+		JButton btnResolutionHighLevelChangesApproveSelected = new JButton("Approve selected");
+		btnResolutionHighLevelChangesApproveSelected.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.approveSelectedEntriesResolutionHighLevelChanges();
+			}
+		});
+		toolBarResolutionHighLevelChanges.add(btnResolutionHighLevelChangesApproveSelected);
+		
+		JButton btnResolutionHighLevelChangesSelectAll = new JButton("Select all");
+		btnResolutionHighLevelChangesSelectAll.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.selectAllEntriesResolutionHighLevelChanges();
+			}
+		});
+		toolBarResolutionHighLevelChanges.add(btnResolutionHighLevelChangesSelectAll);
+		
 		JPanel panelRevisionGraph = new JPanel();
 		splitPaneResolution.setLeftComponent(panelRevisionGraph);
 		panelRevisionGraph.setLayout(new BorderLayout(0, 0));
@@ -701,6 +769,46 @@ public class ApplicationUI {
 	 */
 	public static void setTableResolutionSemanticEnrichmentClassTriples(JTable tableResolutionSemanticEnrichmentClassTriples) {
 		ApplicationUI.tableResolutionSemanticEnrichmentClassTriples = tableResolutionSemanticEnrichmentClassTriples;
+	}
+	
+	
+	/**
+	 * Get the table resolution high level changes.
+	 * 
+	 * @return the table resolution high level changes
+	 */
+	public static JTable getTableResolutionHighLevelChanges() {
+		return tableResolutionHighLevelChanges;
+	}
+
+
+	/**
+	 * Set the table resolution high level changes.
+	 * 
+	 * @param tableResolutionHighLevelChanges the table resolution high level changes
+	 */
+	public static void setTableResolutionHighLevelChanges(JTable tableResolutionHighLevelChanges) {
+		ApplicationUI.tableResolutionHighLevelChanges = tableResolutionHighLevelChanges;
+	}
+
+
+	/**
+	 * Get the table model resolution high level changes.
+	 * 
+	 * @return the table model resolution high level changes
+	 */
+	public static TableModelResolutionHighLevelChanges getTableModelResolutionHighLevelChanges() {
+		return tableModelResolutionHighLevelChanges;
+	}
+
+
+	/**
+	 * Set the table model resolution high level changes.
+	 * 
+	 * @param tableModelResolutionHighLevelChanges the table model resolution high level changes
+	 */
+	public static void setTableModelResolutionHighLevelChanges(TableModelResolutionHighLevelChanges tableModelResolutionHighLevelChanges) {
+		ApplicationUI.tableModelResolutionHighLevelChanges = tableModelResolutionHighLevelChanges;
 	}
 
 

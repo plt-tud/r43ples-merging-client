@@ -38,6 +38,8 @@ import de.tud.plt.r43ples.client.desktop.model.structure.ClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.HighLevelChangeModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.HighLevelChangeRenaming;
 import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.SemanticDefinitionResult;
@@ -45,6 +47,7 @@ import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
 import de.tud.plt.r43ples.client.desktop.model.structure.TripleClassStructure;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelFilter;
@@ -83,6 +86,8 @@ public class Controller {
 	private static String revisionNumberBranchB;
 	/** The difference model. **/
 	private static DifferenceModel differenceModel = new DifferenceModel();
+	/** The high level change model. **/
+	private static HighLevelChangeModel highLevelChangeModel = new HighLevelChangeModel();
 	/** The class model of branch A. **/
 	private static ClassModel classModelBranchA;
 	/** The class model of branch B. **/
@@ -215,6 +220,8 @@ public class Controller {
 				logger.info("Merge query produced conflicts.");
 				// Read the difference model to java model
 				Management.readDifferenceModel(response.getBody(), differenceModel);
+				// Create the high level change (renaming) model
+				Management.createHighLevelChangeRenamingModel(highLevelChangeModel, differenceModel);
 				// Save the current revision numbers
 				revisionNumberBranchA = Management.getRevisionNumberOfBranchAHeaderParameter(response, graphName);
 				revisionNumberBranchB = Management.getRevisionNumberOfBranchBHeaderParameter(response, graphName);
@@ -232,7 +239,6 @@ public class Controller {
 					// Enable semantic enrichment individuals tab
 					ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, true);
 				}
-				
 				
 				// Create the property list of revisions
 				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
@@ -292,6 +298,9 @@ public class Controller {
 			// Update the semantic enrichment
 			updateTableModelSemanticEnrichmentAllClasses();
 			
+			// Update the high level change table
+			updateTableModelHighLevelChanges();
+			
 			ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
 		}
 	}
@@ -350,7 +359,6 @@ public class Controller {
 			ApplicationUI.getTableResolutionTriples().clearSelection();
 			tableResolutionTriplesSelectionChanged();
 		}
-		
 	}
 	
 	
@@ -1179,15 +1187,138 @@ public class Controller {
 	 */
 	public static void resolutionTabSelectionChanged() {
 		if (ApplicationUI.getTabbedPaneResolution().getSelectedIndex() == 0) {
-			if (dividerLocationSplitPaneApplication != -1) {
-				ApplicationUI.getSplitPaneApplication().setDividerLocation(dividerLocationSplitPaneApplication);
-			}
+			ApplicationUI.getSplitPaneApplication().setDividerLocation(dividerLocationSplitPaneApplication);
 			ApplicationUI.getSplitPanePreferences().setVisible(true);
 			dividerLocationSplitPaneApplication = -1;
 		} else {
-			dividerLocationSplitPaneApplication = ApplicationUI.getSplitPaneApplication().getDividerLocation();
 			ApplicationUI.getSplitPaneApplication().setDividerLocation(0);
 			ApplicationUI.getSplitPanePreferences().setVisible(false);
+		}
+		ApplicationUI.getSplitPanePreferences().updateUI();
+	}
+	
+
+	/**
+	 * The split pane application divider location changed.
+	 */
+	public static void splitPaneApplicationDividerLocationChanged() {
+		if (dividerLocationSplitPaneApplication != -1) {
+			dividerLocationSplitPaneApplication = ApplicationUI.getSplitPaneApplication().getDividerLocation();
+		}
+	}
+
+
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## High level change generation.                                                                                                                                        ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */
+	
+	
+	/**
+	 * Update the resolution high level change table model.
+	 */
+	public static void updateTableModelHighLevelChanges() {
+		// Remove the old rows
+		ApplicationUI.getTableModelResolutionHighLevelChanges().removeAllElements();
+		
+		Iterator<String> iteKeys = highLevelChangeModel.getHighLevelChangesRenaming().keySet().iterator();
+		while (iteKeys.hasNext()) {
+			String currentKey = iteKeys.next();
+			HighLevelChangeRenaming highLevelChangeRenaming = highLevelChangeModel.getHighLevelChangesRenaming().get(currentKey);
+			Object[] rowData = Management.createRowDataResolutionHighLevelChanges(highLevelChangeRenaming);
+			TableEntryHighLevelChanges entry = new TableEntryHighLevelChanges(highLevelChangeRenaming, rowData);
+			ApplicationUI.getTableModelResolutionHighLevelChanges().addRow(entry);
+		}
+		
+		ApplicationUI.getTableResolutionHighLevelChanges().updateUI();
+	}
+	
+	
+	
+	/**
+	 * The table resolution high level changes selection changed.
+	 * Update the revision graph. The referenced revisions of the selected table row will be highlighted in the graph.
+	 */
+	public static void tableResolutionHighLevelChangesSelectionChanged() {
+		int[] rows = ApplicationUI.getTableResolutionHighLevelChanges().getSelectedRows();
+		if (rows.length == 1) {
+			int index = ApplicationUI.getTableResolutionHighLevelChanges().convertRowIndexToModel(rows[0]);
+			TableEntryHighLevelChanges entry = ApplicationUI.getTableModelResolutionHighLevelChanges().getTableEntry(index);
+			logger.debug("Selected Entry: A - " + entry.getHighLevelChangeRenaming().getAdditionDifference().getReferencedRevisionA());
+			logger.debug("Selected Entry: B - " + entry.getHighLevelChangeRenaming().getDeletionDifference().getReferencedRevisionB());
+			
+			// Remove highlighting of already highlighted nodes
+			Management.removeHighlighting(graph, highlightedNodeNameA);
+			Management.removeHighlighting(graph, highlightedNodeNameB);
+			
+			// Highlight the new currently selected nodes and save them to currently selected node name variables
+			highlightedNodeNameA = entry.getHighLevelChangeRenaming().getAdditionDifference().getReferencedRevisionA();
+			highlightedNodeNameB = entry.getHighLevelChangeRenaming().getDeletionDifference().getReferencedRevisionB();
+			
+			Color color = Color.RED;
+			DifferenceGroup differenceGroupDel = Management.getDifferenceGroupOfDifference(entry.getHighLevelChangeRenaming().getDeletionDifference(), differenceModel);
+			DifferenceGroup differenceGroupAdd = Management.getDifferenceGroupOfDifference(entry.getHighLevelChangeRenaming().getAdditionDifference(), differenceModel);
+			if (!differenceGroupDel.isConflicting() && !differenceGroupAdd.isConflicting()) {
+				color = Color.ORANGE;
+			}
+			
+			Management.highlightNode(graph, highlightedNodeNameA, color);
+			Management.highlightNode(graph, highlightedNodeNameB, color);
+		} else {
+			// Remove highlighting of already highlighted nodes
+			Management.removeHighlighting(graph, highlightedNodeNameA);
+			Management.removeHighlighting(graph, highlightedNodeNameB);
+		}
+		
+		gp.updateUI();		
+	}
+
+
+	/**
+	 * Approve selected entries of resolution high level changes table.
+	 */
+	public static void approveSelectedEntriesResolutionHighLevelChanges() {
+		int[] selectedRows = ApplicationUI.getTableResolutionHighLevelChanges().getSelectedRows();
+		// Sort the array
+		Arrays.sort(selectedRows);
+		
+		for (int i = selectedRows.length - 1; i >= 0; i--) {
+			int selectedRow = ApplicationUI.getTableResolutionHighLevelChanges().convertRowIndexToModel(selectedRows[i]);
+			Difference differenceAdd = ApplicationUI.getTableModelResolutionHighLevelChanges().getTableEntry(selectedRow).getHighLevelChangeRenaming().getAdditionDifference();
+			Difference differenceDel = ApplicationUI.getTableModelResolutionHighLevelChanges().getTableEntry(selectedRow).getHighLevelChangeRenaming().getDeletionDifference();
+			differenceAdd.setResolutionState(ResolutionState.RESOLVED);
+			differenceDel.setResolutionState(ResolutionState.RESOLVED);
+			// Propagate changes to difference model
+			Boolean checkBoxStateBool = (Boolean) ApplicationUI.getTableModelResolutionHighLevelChanges().getTableEntry(selectedRow).getRowData()[4];
+			if (checkBoxStateBool.booleanValue()) {
+				// Rename - yes
+				differenceAdd.setTripleResolutionState(SDDTripleStateEnum.ADDED);
+				differenceDel.setTripleResolutionState(SDDTripleStateEnum.DELETED);
+			} else {
+				// Rename - no
+				differenceAdd.setTripleResolutionState(SDDTripleStateEnum.DELETED);
+				differenceDel.setTripleResolutionState(SDDTripleStateEnum.ADDED);
+			}
+		}
+		ApplicationUI.getTableResolutionHighLevelChanges().updateUI();
+		
+		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
+		
+		ApplicationUI.getTreeDifferencesDivision().updateUI();
+	}
+
+	
+	/**
+	 * Select all entries of resolution high level changes table.
+	 */
+	public static void selectAllEntriesResolutionHighLevelChanges() {
+		if (ApplicationUI.getTableModelResolutionHighLevelChanges().getRowCount() > 0) {
+			ApplicationUI.getTableResolutionHighLevelChanges().setRowSelectionInterval(0, ApplicationUI.getTableModelResolutionHighLevelChanges().getRowCount() - 1);
 		}
 	}
 
