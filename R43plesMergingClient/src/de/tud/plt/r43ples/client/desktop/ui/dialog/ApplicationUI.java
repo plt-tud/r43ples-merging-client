@@ -491,7 +491,7 @@ public class ApplicationUI {
 		tableResolutionHighLevelChanges = new JTable();
 		tableResolutionHighLevelChanges.setRowHeight(25);
 		tableResolutionHighLevelChanges.getTableHeader().setReorderingAllowed(false);
-		tableResolutionHighLevelChanges.setModel(tableModelResolutionTriples);
+		tableResolutionHighLevelChanges.setModel(tableModelResolutionHighLevelChanges);
 		tableResolutionHighLevelChanges.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			/* (non-Javadoc)

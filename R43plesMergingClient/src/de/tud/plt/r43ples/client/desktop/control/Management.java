@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.swing.JTable;
@@ -1677,7 +1678,7 @@ public class Management {
 		TreeMap<String, Difference> treeMap = new TreeMap<String, Difference>();
 		treeMap.putAll(differenceMap);
 		// Tail the tree map
-		TreeMap<String,Difference> tailMap = (TreeMap<String, Difference>) treeMap.tailMap(prefix);
+		SortedMap<String, Difference> tailMap = treeMap.tailMap(prefix);
 		if (!tailMap.isEmpty() && tailMap.firstKey().startsWith(prefix)) {
 			Iterator<String> iteTailMap = tailMap.keySet().iterator();
 			while (iteTailMap.hasNext()) {
@@ -1707,7 +1708,7 @@ public class Management {
 	 * @return the row data
 	 */
 	public static Object[] createRowDataResolutionHighLevelChanges(HighLevelChangeRenaming highLevelChangeRenaming) {
-		Object[] rowData = new Object[7];
+		Object[] rowData = new Object[5];
 				
 		rowData[0] = getSubject(highLevelChangeRenaming.getDeletionDifference().getTriple());
 		rowData[1] = getPredicate(highLevelChangeRenaming.getDeletionDifference().getTriple());
