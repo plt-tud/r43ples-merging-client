@@ -3,12 +3,15 @@ package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
+import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
@@ -52,6 +55,35 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 		}
 		
+		// Set the icon
+		if ((column == 3) || (column == 4)) {
+			String text = (String) value;
+			if (text.startsWith(SDDTripleStateEnum.ADDED.toString())) {
+				setIcon(new ImageIcon("images/icons/table/Added.png"));
+				setText(text.substring(text.indexOf("("), text.length()));
+			} else if (text.startsWith(SDDTripleStateEnum.DELETED.toString())) {
+				setIcon(new ImageIcon("images/icons/table/Deleted.png"));
+				setText(text.substring(text.indexOf("("), text.length()));
+			} else if (text.startsWith(SDDTripleStateEnum.NOTINCLUDED.toString())) {
+				setIcon(new ImageIcon("images/icons/table/NotIncluded.png"));
+				setText("");
+			} else if (text.startsWith(SDDTripleStateEnum.ORIGINAL.toString())) {
+				setIcon(new ImageIcon("images/icons/table/Original.png"));
+				setText(text.substring(text.indexOf("("), text.length()));
+			}
+		} else if (column == 5) {
+			if (((String) value).equals("TRUE")) {
+				setIcon(new ImageIcon("images/icons/table/Conflict.png"));
+				setText("");
+			} else {
+				setIcon(new ImageIcon("images/icons/table/NoConflict.png"));
+				setText("");
+			}
+		} else {
+			setIcon(null);
+		}
+		setHorizontalAlignment(JLabel.CENTER);
+
 		// Border definitions
 		int top = 0;
 		int left = 0;

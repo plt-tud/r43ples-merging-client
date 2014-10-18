@@ -554,7 +554,7 @@ public class Management {
 			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(currentkey);
 			
 			if (differenceGroup.isConflicting()) {
-				logger.debug(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB());
+				logger.debug(differenceGroup.getTripleStateA().toString() + "-" + differenceGroup.getTripleStateB().toString());
 				result.add(differenceGroup);
 			}
 		}
@@ -611,7 +611,7 @@ public class Management {
 		while (iteConflicting.hasNext()) {
 			DifferenceGroup differenceGroup = iteConflicting.next();
 			
-			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.CONFLICT, differenceGroup));
+			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA().toString() + "-" + differenceGroup.getTripleStateB().toString(), ResolutionState.CONFLICT, differenceGroup));
 			
 			// Add all differences
 			// Sort by key
@@ -746,17 +746,17 @@ public class Management {
 		
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString();
 		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString();
 		}
 		
 		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
@@ -924,17 +924,17 @@ public class Management {
 			
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString();
 		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString();
 		}
 
 		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
@@ -1424,17 +1424,17 @@ public class Management {
 		
 		// Get the revision number if available
 		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString();
 		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB() + " (" + difference.getReferencedRevisionLabelB() + ")";
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
 		} else {
-			rowData[3] = differenceGroup.getTripleStateA();
-			rowData[4] = differenceGroup.getTripleStateB();
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString();
 		}
 
 		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
