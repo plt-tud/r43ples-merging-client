@@ -59,12 +59,14 @@ import de.tud.plt.r43ples.client.desktop.ui.dialog.ConfigurationDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.StartMergingDialog;
 import de.tud.plt.r43ples.client.desktop.ui.editor.table.CustomComboBoxEditor;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellCheckBoxRendererResolutionHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellComboBoxRendererSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererFilter;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
-import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCheckBoxRendererResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellCheckBoxRendererResolutionTriples;
 
 /**
  * The controller.
@@ -240,8 +242,19 @@ public class Controller {
 					ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, true);
 				}
 				
+				// Check existence of high level changes
+				if (highLevelChangeModel.getHighLevelChangesRenaming().isEmpty()) {
+					// Disable high level changes tab
+					ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
+					ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
+				} else {
+					// Enable high level changes tab
+					ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, true);
+				}
+				
 				// Create the property list of revisions
 				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
+				
 				dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
@@ -249,13 +262,38 @@ public class Controller {
 				logger.info("Merge query produced no conflicts. Merged revision was created.");
 				// Create an empty difference model
 				differenceModel = new DifferenceModel();
+				// Create empty class models
+				classModelBranchA = new ClassModel();
+				classModelBranchB = new ClassModel();
+				// Create an empty high level change model
+				highLevelChangeModel = new HighLevelChangeModel();
 				// Create an empty property list
 				propertyList = new ArrayList<String>();
+				// Disable tabs
+				ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
+				ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
+				ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
+				// Get the revision number
 				String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
+				
 				dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				// Error occurred
+				// Create an empty difference model
+				differenceModel = new DifferenceModel();
+				// Create empty class models
+				classModelBranchA = new ClassModel();
+				classModelBranchB = new ClassModel();
+				// Create an empty high level change model
+				highLevelChangeModel = new HighLevelChangeModel();
+				// Create an empty property list
+				propertyList = new ArrayList<String>();
+				// Disable tabs
+				ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
+				ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
+				ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
+				
 				dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Undefined error occurred", "Error", JOptionPane.ERROR_MESSAGE);
 			}
@@ -268,15 +306,20 @@ public class Controller {
 			for (int i = 0; i < ApplicationUI.getTableModelResolutionTriples().getColumnCount() - 1; i++) {
 				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
 			}
-			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCheckBoxRendererResolutionTriples());
-			
-			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentClassTriples());
+			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCellCheckBoxRendererResolutionTriples());
 			
 			TableCellRendererSemanticEnrichmentClassTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentClassTriples();
 			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getColumnCount() - 1; i++) {
 				ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
 			}
-
+			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentClassTriples());
+			
+			TableCellRendererResolutionHighLevelChanges rendererHighLevelChanges = new TableCellRendererResolutionHighLevelChanges();
+			for (int i = 0; i < ApplicationUI.getTableModelResolutionHighLevelChanges().getColumnCount() - 1; i++) {
+				ApplicationUI.getTableResolutionHighLevelChanges().getColumnModel().getColumn(i).setCellRenderer(rendererHighLevelChanges);
+			}
+			ApplicationUI.getTableResolutionHighLevelChanges().getColumnModel().getColumn(4).setCellRenderer(new TableCellCheckBoxRendererResolutionHighLevelChanges());
+			
 			TableCellRendererFilter rendererFilter = new TableCellRendererFilter();
 			ApplicationUI.getTableFilter().getColumnModel().getColumn(0).setCellRenderer(rendererFilter);
 			

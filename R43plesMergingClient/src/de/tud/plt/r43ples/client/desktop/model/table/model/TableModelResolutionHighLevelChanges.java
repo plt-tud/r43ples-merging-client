@@ -97,7 +97,7 @@ public class TableModelResolutionHighLevelChanges extends AbstractTableModel {
 	 */
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		if (column == 6) 
+		if (column == 4) 
 			return true;
 		
 		return false;

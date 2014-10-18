@@ -12,12 +12,12 @@ import javax.swing.table.TableCellRenderer;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
 
 /**
- * The table check box renderer of resolution triples table.
+ * The table cell check box renderer of resolution triples table.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableCheckBoxRendererResolutionTriples extends JCheckBox implements TableCellRenderer {
+public class TableCellCheckBoxRendererResolutionTriples extends JCheckBox implements TableCellRenderer {
 
 	/** The default serial version. **/
 	private static final long serialVersionUID = 1L;
@@ -26,7 +26,7 @@ public class TableCheckBoxRendererResolutionTriples extends JCheckBox implements
 	/**
 	 * The constructor.
 	 */
-	public TableCheckBoxRendererResolutionTriples() {
+	public TableCellCheckBoxRendererResolutionTriples() {
 		setHorizontalAlignment(JLabel.CENTER);
 		setBorderPainted(true);
 	}

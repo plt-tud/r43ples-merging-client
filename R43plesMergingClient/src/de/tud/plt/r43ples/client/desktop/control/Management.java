@@ -1591,6 +1591,9 @@ public class Management {
 	 * @param differenceModel the difference model
 	 */
 	public static void createHighLevelChangeRenamingModel(HighLevelChangeModel highLevelChangeModel, DifferenceModel differenceModel) {
+		// Clear high level change model
+		highLevelChangeModel.clear();
+		
 		// Get all differences of state combination DELETED-ORIGINAL
 		DifferenceGroup delOrig = differenceModel.getDifferenceGroups().get(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ORIGINAL);
 		
