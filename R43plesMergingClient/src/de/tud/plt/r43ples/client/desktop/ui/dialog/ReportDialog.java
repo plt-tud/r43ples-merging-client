@@ -71,6 +71,7 @@ public class ReportDialog {
 		dialog = new JDialog();
 		dialog.setTitle("Summary Report");
 		dialog.setBounds(100, 100, 887, 758);
+		dialog.setMinimumSize(new Dimension(445, 480));
 		dialog.getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);

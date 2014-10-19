@@ -76,7 +76,8 @@ public class StartMergingDialog {
 	private void initialize() {
 		dialog = new JDialog();
 		dialog.setTitle("Start Merging");
-		dialog.setBounds(100, 100, 450, 380);
+		dialog.setBounds(100, 100, 445, 380);
+		dialog.setResizable(false);
 		dialog.getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);
