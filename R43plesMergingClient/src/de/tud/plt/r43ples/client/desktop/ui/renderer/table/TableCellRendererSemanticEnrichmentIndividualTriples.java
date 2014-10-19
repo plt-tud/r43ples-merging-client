@@ -16,16 +16,16 @@ import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
-import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
-import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentIndividualTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentIndividualTriples;
 
 /**
- * The table renderer of semantic enrichment class triples table.
+ * The table renderer of semantic enrichment individual triples table.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableCellRendererSemanticEnrichmentClassTriples extends DefaultTableCellRenderer  {
+public class TableCellRendererSemanticEnrichmentIndividualTriples extends DefaultTableCellRenderer  {
 
 	/** The default serial version. **/
 	private static final long serialVersionUID = 1L;
@@ -39,10 +39,10 @@ public class TableCellRendererSemanticEnrichmentClassTriples extends DefaultTabl
 		JComponent cellComponent = (JComponent) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		
 		// Get the table model
-		TableModelSemanticEnrichmentClassTriples tableModel = (TableModelSemanticEnrichmentClassTriples) table.getModel();
+		TableModelSemanticEnrichmentIndividualTriples tableModel = (TableModelSemanticEnrichmentIndividualTriples) table.getModel();
 		
 		// Get the table entry
-		TableEntrySemanticEnrichmentClassTriples tableEntry =  tableModel.getTableEntry(row);
+		TableEntrySemanticEnrichmentIndividualTriples tableEntry =  tableModel.getTableEntry(row);
 		
 		// Check if difference exists
 		if (tableEntry.getDifference() != null) {

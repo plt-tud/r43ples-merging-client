@@ -11,8 +11,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 
-import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
-import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentIndividualTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentIndividualTriples;
 
 /**
  * The custom combo box editor. 
@@ -29,7 +29,7 @@ public class CustomComboBoxEditor extends DefaultCellEditor {
 	/** The combo box. **/
 	private JComboBox<String> comboBox;
 	/** The table entry. **/
-	private TableEntrySemanticEnrichmentClassTriples tableEntry;
+	private TableEntrySemanticEnrichmentIndividualTriples tableEntry;
 	
 	
 	/**
@@ -51,7 +51,7 @@ public class CustomComboBoxEditor extends DefaultCellEditor {
 		// Remove all entries
 		model.removeAllElements();		
 		// Get current table entry
-		tableEntry = ((TableModelSemanticEnrichmentClassTriples) table.getModel()).getTableEntry(row);
+		tableEntry = ((TableModelSemanticEnrichmentIndividualTriples) table.getModel()).getTableEntry(row);
 		// Add options to model
 		ArrayList<String> options = tableEntry.getSemanticResolutionOptions();
 		if (!options.isEmpty()) {

@@ -4,22 +4,22 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllClasses;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllIndividuals;
 
 /**
- * Table model for semantic enrichment table which contains all classes.
+ * Table model for semantic enrichment table which contains all individuals.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
+public class TableModelSemanticEnrichmentAllIndividuals extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
-	private static final String[] header = {"Classes branch A", "Classes branch B"};
+	private static final String[] header = {"Individuals branch A", "Individuals branch B"};
 	/** The row data list. **/
-	private List<TableEntrySemanticEnrichmentAllClasses> entries;
+	private List<TableEntrySemanticEnrichmentAllIndividuals> entries;
 
 	
 	/**
@@ -27,7 +27,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelSemanticEnrichmentAllClasses(List<TableEntrySemanticEnrichmentAllClasses> entries) {
+	public TableModelSemanticEnrichmentAllIndividuals(List<TableEntrySemanticEnrichmentAllIndividuals> entries) {
 		this.entries = entries;
 	}
 	
@@ -73,7 +73,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntrySemanticEnrichmentAllClasses entry = entries.get(rowIndex);
+		TableEntrySemanticEnrichmentAllIndividuals entry = entries.get(rowIndex);
 		return entry.getRowData()[columnIndex];
 	}
 	
@@ -102,7 +102,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntrySemanticEnrichmentAllClasses entry) {
+	public void addRow(TableEntrySemanticEnrichmentAllIndividuals entry) {
 		entries.add(entry);
 	}
 	
@@ -131,7 +131,7 @@ public class TableModelSemanticEnrichmentAllClasses extends AbstractTableModel {
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntrySemanticEnrichmentAllClasses getTableEntry(int rowIndex) {
+	public TableEntrySemanticEnrichmentAllIndividuals getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
 	}
 

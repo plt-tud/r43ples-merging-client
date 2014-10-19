@@ -34,8 +34,8 @@ import com.hp.hpl.jena.update.UpdateAction;
 import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
-import de.tud.plt.r43ples.client.desktop.model.structure.ClassModel;
-import de.tud.plt.r43ples.client.desktop.model.structure.ClassStructure;
+import de.tud.plt.r43ples.client.desktop.model.structure.IndividualModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.IndividualStructure;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
@@ -45,15 +45,15 @@ import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.SemanticDefinitionResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
-import de.tud.plt.r43ples.client.desktop.model.structure.TripleClassStructure;
+import de.tud.plt.r43ples.client.desktop.model.structure.TripleIndividualStructure;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryFilter;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntryHighLevelChanges;
-import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllClasses;
-import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllIndividuals;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentIndividualTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelFilter;
-import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentAllClasses;
-import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentAllIndividuals;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentIndividualTriples;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ApplicationUI;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.ConfigurationDialog;
@@ -61,12 +61,12 @@ import de.tud.plt.r43ples.client.desktop.ui.dialog.ReportDialog;
 import de.tud.plt.r43ples.client.desktop.ui.dialog.StartMergingDialog;
 import de.tud.plt.r43ples.client.desktop.ui.editor.table.CustomComboBoxEditor;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellCheckBoxRendererResolutionHighLevelChanges;
-import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellComboBoxRendererSemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellComboBoxRendererSemanticEnrichmentIndividualTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererFilter;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
-import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentAllClasses;
-import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentAllIndividuals;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentIndividualTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellCheckBoxRendererResolutionTriples;
 
@@ -88,10 +88,10 @@ public class Controller {
 	private static DifferenceModel differenceModel = new DifferenceModel();
 	/** The high level change model. **/
 	private static HighLevelChangeModel highLevelChangeModel = new HighLevelChangeModel();
-	/** The class model of branch A. **/
-	private static ClassModel classModelBranchA;
-	/** The class model of branch B. **/
-	private static ClassModel classModelBranchB;
+	/** The individual model of branch A. **/
+	private static IndividualModel individualModelBranchA;
+	/** The individual model of branch B. **/
+	private static IndividualModel individualModelBranchB;
 	/** The grappa graph which contains the revision tree. **/
 	private static Graph graph;
 	/** The grappa panel which holds the visualization of the graph. **/
@@ -221,13 +221,13 @@ public class Controller {
 			ApplicationUI.getTableResolutionTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
 			ApplicationUI.getTableResolutionTriples().updateUI();
 			
-			ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Individuals of " + branchNameA);
-			ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().getTableHeader().getColumnModel().getColumn(1).setHeaderValue("Individuals of " + branchNameB);
-			ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
+			ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Individuals of " + branchNameA);
+			ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getTableHeader().getColumnModel().getColumn(1).setHeaderValue("Individuals of " + branchNameB);
+			ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
 			
-			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
-			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
-			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
 			
 			ReportDialog.getTable().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
 			ReportDialog.getTable().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
@@ -246,12 +246,12 @@ public class Controller {
 				revisionNumberBranchA = Management.getRevisionNumberOfBranchAHeaderParameter(response, graphName);
 				revisionNumberBranchB = Management.getRevisionNumberOfBranchBHeaderParameter(response, graphName);
 				
-				// Create the class models of both branches
-				classModelBranchA = Management.createClassModelOfRevision(graphName, branchNameA, differenceModel);
-				classModelBranchB = Management.createClassModelOfRevision(graphName, branchNameB, differenceModel);
+				// Create the individual models of both branches
+				individualModelBranchA = Management.createIndividualModelOfRevision(graphName, branchNameA, differenceModel);
+				individualModelBranchB = Management.createIndividualModelOfRevision(graphName, branchNameB, differenceModel);
 				
-				// Check existence of classes
-				if (classModelBranchA.getClassStructures().isEmpty() && classModelBranchB.getClassStructures().isEmpty()) {
+				// Check existence of individuals
+				if (individualModelBranchA.getIndividualStructures().isEmpty() && individualModelBranchB.getIndividualStructures().isEmpty()) {
 					// Disable semantic enrichment individuals tab
 					ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
 					ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
@@ -283,9 +283,9 @@ public class Controller {
 				logger.info("Merge query produced no conflicts. Merged revision was created.");
 				// Create an empty difference model
 				differenceModel = new DifferenceModel();
-				// Create empty class models
-				classModelBranchA = new ClassModel();
-				classModelBranchB = new ClassModel();
+				// Create empty individual models
+				individualModelBranchA = new IndividualModel();
+				individualModelBranchB = new IndividualModel();
 				// Create an empty high level change model
 				highLevelChangeModel = new HighLevelChangeModel();
 				// Create an empty property list
@@ -303,9 +303,9 @@ public class Controller {
 				// Error occurred
 				// Create an empty difference model
 				differenceModel = new DifferenceModel();
-				// Create empty class models
-				classModelBranchA = new ClassModel();
-				classModelBranchB = new ClassModel();
+				// Create empty individual models
+				individualModelBranchA = new IndividualModel();
+				individualModelBranchB = new IndividualModel();
 				// Create an empty high level change model
 				highLevelChangeModel = new HighLevelChangeModel();
 				// Create an empty property list
@@ -329,16 +329,16 @@ public class Controller {
 			}
 			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCellCheckBoxRendererResolutionTriples());
 			
-			TableCellRendererSemanticEnrichmentAllClasses rendererSemanticIndividuals = new TableCellRendererSemanticEnrichmentAllClasses();
-			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentAllClasses().getColumnCount(); i++) {
-				ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticIndividuals);
+			TableCellRendererSemanticEnrichmentAllIndividuals rendererSemanticIndividuals = new TableCellRendererSemanticEnrichmentAllIndividuals();
+			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals().getColumnCount(); i++) {
+				ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticIndividuals);
 			}
 			
-			TableCellRendererSemanticEnrichmentClassTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentClassTriples();
-			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getColumnCount() - 1; i++) {
-				ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
+			TableCellRendererSemanticEnrichmentIndividualTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentIndividualTriples();
+			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getColumnCount() - 1; i++) {
+				ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
 			}
-			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentClassTriples());
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentIndividualTriples());
 			
 			TableCellRendererResolutionHighLevelChanges rendererHighLevelChanges = new TableCellRendererResolutionHighLevelChanges();
 			for (int i = 0; i < ApplicationUI.getTableModelResolutionHighLevelChanges().getColumnCount() - 1; i++) {
@@ -350,7 +350,7 @@ public class Controller {
 			ApplicationUI.getTableFilter().getColumnModel().getColumn(0).setCellRenderer(rendererFilter);
 			
 			// Set the cell editor
-			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getColumnModel().getColumn(7).setCellEditor(new CustomComboBoxEditor());
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(7).setCellEditor(new CustomComboBoxEditor());
 		
 			// Update filter table
 			updateTableModelFilter();
@@ -365,7 +365,7 @@ public class Controller {
 			new SemanticDefinitions();
 			
 			// Update the semantic enrichment
-			updateTableModelSemanticEnrichmentAllClasses();
+			updateTableModelSemanticEnrichmentAllIndividuals();
 			
 			// Update the high level change table
 			updateTableModelHighLevelChanges();
@@ -821,50 +821,50 @@ public class Controller {
 	
 	
 	/**
-	 * Update the semantic enrichment table model all classes.
+	 * Update the semantic enrichment table model all individuals.
 	 */
-	public static void updateTableModelSemanticEnrichmentAllClasses() {
+	public static void updateTableModelSemanticEnrichmentAllIndividuals() {
 		// Get the table model
-		TableModelSemanticEnrichmentAllClasses tableModel = ApplicationUI.getTableModelSemanticEnrichmentAllClasses();
+		TableModelSemanticEnrichmentAllIndividuals tableModel = ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals();
 		
 		// Get key sets
-		ArrayList<String> keySetClassModelBranchA = new ArrayList<String>(classModelBranchA.getClassStructures().keySet());
-		ArrayList<String> keySetClassModelBranchB = new ArrayList<String>(classModelBranchB.getClassStructures().keySet());
+		ArrayList<String> keySetIndividualModelBranchA = new ArrayList<String>(individualModelBranchA.getIndividualStructures().keySet());
+		ArrayList<String> keySetIndividualModelBranchB = new ArrayList<String>(individualModelBranchB.getIndividualStructures().keySet());
 		
-		// Iterate over all class URIs of branch A
+		// Iterate over all individual URIs of branch A
 		@SuppressWarnings("unchecked")
-		Iterator<String> iteKeySetClassModelBranchA = ((ArrayList<String>) keySetClassModelBranchA.clone()).iterator();
-		while (iteKeySetClassModelBranchA.hasNext()) {
-			String currentKeyBranchA = iteKeySetClassModelBranchA.next();
+		Iterator<String> iteKeySetIndividualModelBranchA = ((ArrayList<String>) keySetIndividualModelBranchA.clone()).iterator();
+		while (iteKeySetIndividualModelBranchA.hasNext()) {
+			String currentKeyBranchA = iteKeySetIndividualModelBranchA.next();
 			
-			// Add all class URIs to table model which are in both branches
-			if (keySetClassModelBranchB.contains(currentKeyBranchA)) {
-				TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(classModelBranchA.getClassStructures().get(currentKeyBranchA), classModelBranchB.getClassStructures().get(currentKeyBranchA), new Object[]{currentKeyBranchA, currentKeyBranchA});
+			// Add all individual URIs to table model which are in both branches
+			if (keySetIndividualModelBranchB.contains(currentKeyBranchA)) {
+				TableEntrySemanticEnrichmentAllIndividuals tableEntry = new TableEntrySemanticEnrichmentAllIndividuals(individualModelBranchA.getIndividualStructures().get(currentKeyBranchA), individualModelBranchB.getIndividualStructures().get(currentKeyBranchA), new Object[]{currentKeyBranchA, currentKeyBranchA});
 				tableModel.addRow(tableEntry);
 				// Remove key from branch A key set copy
-				keySetClassModelBranchA.remove(currentKeyBranchA);
+				keySetIndividualModelBranchA.remove(currentKeyBranchA);
 				// Remove key from branch B key set copy
-				keySetClassModelBranchB.remove(currentKeyBranchA);
+				keySetIndividualModelBranchB.remove(currentKeyBranchA);
 			}
 		}
 		
-		// Iterate over all class URIs of branch A (will only contain the classes which are not in B)
-		Iterator<String> iteKeySetClassModelBranchAOnly = keySetClassModelBranchA.iterator();
-		while (iteKeySetClassModelBranchAOnly.hasNext()) {
-			String currentKeyBranchA = iteKeySetClassModelBranchAOnly.next();
-			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(classModelBranchA.getClassStructures().get(currentKeyBranchA), new ClassStructure(null), new Object[]{currentKeyBranchA, ""});
+		// Iterate over all individual URIs of branch A (will only contain the individuals which are not in B)
+		Iterator<String> iteKeySetIndividualModelBranchAOnly = keySetIndividualModelBranchA.iterator();
+		while (iteKeySetIndividualModelBranchAOnly.hasNext()) {
+			String currentKeyBranchA = iteKeySetIndividualModelBranchAOnly.next();
+			TableEntrySemanticEnrichmentAllIndividuals tableEntry = new TableEntrySemanticEnrichmentAllIndividuals(individualModelBranchA.getIndividualStructures().get(currentKeyBranchA), new IndividualStructure(null), new Object[]{currentKeyBranchA, ""});
 			tableModel.addRow(tableEntry);
 		}
 		
-		// Iterate over all class URIs of branch B (will only contain the classes which are not in A)
-		Iterator<String> iteKeySetClassModelBranchBOnly = keySetClassModelBranchB.iterator();
-		while (iteKeySetClassModelBranchBOnly.hasNext()) {
-			String currentKeyBranchB = iteKeySetClassModelBranchBOnly.next();
-			TableEntrySemanticEnrichmentAllClasses tableEntry = new TableEntrySemanticEnrichmentAllClasses(new ClassStructure(null), classModelBranchB.getClassStructures().get(currentKeyBranchB), new Object[]{"", currentKeyBranchB});
+		// Iterate over all individual URIs of branch B (will only contain the individuals which are not in A)
+		Iterator<String> iteKeySetIndividualModelBranchBOnly = keySetIndividualModelBranchB.iterator();
+		while (iteKeySetIndividualModelBranchBOnly.hasNext()) {
+			String currentKeyBranchB = iteKeySetIndividualModelBranchBOnly.next();
+			TableEntrySemanticEnrichmentAllIndividuals tableEntry = new TableEntrySemanticEnrichmentAllIndividuals(new IndividualStructure(null), individualModelBranchB.getIndividualStructures().get(currentKeyBranchB), new Object[]{"", currentKeyBranchB});
 			tableModel.addRow(tableEntry);
 		}
 		
-		ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
 	}
 	
 	
@@ -875,29 +875,29 @@ public class Controller {
 	 */
 	public static void updateTableModelSemanticEnrichmentTriples() throws IOException {
 		// Get the table model
-		TableModelSemanticEnrichmentClassTriples tableModel = ApplicationUI.getTableModelSemanticEnrichmentClassTriples();
+		TableModelSemanticEnrichmentIndividualTriples tableModel = ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples();
 		// Clear the table model
 		tableModel.removeAllElements();
 		
 		// Get the currently selected table entry	
-		TableEntrySemanticEnrichmentAllClasses currentTableEntry = ApplicationUI.getTableModelSemanticEnrichmentAllClasses().getTableEntry(ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().getSelectedRow());
-		String currentClassUriA = currentTableEntry.getClassStructureA().getClassUri();
-		String currentClassUriB = currentTableEntry.getClassStructureB().getClassUri();
+		TableEntrySemanticEnrichmentAllIndividuals currentTableEntry = ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals().getTableEntry(ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getSelectedRow());
+		String currentIndividualUriA = currentTableEntry.getIndividualStructureA().getIndividualUri();
+		String currentIndividualUriB = currentTableEntry.getIndividualStructureB().getIndividualUri();
 		
 		// Triple key set lists of both branches
 		ArrayList<String> keySetTriplesBranchA = new ArrayList<String>();
 		ArrayList<String> keySetTriplesBranchB = new ArrayList<String>();
 
-		String classUri = null;
-		if (currentClassUriA != null) {
-			classUri = currentClassUriA;
-			keySetTriplesBranchA = new ArrayList<String>(classModelBranchA.getClassStructures().get(classUri).getTriples().keySet());
-			if (currentClassUriB != null) {
-				keySetTriplesBranchB = new ArrayList<String>(classModelBranchB.getClassStructures().get(classUri).getTriples().keySet());
+		String individualUri = null;
+		if (currentIndividualUriA != null) {
+			individualUri = currentIndividualUriA;
+			keySetTriplesBranchA = new ArrayList<String>(individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().keySet());
+			if (currentIndividualUriB != null) {
+				keySetTriplesBranchB = new ArrayList<String>(individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().keySet());
 			}
 		} else {
-			classUri = currentClassUriB;
-			keySetTriplesBranchB = new ArrayList<String>(classModelBranchB.getClassStructures().get(classUri).getTriples().keySet());
+			individualUri = currentIndividualUriB;
+			keySetTriplesBranchB = new ArrayList<String>(individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().keySet());
 		}
 		
 		// Iterate over all triples of branch A
@@ -908,17 +908,17 @@ public class Controller {
 			
 			// Add all triples to table model which are in both branches
 			if (keySetTriplesBranchB.contains(currentKeyBranchA)) {
-				TripleClassStructure currentTriple = classModelBranchA.getClassStructures().get(classUri).getTriples().get(currentKeyBranchA);
+				TripleIndividualStructure currentTriple = individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchA);
 				Difference difference = currentTriple.getDifference();
 				if (difference != null) {
 					DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
 					SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
-					TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(
+					TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(
 																					difference,
 																					semanticDefinitionResult.getSemanticDescription(),
 																					semanticDefinitionResult.getSemanticResolutionOptions(),
 																					semanticDefinitionResult.getSelectedSemanticResolutionOption(),
-																					Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
+																					Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 					tableModel.addRow(tableEntry);
 					// Remove key from branch A key set copy
 					keySetTriplesBranchA.remove(currentKeyBranchA);
@@ -926,8 +926,8 @@ public class Controller {
 					keySetTriplesBranchB.remove(currentKeyBranchA);
 				} else {
 					// No difference is specified for current triple
-					TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, 
-																					Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
+					TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
+																					Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
 					tableModel.addRow(tableEntry);
 					// Remove key from branch A key set copy
 					keySetTriplesBranchA.remove(currentKeyBranchA);
@@ -941,22 +941,22 @@ public class Controller {
 		Iterator<String> iteKeySetTriplesBranchAOnly = keySetTriplesBranchA.iterator();
 		while (iteKeySetTriplesBranchAOnly.hasNext()) {
 			String currentKeyBranchA = iteKeySetTriplesBranchAOnly.next();
-			TripleClassStructure currentTriple = classModelBranchA.getClassStructures().get(classUri).getTriples().get(currentKeyBranchA);
+			TripleIndividualStructure currentTriple = individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchA);
 			Difference difference = currentTriple.getDifference();
 			if (difference != null) {
 				DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
 				SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
-				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(
+				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(
 																				difference,
 																				semanticDefinitionResult.getSemanticDescription(),
 																				semanticDefinitionResult.getSemanticResolutionOptions(),
 																				semanticDefinitionResult.getSelectedSemanticResolutionOption(),
-																				Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
+																				Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 				tableModel.addRow(tableEntry);
 			} else {
 				// No difference is specified for current triple
-				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, 
-																				Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
+				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
+																				Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
 				tableModel.addRow(tableEntry);
 			}
 		}
@@ -965,31 +965,31 @@ public class Controller {
 		Iterator<String> iteKeySetTriplesBranchBOnly = keySetTriplesBranchB.iterator();
 		while (iteKeySetTriplesBranchBOnly.hasNext()) {
 			String currentKeyBranchB = iteKeySetTriplesBranchBOnly.next();
-			TripleClassStructure currentTriple = classModelBranchB.getClassStructures().get(classUri).getTriples().get(currentKeyBranchB);
+			TripleIndividualStructure currentTriple = individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchB);
 			Difference difference = currentTriple.getDifference();
 			if (difference != null) {
 				DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
 				SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
-				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(
+				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(
 																				difference,
 																				semanticDefinitionResult.getSemanticDescription(),
 																				semanticDefinitionResult.getSemanticResolutionOptions(),
 																				semanticDefinitionResult.getSelectedSemanticResolutionOption(),
-																				Management.createRowDataSemanticEnrichmentClassTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
+																				Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 				tableModel.addRow(tableEntry);
 			} else {
 				// No difference is specified for current triple
-				TableEntrySemanticEnrichmentClassTriples tableEntry = new TableEntrySemanticEnrichmentClassTriples(null, "", new ArrayList<String>(), -1, 
-																				Management.createRowDataSemanticEnrichmentClassTriplesWithoutDifference(currentTriple.getTriple()));
+				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
+																				Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
 				tableModel.addRow(tableEntry);
 			}
 		}
 
 		// Clear selection
-		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectionModel().clearSelection();
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getSelectionModel().clearSelection();
 		
 		// Update triples table
-		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
 	}
 	
 	
@@ -1087,8 +1087,8 @@ public class Controller {
 		// Update the corresponding tables and trees
 		ApplicationUI.getTreeDifferencesDivision().updateUI();
 		ApplicationUI.getTableResolutionTriples().updateUI();
-		ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
-		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
 		ApplicationUI.getTableFilter().updateUI();
 		
 		ConfigurationDialog.dialog.setVisible(false);
@@ -1104,14 +1104,14 @@ public class Controller {
 	
 	
 	/**
-	 * The table resolution semantic enrichment class triples selection changed.
+	 * The table resolution semantic enrichment individual triples selection changed.
 	 * Update the revision graph. The referenced revisions of the selected table row will be highlighted in the graph.
 	 */
-	public static void tableResolutionSemanticEnrichmentClassTriplesSelectionChanged() {
-		int[] rows = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectedRows();
+	public static void tableResolutionSemanticEnrichmentIndividualTriplesSelectionChanged() {
+		int[] rows = ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getSelectedRows();
 		if (rows.length == 1) {
-			int index = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().convertRowIndexToModel(rows[0]);
-			TableEntrySemanticEnrichmentClassTriples entry = ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getTableEntry(index);
+			int index = ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().convertRowIndexToModel(rows[0]);
+			TableEntrySemanticEnrichmentIndividualTriples entry = ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getTableEntry(index);
 			if (entry.getDifference() != null) {
 				logger.debug("Selected Entry: A - " + entry.getDifference().getReferencedRevisionA());
 				logger.debug("Selected Entry: B - " + entry.getDifference().getReferencedRevisionB());
@@ -1144,41 +1144,41 @@ public class Controller {
 
 
 	/**
-	 * Approve selected entries of resolution semantic enrichment class triples table.
+	 * Approve selected entries of resolution semantic enrichment individual triples table.
 	 */
-	public static void approveSelectedEntriesResolutionSemanticEnrichmentClassTriples() {
-		int[] selectedRows = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getSelectedRows();
+	public static void approveSelectedEntriesResolutionSemanticEnrichmentIndividualTriples() {
+		int[] selectedRows = ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getSelectedRows();
 		// Sort the array
 		Arrays.sort(selectedRows);
 		
 		for (int i = selectedRows.length - 1; i >= 0; i--) {
-			int selectedRow = ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().convertRowIndexToModel(selectedRows[i]);
-			Difference difference = ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getTableEntry(selectedRow).getDifference();
+			int selectedRow = ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().convertRowIndexToModel(selectedRows[i]);
+			Difference difference = ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getTableEntry(selectedRow).getDifference();
 			difference.setResolutionState(ResolutionState.RESOLVED);
 			// Propagate changes to difference model
-			int selectedOption = ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getTableEntry(selectedRow).getSelectedSemanticResolutionOption();
+			int selectedOption = ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getTableEntry(selectedRow).getSelectedSemanticResolutionOption();
 			if (selectedOption == 1) {
 				difference.setTripleResolutionState(SDDTripleStateEnum.ADDED);
 			} else {
 				difference.setTripleResolutionState(SDDTripleStateEnum.DELETED);
 			}
 		}
-		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
 		
 		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
 		
 		ApplicationUI.getTreeDifferencesDivision().updateUI();
 		
-		ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
 	}
 	
 	
 	/**
-	 * Select all entries of resolution semantic enrichment class triples table.
+	 * Select all entries of resolution semantic enrichment individual triples table.
 	 */
-	public static void selectAllEntriesResolutionSemanticEnrichmentClassTriples() {
-		if (ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getRowCount() > 0) {
-			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().setRowSelectionInterval(0, ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getRowCount() - 1);
+	public static void selectAllEntriesResolutionSemanticEnrichmentIndividualTriples() {
+		if (ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getRowCount() > 0) {
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().setRowSelectionInterval(0, ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getRowCount() - 1);
 		}		
 	}
 	
@@ -1297,12 +1297,12 @@ public class Controller {
 	/**
 	 * Get the highest resolution state of table entry of semantic enrichment all individuals table.
 	 * 
-	 * @param classStructureA the class structure A
-	 * @param classStructureB the class structure B
+	 * @param individualStructureA the individual structure A
+	 * @param individualStructureB the individual structure B
 	 * @return the highest resolution state
 	 */
-	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(ClassStructure classStructureA, ClassStructure classStructureB) {
-		return Management.getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(classStructureA, classStructureB);
+	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(IndividualStructure individualStructureA, IndividualStructure individualStructureB) {
+		return Management.getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(individualStructureA, individualStructureB);
 	}
 	
 	

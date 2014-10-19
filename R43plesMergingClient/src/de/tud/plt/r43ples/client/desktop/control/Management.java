@@ -48,8 +48,8 @@ import de.tud.plt.r43ples.client.desktop.control.enums.MergeQueryTypeEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.control.enums.TripleObjectTypeEnum;
-import de.tud.plt.r43ples.client.desktop.model.structure.ClassModel;
-import de.tud.plt.r43ples.client.desktop.model.structure.ClassStructure;
+import de.tud.plt.r43ples.client.desktop.model.structure.IndividualModel;
+import de.tud.plt.r43ples.client.desktop.model.structure.IndividualStructure;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceModel;
@@ -58,7 +58,7 @@ import de.tud.plt.r43ples.client.desktop.model.structure.HighLevelChangeRenaming
 import de.tud.plt.r43ples.client.desktop.model.structure.HttpResponse;
 import de.tud.plt.r43ples.client.desktop.model.structure.ReportResult;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
-import de.tud.plt.r43ples.client.desktop.model.structure.TripleClassStructure;
+import de.tud.plt.r43ples.client.desktop.model.structure.TripleIndividualStructure;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSummaryReport;
 import de.tud.plt.r43ples.client.desktop.model.tree.TreeNodeObject;
@@ -1259,37 +1259,37 @@ public class Management {
 	
 	
 	/**
-	 * Get all classes of specified revision.
+	 * Get all individuals of specified revision.
 	 * 
 	 * @param graphName the graph name
 	 * @param revisionName the revision name
-	 * @return the array list of class URIs
+	 * @return the array list of individual URIs
 	 * @throws IOException 
 	 */
-	public static ArrayList<String> getAllClassesOfRevision(String graphName, String revisionName) throws IOException {
-		logger.info("Get all classes of revision.");
+	public static ArrayList<String> getAllIndividualsOfRevision(String graphName, String revisionName) throws IOException {
+		logger.info("Get all individuals of revision.");
 		
 		// Result array list
 		ArrayList<String> list = new ArrayList<String>();
 		
-    	// Query all classes (DISTINCT because there can be multiple class definitions)
+    	// Query all individuals (DISTINCT because there can be multiple individual definitions)
 		String query = prefixes + String.format(
-				  "SELECT DISTINCT ?classUri %n"
+				  "SELECT DISTINCT ?individualUri %n"
 				+ "FROM <%s> REVISION \"%s\" %n"
 				+ "WHERE { %n"
-				+ "	?classUri a ?class . %n"
+				+ "	?individualUri a ?class . %n"
 				+ "} %n"
-				+ "ORDER BY ?classUri", graphName, revisionName);
+				+ "ORDER BY ?individualUri", graphName, revisionName);
 		logger.debug(query);
 		
 		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
 		logger.debug(result);
 		
-		// Iterate over all classes
+		// Iterate over all individuals
 		ResultSet resultSet = ResultSetFactory.fromXML(result);
 		while (resultSet.hasNext()) {
 			QuerySolution qs = resultSet.next();
-			list.add(qs.getResource("?classUri").toString());
+			list.add(qs.getResource("?individualUri").toString());
 		}
 
 		return list;
@@ -1297,35 +1297,35 @@ public class Management {
 	
 	
 	/**
-	 * Get all corresponding triples of specified class.
+	 * Get all corresponding triples of specified individual.
 	 * 
 	 * @param graphName the graph name
 	 * @param revisionName the revision name
-	 * @param classUri the class URI
+	 * @param individualUri the individual URI
 	 * @param differenceModel the difference model
 	 * @return the hash map of triples
 	 * @throws IOException 
 	 */
-	public static HashMap<String, TripleClassStructure> getAllTriplesOfClass(String graphName, String revisionName, String classUri, DifferenceModel differenceModel) throws IOException {
-		logger.info("Get all corresponding triples of specified class.");
+	public static HashMap<String, TripleIndividualStructure> getAllTriplesOfIndividual(String graphName, String revisionName, String individualUri, DifferenceModel differenceModel) throws IOException {
+		logger.info("Get all corresponding triples of specified individual.");
 		
 		// Result hash map
-		HashMap<String, TripleClassStructure> list = new HashMap<String, TripleClassStructure>();
+		HashMap<String, TripleIndividualStructure> list = new HashMap<String, TripleIndividualStructure>();
 		
-    	// Query all classes
+    	// Query all individuals
 		String query = prefixes + String.format(
 				  "SELECT ?predicate ?object %n"
 				+ "FROM <%s> REVISION \"%s\" %n"
 				+ "WHERE { %n"
 				+ "	<%s> ?predicate ?object . %n"
 				+ "}"
-				+ "ORDER BY ?predicate ?object", graphName, revisionName, classUri);
+				+ "ORDER BY ?predicate ?object", graphName, revisionName, individualUri);
 		logger.debug(query);
 		
 		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
 		logger.debug(result);
 		
-		// Iterate over all classes
+		// Iterate over all individuals
 		ResultSet resultSet = ResultSetFactory.fromXML(result);
 		while (resultSet.hasNext()) {
 			QuerySolution qs = resultSet.next();
@@ -1343,13 +1343,13 @@ public class Management {
 				objectType = TripleObjectTypeEnum.RESOURCE;
 			}
 	    	// Create the triple
-			Triple triple = new Triple(classUri, predicate, object, objectType);
+			Triple triple = new Triple(individualUri, predicate, object, objectType);
 			// Check if there is a corresponding difference
 			Difference difference = getDifferenceByTriple(triple, differenceModel);			
-			// Create the triple class structure
-			TripleClassStructure tripleClassStructure = new TripleClassStructure(triple, difference);
-			// Put the triple class structure
-	    	list.put(tripleToString(triple), tripleClassStructure);
+			// Create the triple individual structure
+			TripleIndividualStructure tripleIndividualStructure = new TripleIndividualStructure(triple, difference);
+			// Put the triple individual structure
+	    	list.put(tripleToString(triple), tripleIndividualStructure);
 		}
 
 		return list;
@@ -1357,29 +1357,29 @@ public class Management {
 	
 	
 	/**
-	 * Create the class model of specified revision.
+	 * Create the individual model of specified revision.
 	 * 
 	 * @param graphName the graph name
 	 * @param revisionName the revision name
 	 * @param differenceModel the difference model
-	 * @return the class model
+	 * @return the individual model
 	 * @throws IOException 
 	 */
-	public static ClassModel createClassModelOfRevision(String graphName, String revisionName, DifferenceModel differenceModel) throws IOException {
-		ClassModel classModel = new ClassModel();
+	public static IndividualModel createIndividualModelOfRevision(String graphName, String revisionName, DifferenceModel differenceModel) throws IOException {
+		IndividualModel individualModel = new IndividualModel();
 		
-		ArrayList<String> classURIs = getAllClassesOfRevision(graphName, revisionName);
+		ArrayList<String> individualURIs = getAllIndividualsOfRevision(graphName, revisionName);
 		
-		Iterator<String> iteClassURIs = classURIs.iterator();
-		while (iteClassURIs.hasNext()) {
-			String currentClassUri = iteClassURIs.next();
-			HashMap<String, TripleClassStructure> currentTriples = getAllTriplesOfClass(graphName, revisionName, currentClassUri, differenceModel);
-			ClassStructure currentClassStructure = new ClassStructure(currentClassUri);
-			currentClassStructure.setTriples(currentTriples);		
-			classModel.addClassStructure(currentClassUri, currentClassStructure);
+		Iterator<String> iteIndividualURIs = individualURIs.iterator();
+		while (iteIndividualURIs.hasNext()) {
+			String currentIndividualUri = iteIndividualURIs.next();
+			HashMap<String, TripleIndividualStructure> currentTriples = getAllTriplesOfIndividual(graphName, revisionName, currentIndividualUri, differenceModel);
+			IndividualStructure currentIndividualStructure = new IndividualStructure(currentIndividualUri);
+			currentIndividualStructure.setTriples(currentTriples);		
+			individualModel.addIndividualStructure(currentIndividualUri, currentIndividualStructure);
 		}
 		
-		return classModel;
+		return individualModel;
 	}
 	
 	
@@ -1409,13 +1409,13 @@ public class Management {
 	
 	
 	/**
-	 * Create the row data for resolution triples.
+	 * Create the row data for semantic enrichment individual triples.
 	 * 
 	 * @param difference the difference
 	 * @param differenceGroup the difference group
 	 * @return the row data
 	 */
-	public static Object[] createRowDataSemanticEnrichmentClassTriples(Difference difference, DifferenceGroup differenceGroup, String semanticDescription) {
+	public static Object[] createRowDataSemanticEnrichmentIndividualTriples(Difference difference, DifferenceGroup differenceGroup, String semanticDescription) {
 		Object[] rowData = new Object[8];
 
 		rowData[0] = getSubject(difference.getTriple());
@@ -1448,12 +1448,12 @@ public class Management {
 	
 	
 	/**
-	 * Create the row data for resolution triples without difference.
+	 * Create the row data for semantic enrichment individual triples without difference.
 	 * 
 	 * @param triple the triple
 	 * @return the row data
 	 */
-	public static Object[] createRowDataSemanticEnrichmentClassTriplesWithoutDifference(Triple triple) {
+	public static Object[] createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(Triple triple) {
 		Object[] rowData = new Object[8];
 
 		rowData[0] = getSubject(triple);
@@ -1576,31 +1576,31 @@ public class Management {
 	/**
 	 * Get the highest resolution state of table entry of semantic enrichment all individuals table.
 	 * 
-	 * @param classStructureA the class structure A
-	 * @param classStructureB the class structure B
+	 * @param individualStructureA the individual structure A
+	 * @param individualStructureB the individual structure B
 	 * @return the highest resolution state
 	 */
-	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(ClassStructure classStructureA, ClassStructure classStructureB) {
+	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(IndividualStructure individualStructureA, IndividualStructure individualStructureB) {
 		// The result resolution state
 		ResolutionState resolutionState = ResolutionState.RESOLVED;
-		// Check class structure A
-		Iterator<String> iteTriplesA = classStructureA.getTriples().keySet().iterator();
+		// Check individual structure A
+		Iterator<String> iteTriplesA = individualStructureA.getTriples().keySet().iterator();
 		while (iteTriplesA.hasNext()) {
 			String currentTripleKey = iteTriplesA.next();
-			TripleClassStructure currentTripleClassStructure = classStructureA.getTriples().get(currentTripleKey);
-			Difference currentDifference = currentTripleClassStructure.getDifference();
+			TripleIndividualStructure currentTripleIndividualStructure = individualStructureA.getTriples().get(currentTripleKey);
+			Difference currentDifference = currentTripleIndividualStructure.getDifference();
 			if (currentDifference != null) {
 				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
 					resolutionState = currentDifference.getResolutionState();
 				}
 			}
 		}
-		// Check class structure B
-		Iterator<String> iteTriplesB = classStructureB.getTriples().keySet().iterator();
+		// Check individual structure B
+		Iterator<String> iteTriplesB = individualStructureB.getTriples().keySet().iterator();
 		while (iteTriplesB.hasNext()) {
 			String currentTripleKey = iteTriplesB.next();
-			TripleClassStructure currentTripleClassStructure = classStructureB.getTriples().get(currentTripleKey);
-			Difference currentDifference = currentTripleClassStructure.getDifference();
+			TripleIndividualStructure currentTripleIndividualStructure = individualStructureB.getTriples().get(currentTripleKey);
+			Difference currentDifference = currentTripleIndividualStructure.getDifference();
 			if (currentDifference != null) {
 				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
 					resolutionState = currentDifference.getResolutionState();

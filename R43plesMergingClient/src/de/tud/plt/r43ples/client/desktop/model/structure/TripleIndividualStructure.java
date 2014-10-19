@@ -1,12 +1,12 @@
 package de.tud.plt.r43ples.client.desktop.model.structure;
 
 /**
- * Stores all information of a class triple.
+ * Stores all information of an individual triple.
  * 
  * @author Stephan Hensel
  *
  */
-public class TripleClassStructure {
+public class TripleIndividualStructure {
 
 	/** The triple. **/
 	private Triple triple;
@@ -20,7 +20,7 @@ public class TripleClassStructure {
 	 * @param triple the triple
 	 * @param difference the difference
 	 */
-	public TripleClassStructure(Triple triple, Difference difference) {
+	public TripleIndividualStructure(Triple triple, Difference difference) {
 		this.setTriple(triple);
 		this.setDifference(difference);
 	}

@@ -10,7 +10,7 @@ import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
  * @author Stephan Hensel
  *
  */
-public class TableEntrySemanticEnrichmentClassTriples {
+public class TableEntrySemanticEnrichmentIndividualTriples {
 
 	/** The difference. **/
 	private Difference difference;
@@ -34,7 +34,7 @@ public class TableEntrySemanticEnrichmentClassTriples {
 	 * @param selectedSemanticResolutionOption the selected semantic resolution option
 	 * @param rowData the row data
 	 */
-	public TableEntrySemanticEnrichmentClassTriples(Difference difference, String semanticDescription, ArrayList<String> semanticResolutionOptions, int selectedSemanticResolutionOption, Object[] rowData) {
+	public TableEntrySemanticEnrichmentIndividualTriples(Difference difference, String semanticDescription, ArrayList<String> semanticResolutionOptions, int selectedSemanticResolutionOption, Object[] rowData) {
 		this.setDifference(difference);
 		this.setSemanticDescription(semanticDescription);
 		this.setSemanticResolutionOptions(semanticResolutionOptions);

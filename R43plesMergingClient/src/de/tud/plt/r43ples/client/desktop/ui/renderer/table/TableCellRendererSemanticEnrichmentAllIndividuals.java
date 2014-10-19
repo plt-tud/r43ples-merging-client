@@ -10,16 +10,16 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
-import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllClasses;
-import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentAllClasses;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllIndividuals;
+import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentAllIndividuals;
 
 /**
- * The table cell renderer of semantic enrichment all classes table.
+ * The table cell renderer of semantic enrichment all individuals table.
  *  
  * @author Stephan Hensel
  *
  */
-public class TableCellRendererSemanticEnrichmentAllClasses extends DefaultTableCellRenderer {
+public class TableCellRendererSemanticEnrichmentAllIndividuals extends DefaultTableCellRenderer {
 
 	/** The default serial version. **/
 	private static final long serialVersionUID = 1L;
@@ -32,13 +32,13 @@ public class TableCellRendererSemanticEnrichmentAllClasses extends DefaultTableC
 		JComponent cellComponent = (JComponent) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 		// Get the table model
-		TableModelSemanticEnrichmentAllClasses tableModel = (TableModelSemanticEnrichmentAllClasses) table.getModel();
+		TableModelSemanticEnrichmentAllIndividuals tableModel = (TableModelSemanticEnrichmentAllIndividuals) table.getModel();
 		
 		// Get the table entry
-		TableEntrySemanticEnrichmentAllClasses tableEntry =  tableModel.getTableEntry(row);
+		TableEntrySemanticEnrichmentAllIndividuals tableEntry =  tableModel.getTableEntry(row);
 		
 		// Get the resolution state
-		ResolutionState resolutionState = Controller.getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(tableEntry.getClassStructureA(), tableEntry.getClassStructureB());
+		ResolutionState resolutionState = Controller.getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(tableEntry.getIndividualStructureA(), tableEntry.getIndividualStructureB());
 		
 		// Set the background color of the row
 		Color color = Color.BLACK;

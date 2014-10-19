@@ -4,23 +4,23 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
+import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentIndividualTriples;
 
 /**
- * Table model for semantic enrichment table which contains all triples of selected class.
+ * Table model for semantic enrichment table which contains all triples of selected individual.
  * Column 7 will contain combo boxes.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel {
+public class TableModelSemanticEnrichmentIndividualTriples extends AbstractTableModel {
 
 	/** The default serial version UID. **/
 	private static final long serialVersionUID = 1L;
 	/** The table header. **/
 	private static final String[] header = {"Subject", "Predicate", "Object", "State A (Revision)", "State B (Revision)", "Conflicting", "Semantic description", "Semantic resolution"};
 	/** The row data list. **/
-	private List<TableEntrySemanticEnrichmentClassTriples> entries;
+	private List<TableEntrySemanticEnrichmentIndividualTriples> entries;
 
 	
 	/**
@@ -28,7 +28,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 * 
 	 * @param entries the initial entries
 	 */
-	public TableModelSemanticEnrichmentClassTriples(List<TableEntrySemanticEnrichmentClassTriples> entries) {
+	public TableModelSemanticEnrichmentIndividualTriples(List<TableEntrySemanticEnrichmentIndividualTriples> entries) {
 		this.entries = entries;
 	}
 	
@@ -74,7 +74,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 */
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableEntrySemanticEnrichmentClassTriples entry = entries.get(rowIndex);
+		TableEntrySemanticEnrichmentIndividualTriples entry = entries.get(rowIndex);
 		
 		if (columnIndex == 7) {
 			if (!entry.getSemanticResolutionOptions().isEmpty()) {
@@ -113,7 +113,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 * 
 	 * @param entry the table entry to add
 	 */
-	public void addRow(TableEntrySemanticEnrichmentClassTriples entry) {
+	public void addRow(TableEntrySemanticEnrichmentIndividualTriples entry) {
 		entries.add(entry);
 	}
 	
@@ -142,7 +142,7 @@ public class TableModelSemanticEnrichmentClassTriples extends AbstractTableModel
 	 * @param rowIndex the row index of the entry
 	 * @return the table entry
 	 */
-	public TableEntrySemanticEnrichmentClassTriples getTableEntry(int rowIndex) {
+	public TableEntrySemanticEnrichmentIndividualTriples getTableEntry(int rowIndex) {
 		return entries.get(rowIndex);
 	}
 
