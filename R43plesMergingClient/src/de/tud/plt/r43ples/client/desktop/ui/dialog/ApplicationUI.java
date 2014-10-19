@@ -119,6 +119,7 @@ public class ApplicationUI {
 		frmRplesMergingClient = new JFrame();
 		frmRplesMergingClient.setTitle("R43ples Merging Client");
 		frmRplesMergingClient.setBounds(100, 100, 1116, 862);
+		frmRplesMergingClient.setLocationRelativeTo(null);
 		frmRplesMergingClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JMenuBar menuBar = new JMenuBar();
