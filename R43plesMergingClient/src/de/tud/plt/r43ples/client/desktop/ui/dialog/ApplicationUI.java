@@ -21,11 +21,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
@@ -358,6 +361,25 @@ public class ApplicationUI {
 		tableResolutionTriples.setRowHeight(25);
 		tableResolutionTriples.getTableHeader().setReorderingAllowed(false);
 		tableResolutionTriples.setModel(tableModelResolutionTriples);
+		tableModelResolutionTriples.addTableModelListener(new TableModelListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
+			 */
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				 SwingUtilities.invokeLater(new Runnable() {
+					
+					/* (non-Javadoc)
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						tableResolutionTriples.updateUI();
+					}
+				});
+			}
+		});
 		tableResolutionTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			/* (non-Javadoc)

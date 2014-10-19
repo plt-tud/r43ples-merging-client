@@ -108,6 +108,8 @@ public class Controller {
 	private static ReportResult reportResult = null;
 	/** The update table flag. Recursively used for updating the table. **/
 	private static boolean updateTableFlag = false;
+	/** The global update table flag. When set to true the table will be updated when the selection of the tree changed. **/
+	private static boolean globalTableUpdateFlag = true;
 	/** The properties array list. **/
 	private static ArrayList<String> propertyList;
 	/** The wait cursor. **/
@@ -368,39 +370,41 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void selectionChangedDifferencesTree() throws IOException {
-		// Set the update flag
-		updateTableFlag = true;
-		
-		// Hash map which stores all selected tree node objects and the corresponding tree paths
-		HashMap<TreeNodeObject, TreePath> map = new HashMap<TreeNodeObject, TreePath>();
-		
-		// Get the selected nodes
-		TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
-		if (treePaths != null) {
-			for (TreePath treePath : treePaths) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
-				if (node.isLeaf()) {
-					TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
-					map.put(treeNodeObject, treePath);
-				} else {
-					// Select the sub nodes
-					for (int i = 0; i < node.getChildCount(); i++) {
-						DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
-						ApplicationUI.getTreeDifferencesDivision().addSelectionPath(new TreePath(child.getPath()));
+		if (globalTableUpdateFlag) {
+			// Set the update flag
+			updateTableFlag = true;
+			
+			// Hash map which stores all selected tree node objects and the corresponding tree paths
+			HashMap<TreeNodeObject, TreePath> map = new HashMap<TreeNodeObject, TreePath>();
+			
+			// Get the selected nodes
+			TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
+			if (treePaths != null) {
+				for (TreePath treePath : treePaths) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+					if (node.isLeaf()) {
+						TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
+						map.put(treeNodeObject, treePath);
+					} else {
+						// Select the sub nodes
+						for (int i = 0; i < node.getChildCount(); i++) {
+							DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+							ApplicationUI.getTreeDifferencesDivision().addSelectionPath(new TreePath(child.getPath()));
+						}
+						// Remove selection of parent node
+						ApplicationUI.getTreeDifferencesDivision().removeSelectionPath(new TreePath(node.getPath()));
+						// Set the update flag
+						updateTableFlag = false;
 					}
-					// Remove selection of parent node
-					ApplicationUI.getTreeDifferencesDivision().removeSelectionPath(new TreePath(node.getPath()));
-					// Set the update flag
-					updateTableFlag = false;
 				}
 			}
-		}
-		
-		if (updateTableFlag) {
-			// Update the triple table
-			updateTableResolutionTriples(map);
-			ApplicationUI.getTableResolutionTriples().clearSelection();
-			tableResolutionTriplesSelectionChanged();
+			
+			if (updateTableFlag) {
+				// Update the triple table
+				updateTableResolutionTriples(map);
+				ApplicationUI.getTableResolutionTriples().clearSelection();
+				tableResolutionTriplesSelectionChanged();
+			}
 		}
 	}
 	
@@ -476,7 +480,9 @@ public class Controller {
 		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
 		
 		// Update the tree selection
+		globalTableUpdateFlag = false;
 		ApplicationUI.getTreeDifferencesDivision().removeSelectionPaths(treePaths);
+		globalTableUpdateFlag = true;
 		
 		ApplicationUI.getTreeDifferencesDivision().updateUI();
 	}
@@ -1248,6 +1254,17 @@ public class Controller {
 		if (dividerLocationSplitPaneApplication != -1) {
 			dividerLocationSplitPaneApplication = ApplicationUI.getSplitPaneApplication().getDividerLocation();
 		}
+	}
+	
+	
+	/**
+	 * Get the difference group of difference.
+	 * 
+	 * @param difference the difference
+	 * @return the difference group
+	 */
+	public static DifferenceGroup getDifferenceGroupOfDifference(Difference difference) {
+		return Management.getDifferenceGroupOfDifference(difference, differenceModel);
 	}
 
 
