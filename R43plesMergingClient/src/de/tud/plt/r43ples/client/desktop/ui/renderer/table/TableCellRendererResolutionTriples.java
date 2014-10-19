@@ -149,7 +149,11 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 		}
 		
 		// Set border
-		cellComponent.setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+		if (!isSelected) {
+			cellComponent.setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+		} else {
+			cellComponent.setBorder(new MatteBorder(top, left, bottom, right, Color.WHITE));
+		}
 		
 		return cellComponent;
 	}

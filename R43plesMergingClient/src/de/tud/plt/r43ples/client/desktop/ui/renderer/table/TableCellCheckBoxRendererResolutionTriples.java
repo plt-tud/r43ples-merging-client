@@ -102,7 +102,11 @@ public class TableCellCheckBoxRendererResolutionTriples extends JCheckBox implem
 		}
 		
 		// Set border
-		setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+		if (!isSelected) {
+			setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+		} else {
+			setBorder(new MatteBorder(top, left, bottom, right, Color.WHITE));
+		}
 		
 		return this;
     }

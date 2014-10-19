@@ -97,7 +97,11 @@ public class TableCellCheckBoxRendererResolutionHighLevelChanges extends JCheckB
 		int right = 0;
 		
 		// Set border
-		setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+		if (!isSelected) {
+			setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+		} else {
+			setBorder(new MatteBorder(top, left, bottom, right, Color.WHITE));
+		}
 		
 		return this;
     }
