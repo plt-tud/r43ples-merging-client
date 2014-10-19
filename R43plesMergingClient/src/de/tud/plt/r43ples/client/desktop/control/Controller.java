@@ -217,7 +217,20 @@ public class Controller {
 			} else {
 				type = MergeQueryTypeEnum.MANUAL;
 			}
-	
+			
+			// Set the column headers
+			ApplicationUI.getTableResolutionTriples().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
+			ApplicationUI.getTableResolutionTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
+			ApplicationUI.getTableResolutionTriples().updateUI();
+			
+			ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Individuals of " + branchNameA);
+			ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().getTableHeader().getColumnModel().getColumn(1).setHeaderValue("Individuals of " + branchNameB);
+			ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
+			
+			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
+			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
+			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+			
 			HttpResponse response = Management.executeMergeQuery(graphName, sdd, user, commitMessage, type, branchNameA, branchNameB, null, differenceModel);
 			
 			if (response.getStatusCode() == HttpURLConnection.HTTP_CONFLICT) {
