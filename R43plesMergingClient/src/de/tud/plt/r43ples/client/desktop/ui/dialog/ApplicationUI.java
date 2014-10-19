@@ -100,6 +100,8 @@ public class ApplicationUI {
 	private static JSplitPane splitPaneApplication;
 	/** The preferences split pane. **/
 	private static JSplitPane splitPanePreferences;
+	/** The push button. **/
+	private static JButton btnPush;
 	
 
 	/**
@@ -177,7 +179,8 @@ public class ApplicationUI {
 		});
 		toolBar.add(btnNewMerge);
 		
-		JButton btnPush = new JButton("Push");
+		btnPush = new JButton("Push");
+		btnPush.setEnabled(false);
 		btnPush.addActionListener(new ActionListener() {
 			
 			/* (non-Javadoc)
@@ -929,6 +932,16 @@ public class ApplicationUI {
 	 */
 	public static JSplitPane getSplitPanePreferences() {
 		return splitPanePreferences;
+	}
+
+
+	/**
+	 * Get the push button.
+	 * 
+	 * @return the push button
+	 */
+	public static JButton getBtnPush() {
+		return btnPush;
 	}
 
 }

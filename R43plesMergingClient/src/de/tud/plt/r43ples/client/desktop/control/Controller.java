@@ -204,6 +204,9 @@ public class Controller {
 			String branchNameA = (String) StartMergingDialog.getcBModelRevisionA().getSelectedItem();
 			String branchNameB = (String) StartMergingDialog.getcBModelRevisionB().getSelectedItem();
 
+			// Disable the push button
+			ApplicationUI.getBtnPush().setEnabled(false);
+			
 			MergeQueryTypeEnum type = null;
 			if (StartMergingDialog.getRdbtnMergingMethodAUTO().isSelected()) {
 				type = MergeQueryTypeEnum.AUTO;
@@ -225,6 +228,10 @@ public class Controller {
 			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
 			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
 			ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
+			
+			ReportDialog.getTable().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
+			ReportDialog.getTable().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
+			ReportDialog.getTable().updateUI();
 			
 			HttpResponse response = Management.executeMergeQuery(graphName, sdd, user, commitMessage, type, branchNameA, branchNameB, null, differenceModel);
 			
@@ -265,6 +272,9 @@ public class Controller {
 				
 				// Create the property list of revisions
 				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
+				
+				// Enable the push button
+				ApplicationUI.getBtnPush().setEnabled(true);
 				
 				StartMergingDialog.dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);

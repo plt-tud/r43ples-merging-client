@@ -53,6 +53,14 @@ public class ConfigurationDialog {
 	 * Create the dialog.
 	 */
 	public ConfigurationDialog() {
+		initialize();
+	}
+	
+	
+	/**
+	 * Initialize the contents of the dialog.
+	 */
+	private void initialize() {
 		dialog = new JDialog();
 		dialog.setTitle("Properties configuration");
 		dialog.setResizable(false);

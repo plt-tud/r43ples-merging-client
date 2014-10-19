@@ -60,6 +60,14 @@ public class ReportDialog {
 	 * Create the dialog.
 	 */
 	public ReportDialog() {
+		initialize();
+	}
+
+	
+	/**
+	 * Initialize the contents of the dialog.
+	 */
+	private void initialize() {
 		dialog = new JDialog();
 		dialog.setTitle("Summary Report");
 		dialog.setBounds(100, 100, 887, 758);

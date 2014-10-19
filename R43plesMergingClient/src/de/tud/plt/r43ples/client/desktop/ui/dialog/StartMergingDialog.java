@@ -66,6 +66,14 @@ public class StartMergingDialog {
 	 * Create the dialog.
 	 */
 	public StartMergingDialog() {
+		initialize();
+	}
+
+	
+	/**
+	 * Initialize the contents of the dialog.
+	 */
+	private void initialize() {
 		dialog = new JDialog();
 		dialog.setTitle("Start Merging");
 		dialog.setBounds(100, 100, 450, 380);
