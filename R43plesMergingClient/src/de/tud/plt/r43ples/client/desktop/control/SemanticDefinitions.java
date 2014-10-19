@@ -17,10 +17,10 @@ import de.tud.plt.r43ples.client.desktop.model.structure.SemanticDefinitionResul
  */
 public class SemanticDefinitions {
 
-	/** The definition map for class descriptions. **/
-	private static HashMap<String, String> definitionMapClassDescriptions = new HashMap<String, String>();
-	/** The definition map for class resolution options. **/
-	private static HashMap<String,  ArrayList<String>> definitionMapClassResolutionOptions = new HashMap<String, ArrayList<String>>();
+	/** The definition map for individual descriptions. **/
+	private static HashMap<String, String> definitionMapIndividualDescriptions = new HashMap<String, String>();
+	/** The definition map for individual resolution options. **/
+	private static HashMap<String,  ArrayList<String>> definitionMapIndividualResolutionOptions = new HashMap<String, ArrayList<String>>();
 	/** The definition map for property descriptions. **/
 	private static HashMap<String, String> definitionMapPropertyDescriptions = new HashMap<String, String>();
 	/** The definition map for property resolution options. **/
@@ -31,117 +31,117 @@ public class SemanticDefinitions {
 	 * The constructor.
 	 */
 	public SemanticDefinitions() {
-		setClassDescriptionDefinitions();
-		setClassResolutionOptions();
+		setIndividualDescriptionDefinitions();
+		setIndividualResolutionOptions();
 		setPropertyDescriptionDefinitions();
 		setPropertyResolutionOptions();
 	}
 	
 	
 	/**
-	 * Set the class description definitions.
+	 * Set the individual description definitions.
 	 */
-	private static void setClassDescriptionDefinitions() {
+	private static void setIndividualDescriptionDefinitions() {
 		// Remove all entries
-		definitionMapClassDescriptions.clear();
+		definitionMapIndividualDescriptions.clear();
 		// Put entries
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.DELETED, "Class remains deleted.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ADDED, "Explicit added class will be removed.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ORIGINAL, "Original class will be removed.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.NOTINCLUDED, "ERROR - Combination is not allowed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.DELETED, "Individual remains deleted.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ADDED, "Explicit added individual will be removed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ORIGINAL, "Original individual will be removed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.NOTINCLUDED, "ERROR - Combination is not allowed.");
 		
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.DELETED, "Explicit removed class will be added.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ADDED, "Class remains added.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ORIGINAL, "Class remains original.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.NOTINCLUDED, "Not included class will be added.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.DELETED, "Explicit removed individual will be added.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ADDED, "Individual remains added.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ORIGINAL, "Individual remains original.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.NOTINCLUDED, "Not included individual will be added.");
 		
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.DELETED, "Explicit removed class will be added.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ADDED, "Class remains added.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ORIGINAL, "Class remains original.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.NOTINCLUDED, "ERROR - Combination is not allowed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.DELETED, "Explicit removed individual will be added.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ADDED, "Individual remains added.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ORIGINAL, "Individual remains original.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.NOTINCLUDED, "ERROR - Combination is not allowed.");
 		
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.DELETED, "ERROR - Combination is not allowed.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ADDED, "Class will be removed.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ORIGINAL, "ERROR - Combination is not allowed.");
-		definitionMapClassDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.NOTINCLUDED, "ERROR - Combination is not allowed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.DELETED, "ERROR - Combination is not allowed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ADDED, "Individual will be removed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ORIGINAL, "ERROR - Combination is not allowed.");
+		definitionMapIndividualDescriptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.NOTINCLUDED, "ERROR - Combination is not allowed.");
 	}
 	
 	
 	/**
-	 * Get the class description by identifier.
+	 * Get the individual description by identifier.
 	 * 
 	 * @param identifier the identifier (STATE-STATE)
-	 * @return the class description
+	 * @return the individual description
 	 */
-	public static String getClassDescription(String identifier) {
-		return definitionMapClassDescriptions.get(identifier);
+	public static String getIndividualDescription(String identifier) {
+		return definitionMapIndividualDescriptions.get(identifier);
 	}
 	
 	
 	/**
-	 * Set the class resolution options.
+	 * Set the individual resolution options.
 	 */
-	private static void setClassResolutionOptions() {
+	private static void setIndividualResolutionOptions() {
 		// Remove all entries
-		definitionMapClassResolutionOptions.clear();
+		definitionMapIndividualResolutionOptions.clear();
 		// Put entries
 		ArrayList<String> delDel = new ArrayList<String>();
 		delDel.add("Approve deletion");
-		delDel.add("Add class to result");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.DELETED, delDel);
+		delDel.add("Add individual to result");
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.DELETED, delDel);
 		ArrayList<String> delAdd = new ArrayList<String>();
 		delAdd.add("Approve deletion");
-		delAdd.add("Do not remove added class");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ADDED, delAdd);
+		delAdd.add("Do not remove added individual");
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ADDED, delAdd);
 		ArrayList<String> delOrig = new ArrayList<String>();
 		delOrig.add("Approve deletion");
-		delOrig.add("Do not remove original class");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ORIGINAL, delOrig);
+		delOrig.add("Do not remove original individual");
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.ORIGINAL, delOrig);
 		ArrayList<String> delNotIncl = new ArrayList<String>();
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.NOTINCLUDED, delNotIncl);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.DELETED + "-" + SDDTripleStateEnum.NOTINCLUDED, delNotIncl);
 		
 		ArrayList<String> addDel = new ArrayList<String>();
-		addDel.add("Do not add removed class");
+		addDel.add("Do not add removed individual");
 		addDel.add("Approve addition");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.DELETED, addDel);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.DELETED, addDel);
 		ArrayList<String> addAdd = new ArrayList<String>();
-		addAdd.add("Remove class from result");
+		addAdd.add("Remove individual from result");
 		addAdd.add("Approve addition");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ADDED, addAdd);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ADDED, addAdd);
 		ArrayList<String> addOrig = new ArrayList<String>();
-		addOrig.add("Remove class from result");
-		addOrig.add("Approve no change of original class");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ORIGINAL, addOrig);
+		addOrig.add("Remove individual from result");
+		addOrig.add("Approve no change of original individual");
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.ORIGINAL, addOrig);
 		ArrayList<String> addNotIncl = new ArrayList<String>();
-		addNotIncl.add("Do not add not included class");
+		addNotIncl.add("Do not add not included individual");
 		addNotIncl.add("Approve addition");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.NOTINCLUDED, addNotIncl);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ADDED + "-" + SDDTripleStateEnum.NOTINCLUDED, addNotIncl);
 		
 		ArrayList<String> origDel = new ArrayList<String>();
-		origDel.add("Do not add removed class");
+		origDel.add("Do not add removed individual");
 		origDel.add("Approve addition");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.DELETED, origDel);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.DELETED, origDel);
 		ArrayList<String> origAdd = new ArrayList<String>();
-		origAdd.add("Remove class from result");
+		origAdd.add("Remove individual from result");
 		origAdd.add("Approve addition");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ADDED, origAdd);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ADDED, origAdd);
 		ArrayList<String> origOrig = new ArrayList<String>();
-		origOrig.add("Remove class from result");
-		origOrig.add("Approve no change of original class");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ORIGINAL, origOrig);
+		origOrig.add("Remove individual from result");
+		origOrig.add("Approve no change of original individual");
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.ORIGINAL, origOrig);
 		ArrayList<String> origNotIncl = new ArrayList<String>();
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.NOTINCLUDED, origNotIncl);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.ORIGINAL + "-" + SDDTripleStateEnum.NOTINCLUDED, origNotIncl);
 		
 		ArrayList<String> notInclDel = new ArrayList<String>();
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.DELETED, notInclDel);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.DELETED, notInclDel);
 		ArrayList<String> notInclAdd = new ArrayList<String>();
 		notInclAdd.add("Approve deletion");
-		notInclAdd.add("Do not remove added class");
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ADDED, notInclAdd);
+		notInclAdd.add("Do not remove added individual");
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ADDED, notInclAdd);
 		ArrayList<String> notInclOrig = new ArrayList<String>();
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ORIGINAL, notInclOrig);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.ORIGINAL, notInclOrig);
 		ArrayList<String> notInclNotIncl = new ArrayList<String>();
-		definitionMapClassResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.NOTINCLUDED, notInclNotIncl);
+		definitionMapIndividualResolutionOptions.put(SDDTripleStateEnum.NOTINCLUDED + "-" + SDDTripleStateEnum.NOTINCLUDED, notInclNotIncl);
 	}
 	
 	
@@ -151,8 +151,8 @@ public class SemanticDefinitions {
 	 * @param identifier the identifier (STATE-STATE)
 	 * @return the property resolution options
 	 */
-	public static ArrayList<String> getClassResolutionOptions(String identifier) {
-		return definitionMapClassResolutionOptions.get(identifier);
+	public static ArrayList<String> getIndividualResolutionOptions(String identifier) {
+		return definitionMapIndividualResolutionOptions.get(identifier);
 	}
 	
 	
@@ -302,13 +302,13 @@ public class SemanticDefinitions {
 
 
 	/**
-	 * Check the identifier existence in all class maps.
+	 * Check the identifier existence in all individual maps.
 	 * 
 	 * @param identifier the identifier (STATE-STATE) to check
 	 * @return true when identifier is contained in all maps
 	 */
-	public static boolean checkIdentifierExistenceInClassMaps(String identifier) {
-		return definitionMapClassDescriptions.containsKey(identifier) && definitionMapClassResolutionOptions.containsKey(identifier);
+	public static boolean checkIdentifierExistenceInIndividualMaps(String identifier) {
+		return definitionMapIndividualDescriptions.containsKey(identifier) && definitionMapIndividualResolutionOptions.containsKey(identifier);
 	}
 	
 	
@@ -334,10 +334,10 @@ public class SemanticDefinitions {
 		// Create the identifier (STATE-STATE)
 		String identifier = differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB();
 		
-		// Check if triple is a class triple
+		// Check if triple is an individual triple
 		if (Management.getPredicate(difference.getTriple()).equals("a")) {
-			if (checkIdentifierExistenceInClassMaps(identifier)) {
-				return new SemanticDefinitionResult(getClassDescription(identifier), getClassResolutionOptions(identifier), getSelectedResolutionOption(difference, differenceGroup));
+			if (checkIdentifierExistenceInIndividualMaps(identifier)) {
+				return new SemanticDefinitionResult(getIndividualDescription(identifier), getIndividualResolutionOptions(identifier), getSelectedResolutionOption(difference, differenceGroup));
 			}
 		} else {
 			if (checkIdentifierExistenceInPropertyMaps(identifier)) {
