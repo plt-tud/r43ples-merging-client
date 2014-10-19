@@ -85,111 +85,17 @@ public class Management {
 			+ "PREFIX rpo: <http://eatld.et.tu-dresden.de/rpo#> \n"
 			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
 			+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n";
-	
-	
-	/**
-	 * Get all graphs under revision control.
-	 * 
-	 * @return the array list of all revised graphs
-	 * @throws IOException
-	 */
-	public static ArrayList<String> getAllGraphsUnderRevisionControl() throws IOException {
-		logger.info("Get all graphs under revision control.");
-		
-		// Result array list
-		ArrayList<String> list = new ArrayList<String>();
-		
-		// Get the revised graphs (result format is JSON)
-		String revisedGraphs = TripleStoreInterface.executeHttpGet("/r43ples/getRevisedGraphs");
-		logger.debug(revisedGraphs);
-		
-		JsonParser parser = new JsonParser();
-		JsonElement element = parser.parse(revisedGraphs);
-		if (element.isJsonObject()) {
-			JsonObject results = element.getAsJsonObject().getAsJsonObject("results");
-			JsonArray bindings = results.getAsJsonArray("bindings");
-			for (int i = 0; i < bindings.size(); i++) {
-				String graphName = bindings.get(i).getAsJsonObject().getAsJsonObject("graph").get("value").getAsString();
-				list.add(graphName);
-			}
-		}
-		return list;
-	}
-	
-	
-	/**
-	 * Get all SDDs.
-	 * 
-	 * @return the array list of all SDDs
-	 * @throws IOException 
-	 */
-	public static ArrayList<String> getAllSDDs() throws IOException {
-		logger.info("Get all SDDs.");
-		
-		// Result array list
-		ArrayList<String> list = new ArrayList<String>();
-		
-    	// Query all differences
-		String query = prefixes + String.format(
-				  "SELECT ?sddUri %n"
-				+ "FROM <%s>"
-				+ "WHERE { %n"
-				+ "	?sddUri a sddo:StructuralDefinitionGroup . %n"
-				+ "}", Config.r43ples_sdd_graph);
-		logger.debug(query);
-		
-		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
-		logger.debug(result);
-		
-		// Iterate over all SDDs
-		ResultSet resultSet = ResultSetFactory.fromXML(result);
-		while (resultSet.hasNext()) {
-			QuerySolution qs = resultSet.next();
-			list.add(qs.getResource("?sddUri").toString());
-		}
 
-		return list;
-	}
-	
 	
 	/**
-	 * Get all branch names of graph.
-	 * 
-	 * @param graphName the graph name
-	 * @return the array list of all branch names
-	 * @throws IOException 
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## General.                                                                                                                                                             ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
 	 */
-	public static ArrayList<String> getAllBranchNamesOfGraph(String graphName) throws IOException {
-		logger.info("Get all branch names of graph.");
-		
-		// Result array list
-		ArrayList<String> list = new ArrayList<String>();
-		
-		if (graphName != null) {
-						
-			String query = prefixes + String.format(
-					  "SELECT DISTINCT ?label %n"
-					+ "FROM <%s> %n"
-					+ "WHERE { %n"
-					+ "	?branch a rmo:Branch ; %n"
-					+ "		rdfs:label ?label . %n"
-					+ "	?rev rmo:revisionOfBranch ?branch ;"
-					+ "		rmo:revisionOf <%s> . %n"
-					+ "} %n"
-					+ "ORDER BY ?label", Config.r43ples_revision_graph, graphName);
-	
-			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
-			logger.debug(result);
-			
-			// Iterate over all labels
-			ResultSet resultSet = ResultSetFactory.fromXML(result);
-			while (resultSet.hasNext()) {
-				QuerySolution qs = resultSet.next();
-				list.add(qs.getLiteral("?label").toString());
-			}
-		}
-		return list;
-	}
 	
 	
 	/**
@@ -592,125 +498,6 @@ public class Management {
 	
 	
 	/**
-	 * Create the differences tree root node.
-	 * 
-	 * @param differenceModel the differences model to use
-	 * @return the root node
-	 */
-	public static DefaultMutableTreeNode createDifferencesTree(DifferenceModel differenceModel) {
-		
-		// Create the root node
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeNodeObject("All", ResolutionState.CONFLICT, null));		
-		
-		// Create group of conflicting difference groups
-		DefaultMutableTreeNode conflictsNode = new DefaultMutableTreeNode(new TreeNodeObject("Conflicts", ResolutionState.CONFLICT, null));
-		
-		ArrayList<DifferenceGroup> conflicting = getAllConflictingDifferenceGroups(differenceModel);
-		
-		Iterator<DifferenceGroup> iteConflicting = conflicting.iterator();
-		while (iteConflicting.hasNext()) {
-			DifferenceGroup differenceGroup = iteConflicting.next();
-			
-			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA().toString() + "-" + differenceGroup.getTripleStateB().toString(), ResolutionState.CONFLICT, differenceGroup));
-			
-			// Add all differences
-			// Sort by key
-			Map<String, Difference> sortedMap = new TreeMap<String, Difference>(differenceGroup.getDifferences());
-			Iterator<Difference> iteDifferences = sortedMap.values().iterator();
-			while (iteDifferences.hasNext()) {
-				Difference difference = iteDifferences.next();
-				
-				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.CONFLICT, difference));
-				// Check filter
-				if (Controller.getActivatedFilters().contains(difference.getTriple().getPredicate())) {
-					differenceGroupNode.add(differenceNode);
-				}
-			}
-			
-			conflictsNode.add(differenceGroupNode);
-
-		}
-		
-		root.add(conflictsNode);
-		
-		// Create group of non conflicting difference groups
-		DefaultMutableTreeNode differencesNode = new DefaultMutableTreeNode(new TreeNodeObject("Differences", ResolutionState.DIFFERENCE, null));
-		
-		ArrayList<DifferenceGroup> nonConflicting = getAllNonConflictingDifferenceGroups(differenceModel);
-		
-		Iterator<DifferenceGroup> iteNonConflicting = nonConflicting.iterator();
-		while (iteNonConflicting.hasNext()) {
-			DifferenceGroup differenceGroup = iteNonConflicting.next();
-			
-			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.DIFFERENCE, differenceGroup));
-			
-			// Add all differences
-			// Sort by key
-			Map<String, Difference> sortedMap = new TreeMap<String, Difference>(differenceGroup.getDifferences());
-			Iterator<Difference> iteDifferences = sortedMap.values().iterator();
-			while (iteDifferences.hasNext()) {
-				Difference difference = iteDifferences.next();
-				
-				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.DIFFERENCE, difference));
-				// Check filter
-				if (Controller.getActivatedFilters().contains(difference.getTriple().getPredicate())) {
-					differenceGroupNode.add(differenceNode);
-				}
-			}
-			
-			differencesNode.add(differenceGroupNode);
-
-		}
-		
-		root.add(differencesNode);
-		
-		refreshParentNodeStateDifferencesTree(root);
-		
-		return root;
-	}
-	
-	
-	/**
-	 * Refresh the parent node states by current child states of the difference tree.
-	 * 
-	 * @param rootNode the root node of tree
-	 */
-	public static ResolutionState refreshParentNodeStateDifferencesTree(DefaultMutableTreeNode rootNode) {
-		
-		if (!rootNode.isLeaf()) {
-			ResolutionState rootNodeState = ResolutionState.RESOLVED;
-			
-			for (int i=0; i<rootNode.getChildCount(); i++) {
-				ResolutionState childState = refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) rootNode.getChildAt(i));
-				if (childState.compareTo(rootNodeState) > 0) {
-					rootNodeState = childState;
-				}
-			}
-			((TreeNodeObject) rootNode.getUserObject()).setResolutionState(rootNodeState);
-			return rootNodeState;
-		} else {
-			return ((TreeNodeObject) rootNode.getUserObject()).getResolutionState();
-		}
-	}
-	
-	
-	/**
-//	 * Get the tree path of the specified tree node object.
-//	 * 
-//	 * @param tree the tree which contains the tree node object
-//	 * @param nodeObject the tree node object
-//	 * @return the tree path
-//	 */
-//	public static TreePath getTreePathOfTreeNodeObject(JTree tree, TreeNodeObject nodeObject) {
-//		DefaultMutableTreeNode root = ((DefaultMutableTreeNode) tree.getModel().getRoot())
-//		for (int i=0; i<((DefaultMutableTreeNode) tree.getModel().getRoot()).getChildCount(); i++) {
-//		
-//		((DefaultMutableTreeNode) tree.getModel().getRoot()).children()
-//		
-//	}	
-//	
-	
-	/**
 	 * Get the difference group of difference.
 	 * 
 	 * @param difference the difference
@@ -727,305 +514,8 @@ public class Management {
 				
 		return null;
 	}
-
-
-	/**
-	 * Create the row data for resolution triples.
-	 * 
-	 * @param difference the difference
-	 * @param differenceGroup the difference group
-	 * @return the row data
-	 * @throws IOException 
-	 */
-	public static Object[] createRowDataResolutionTriples(Difference difference, DifferenceGroup differenceGroup) throws IOException {
-		Object[] rowData = new Object[7];
-		
-		rowData[0] = getSubject(difference.getTriple());
-		rowData[1] = getPredicate(difference.getTriple());
-		rowData[2] = getObject(difference.getTriple());
-		
-		// Get the revision number if available
-		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB().toString();
-		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA().toString();
-			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
-		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
-		} else {
-			rowData[3] = differenceGroup.getTripleStateA().toString();
-			rowData[4] = differenceGroup.getTripleStateB().toString();
-		}
-		
-		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
-
-		rowData[6] = difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED);
-		
-		return rowData;
-	}
 	
 	
-	/**
-	 * Get the dot graph.
-	 * 
-	 * @param graphName the graph name 
-	 * @return the dot graph
-	 * @throws IOException
-	 * @throws HttpException
-	 */
-	public static Graph getDotGraph(String graphName) throws IOException, HttpException {
-		// Create a new graph
-		Graph graph =  new Graph("Revision graph of " + graphName);
-		graph.setAttribute(Attribute.RANKDIR_ATTR, "LR");
-		
-		String query_branches = prefixes + String.format(
-				  "SELECT ?branchURI ?branch %n"
-				+ "FROM <%s> %n"
-				+ "WHERE { %n"
-				+ "	?branchURI a rmo:Branch ; %n"
-				+ "		rdfs:label ?branch ; %n"
-				+ "		rmo:references ?revisionURI . %n"
-				+ "	?revisionURI a rmo:Revision ; %n"
-				+ "		rmo:revisionOf <%s> . %n"
-				+ "}", Config.r43ples_revision_graph, graphName);
-		
-		String result_branches = TripleStoreInterface.executeQueryWithoutAuthorization(query_branches, "text/xml");
-		ResultSet resultSet_brances = ResultSetFactory.fromXML(result_branches);
-		while (resultSet_brances.hasNext()) {
-			QuerySolution qs_branches = resultSet_brances.next();
-			String branchURI = qs_branches.getResource("branchURI").toString();
-			String branchName = qs_branches.getLiteral("branch").toString();
-			
-			// Create new sub graph
-			Subgraph subGraph = new Subgraph(graph, "Branch: " + branchName);
-			
-			// Get all nodes (revisions)
-			String query_nodes = prefixes + String.format(
-					  "SELECT DISTINCT ?revision ?number %n"
-					+ "FROM <%s> %n"
-					+ "WHERE { %n"
-					+ " ?revision a rmo:Revision ; %n"
-					+ "		rmo:revisionOf <%s> ; %n"
-					+ "		rmo:revisionOfBranch <%s> ; %n"
-					+ "		rmo:revisionNumber ?number . %n"
-					+ "}", Config.r43ples_revision_graph, graphName, branchURI);
-			
-			String result_nodes = TripleStoreInterface.executeQueryWithoutAuthorization(query_nodes, "text/xml");
-			ResultSet resultSet_nodes = ResultSetFactory.fromXML(result_nodes);
-			while (resultSet_nodes.hasNext()) {
-				QuerySolution qs_nodes = resultSet_nodes.next();
-				String rev = qs_nodes.getResource("revision").toString();
-				String name = qs_nodes.getLiteral("number").toString();
-				Node newNode = new Node(graph, rev);
-
-				// Check if revision is referenced
-				String query_reference = prefixes + String.format(
-						  "SELECT ?label %n"
-						+ "FROM <%s> %n"
-						+ "WHERE { %n"
-						+ "	?reference a rmo:Reference ; %n"
-						+ "		rmo:references <%s> ; %n"
-						+ "		rdfs:label ?label . %n"
-						+ "}", Config.r43ples_revision_graph, rev);
-				
-				String result_reference = TripleStoreInterface.executeQueryWithoutAuthorization(query_reference, "text/xml");
-				ResultSet resultSet_reference = ResultSetFactory.fromXML(result_reference);
-				if (resultSet_reference.hasNext()) {
-					QuerySolution qs = resultSet_reference.next();
-					String reference = qs.getLiteral("label").toString();
-					name = name + " | " + reference;					
-				}
-				
-				newNode.setAttribute(Attribute.LABEL_ATTR, name);
-				newNode.setAttribute(Attribute.SHAPE_ATTR, Attribute.RECORD_SHAPE);
-				subGraph.addNode(newNode);
-				
-			}
-		}
-		
-		// Create the directed edges between the revisions
-		String query_edges = prefixes + String.format(""
-				+ "SELECT DISTINCT ?revision ?next_revision "
-				+ "FROM <%s> "
-				+ "WHERE {"
-				+ " ?revision a rmo:Revision;"
-				+ "		rmo:revisionOf <%s>."
-				+ "	?next_revision a rmo:Revision;"
-				+ "		prov:wasDerivedFrom ?revision."
-				+ "}", Config.r43ples_revision_graph, graphName);
-		
-		String result_edges = TripleStoreInterface.executeQueryWithoutAuthorization(query_edges, "text/xml");
-		ResultSet resultSet_edges = ResultSetFactory.fromXML(result_edges);
-		while (resultSet_edges.hasNext()) {
-			QuerySolution qs_edges = resultSet_edges.next();
-			String rev = qs_edges.getResource("revision").toString();
-			String next = qs_edges.getResource("next_revision").toString();
-			Node newNode = graph.findNodeByName(rev);
-			Node nextNode = graph.findNodeByName(next);
-			graph.addEdge(new Edge(graph, newNode, nextNode));
-		}
-
-		return graph;
-	}
-	
-	
-	/**
-	 * Highlight a node in the specified graph.
-	 * 
-	 * @param graph the graph which contains the nodes
-	 * @param nodeName the name of the node to highlight (revision URI)
-	 * @param color the highlight color
-	 * @return true when node was highlighted elsewhere false when the graph does not contain the specified node
-	 */
-	public static boolean highlightNode(Graph graph, String nodeName, Color color) {
-		if (graph.findNodeByName(nodeName) != null) {		
-			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
-			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, color);	
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	
-	/**
-	 * Remove the highlighting of a node in the specified graph.
-	 * 
-	 * @param graph the graph which contains the nodes
-	 * @param nodeName the name of the node where the highlighting should be removed (revision URI)
-	 * @return true when the highlighting of the node was removed elsewhere false when the graph does not contain the specified graph
-	 */
-	public static boolean removeHighlighting(Graph graph, String nodeName) {
-		if (graph.findNodeByName(nodeName) != null) {		
-			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
-			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, Color.WHITE);	
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	
-	/**
-	 * Create the row data for summary report.
-	 * 
-	 * @param difference the difference
-	 * @param differenceGroup the difference group
-	 * @return the row data
-	 */
-	public static Object[] createRowDataSummaryReport(Difference difference, DifferenceGroup differenceGroup) {
-		Object[] rowData = new Object[9];
-		
-		rowData[0] = getSubject(difference.getTriple());
-		rowData[1] = getPredicate(difference.getTriple());
-		rowData[2] = getObject(difference.getTriple());
-			
-		// Get the revision number if available
-		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
-			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB().toString();
-		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA().toString();
-			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
-		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
-			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
-			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
-		} else {
-			rowData[3] = differenceGroup.getTripleStateA().toString();
-			rowData[4] = differenceGroup.getTripleStateB().toString();
-		}
-
-		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
-		
-		rowData[6] = differenceGroup.getAutomaticResolutionState().toString().toUpperCase();
-		
-		rowData[7] = difference.getTripleResolutionState().toString().toUpperCase();
-		
-		rowData[8] = Boolean.toString(difference.getResolutionState().equals(ResolutionState.RESOLVED)).toUpperCase();
-		
-		return rowData;
-	}
-	
-	
-	/**
-	 * Create the summary report table content.
-	 * 
-	 * @param table the table reference
-	 * @param differenceModel the difference model
-	 * @return the report creation result
-	 */
-	public static ReportResult createReportTable(JTable table, DifferenceModel differenceModel) {
-		
-		ReportResult result = new ReportResult();
-		
-		// Remove all entries
-		((TableModelSummaryReport) table.getModel()).removeAllElements();
-		
-		// Differ between conflicting and non conflicting difference groups
-		ArrayList<DifferenceGroup> conflictingDifferenceGroups = new ArrayList<DifferenceGroup>();
-		ArrayList<DifferenceGroup> nonconflictingDifferenceGroups = new ArrayList<DifferenceGroup>();
-		
-		Iterator<String> iteDifferenceGroupNames = differenceModel.getDifferenceGroups().keySet().iterator();
-		while (iteDifferenceGroupNames.hasNext()) {
-			String differenceGroupName = iteDifferenceGroupNames.next();
-			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupName);
-			if (differenceGroup.isConflicting()) {
-				conflictingDifferenceGroups.add(differenceGroup);
-			} else {
-				nonconflictingDifferenceGroups.add(differenceGroup);
-			}
-		}
-		
-		// Check if all conflicts were approved
-		Iterator<DifferenceGroup> iteConflictingDifferenceGroups = conflictingDifferenceGroups.iterator();
-		while (iteConflictingDifferenceGroups.hasNext()) {
-			DifferenceGroup differenceGroup = iteConflictingDifferenceGroups.next();
-			
-			Iterator<String> iteDifferenceNames = differenceGroup.getDifferences().keySet().iterator();
-			while (iteDifferenceNames.hasNext()) {
-				String currentDifferenceName = iteDifferenceNames.next();
-				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
-				
-				Color color = Color.GREEN;
-				if (!difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
-					color = Color.RED;
-					result.incrementCounterConflictsNotApproved();
-				}
-				
-				// Create new table entry
-				((TableModelSummaryReport) table.getModel()).addRow(new TableEntrySummaryReport(difference, color, createRowDataSummaryReport(difference, differenceGroup)));
-
-			}
-		}
-		
-		// Check if the resolution state of differences was changed manually
-		Iterator<DifferenceGroup> iteNonConflictingDifferenceGroups = nonconflictingDifferenceGroups.iterator();
-		while (iteNonConflictingDifferenceGroups.hasNext()) {
-			DifferenceGroup differenceGroup = iteNonConflictingDifferenceGroups.next();
-			
-			Iterator<String> iteDifferenceNames = differenceGroup.getDifferences().keySet().iterator();
-			while (iteDifferenceNames.hasNext()) {
-				String currentDifferenceName = iteDifferenceNames.next();
-				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
-				
-				Color color = Color.GREEN;
-				if (!difference.getTripleResolutionState().equals(differenceGroup.getAutomaticResolutionState())) {
-					color = Color.ORANGE;
-					result.incrementCounterDifferencesResolutionChanged();;
-				}
-				
-				// Create new table entry
-				((TableModelSummaryReport) table.getModel()).addRow(new TableEntrySummaryReport(difference, color, createRowDataSummaryReport(difference, differenceGroup)));
-
-			}
-		}
-		
-		return result;
-	}
-	
-
 	/**
 	 * Get the triples of the MERGE WITH query.
 	 * 
@@ -1259,6 +749,702 @@ public class Management {
 	
 	
 	/**
+	 * Get difference by triple. If the difference model does not contain the triple null will be returned.
+	 * 
+	 * @param triple the triple to look for
+	 * @param differenceModel the difference model
+	 * @return the difference or null if triple is not included in difference model
+	 */
+	public static Difference getDifferenceByTriple(Triple triple, DifferenceModel differenceModel) {
+		String tripleIdentifier = tripleToString(triple);
+		
+		// Iterate over all difference groups
+		Iterator<String> iteDifferenceGroupNames = differenceModel.getDifferenceGroups().keySet().iterator();
+		while (iteDifferenceGroupNames.hasNext()) {
+			String differenceGroupName = iteDifferenceGroupNames.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupName);
+			// Check if the hash map contains the triple
+			if (differenceGroup.getDifferences().containsKey(tripleIdentifier)) {
+				return differenceGroup.getDifferences().get(tripleIdentifier);
+			};
+		}
+
+		return null;
+	}
+	
+	
+	/**
+	 * Converts a triple string to a string in which URIs are replaced by prefixes which were specified in the configuration.
+	 * If no prefix was found or if input string is a literal the input string will be returned.
+	 * 
+	 * @param tripleString the triple string (subject or predicate or object) to convert
+	 * @return the converted triple string or input string
+	 */
+	public static String convertTripleStringToPrefixTripleString(String tripleString) {
+		if (tripleString.contains("<") && tripleString.contains(">")) {
+			String tripleStringConverted = tripleString.trim().replaceAll("<", "").replaceAll(">", "");
+			int lastIndexSlash = tripleStringConverted.lastIndexOf("/");
+			int lastIndexHash = tripleStringConverted.lastIndexOf("#");
+			if ((lastIndexSlash == -1) && (lastIndexHash == -1)) {
+				return tripleString;
+			} else {
+				int index = 0;
+				if (lastIndexSlash > lastIndexHash) {
+					// Slash separator found
+					index = lastIndexSlash + 1;
+				} else {
+					// Hash separator found
+					index = lastIndexHash + 1;
+				}
+				String subString = tripleStringConverted.substring(0, index);
+				// Try to find the prefix
+				if (Config.prefixMappings.containsKey(subString)) {
+					return Config.prefixMappings.get(subString) + ":" + tripleStringConverted.substring(index, tripleStringConverted.length());
+				}
+			}
+		}
+		return tripleString;
+	}
+	
+	
+	/**
+	 * Get all properties of specified revision.
+	 * 
+	 * @param graphName the graph name
+	 * @param branchNameA the branch name A
+	 * @param branchNameB the branch name B
+	 * @return the array list of property URIs
+	 * @throws IOException 
+	 */
+	public static ArrayList<String> getPropertiesOfRevision(String graphName, String branchNameA, String branchNameB) throws IOException {
+		logger.info("Get all properties of branches.");
+		
+		// Result array list
+		ArrayList<String> list = new ArrayList<String>();
+
+    	// Query all properties (DISTINCT because there can be multiple property occurrences)
+		String query = String.format(
+				  "OPTION r43ples:SPARQL_JOIN %n"
+				+ "SELECT DISTINCT ?propertyUri %n"
+				+ "FROM <%s> REVISION \"%s\" %n"
+				+ "FROM <%s> REVISION \"%s\" %n"
+				+ "WHERE { %n"
+				+ "	?subject ?propertyUri ?object . %n"
+				+ "} %n"
+				+ "ORDER BY ?propertyUri", graphName, branchNameA, graphName, branchNameB);
+		logger.debug(query);
+		
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		logger.debug(result);
+		
+		// Iterate over all properties
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		while (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			list.add(qs.getResource("?propertyUri").toString());
+		}
+
+		return list;
+	}
+	
+	
+	/**
+	 * Get the revision number of a given reference name.
+	 * 
+	 * @param graphName the graph name
+	 * @param referenceName the reference name
+	 * @return the revision number of given reference name
+	 * @throws IOException
+	 */
+	public static String getRevisionNumber(final String graphName, final String referenceName) throws IOException {
+		String query = prefixes
+				+ String.format(
+						"SELECT ?revNumber WHERE { GRAPH <%s> {"
+								+ "	?rev a rmo:Revision; rmo:revisionNumber ?revNumber; rmo:revisionOf <%s>."
+								+ "	{?rev rmo:revisionNumber \"%s\".} UNION {?ref a rmo:Reference; rmo:references ?rev; rdfs:label \"%s\".}"
+								+ "} }", Config.r43ples_revision_graph, graphName, referenceName, referenceName);
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		if (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			return qs.getLiteral("?revNumber").toString();
+		}
+		return referenceName;
+	}
+	
+	
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## Start merging dialog.                                                                                                                                                ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */
+	
+	
+	/**
+	 * Get all graphs under revision control.
+	 * 
+	 * @return the array list of all revised graphs
+	 * @throws IOException
+	 */
+	public static ArrayList<String> getAllGraphsUnderRevisionControl() throws IOException {
+		logger.info("Get all graphs under revision control.");
+		
+		// Result array list
+		ArrayList<String> list = new ArrayList<String>();
+		
+		// Get the revised graphs (result format is JSON)
+		String revisedGraphs = TripleStoreInterface.executeHttpGet("/r43ples/getRevisedGraphs");
+		logger.debug(revisedGraphs);
+		
+		JsonParser parser = new JsonParser();
+		JsonElement element = parser.parse(revisedGraphs);
+		if (element.isJsonObject()) {
+			JsonObject results = element.getAsJsonObject().getAsJsonObject("results");
+			JsonArray bindings = results.getAsJsonArray("bindings");
+			for (int i = 0; i < bindings.size(); i++) {
+				String graphName = bindings.get(i).getAsJsonObject().getAsJsonObject("graph").get("value").getAsString();
+				list.add(graphName);
+			}
+		}
+		return list;
+	}
+	
+	
+	/**
+	 * Get all SDDs.
+	 * 
+	 * @return the array list of all SDDs
+	 * @throws IOException 
+	 */
+	public static ArrayList<String> getAllSDDs() throws IOException {
+		logger.info("Get all SDDs.");
+		
+		// Result array list
+		ArrayList<String> list = new ArrayList<String>();
+		
+    	// Query all differences
+		String query = prefixes + String.format(
+				  "SELECT ?sddUri %n"
+				+ "FROM <%s>"
+				+ "WHERE { %n"
+				+ "	?sddUri a sddo:StructuralDefinitionGroup . %n"
+				+ "}", Config.r43ples_sdd_graph);
+		logger.debug(query);
+		
+		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+		logger.debug(result);
+		
+		// Iterate over all SDDs
+		ResultSet resultSet = ResultSetFactory.fromXML(result);
+		while (resultSet.hasNext()) {
+			QuerySolution qs = resultSet.next();
+			list.add(qs.getResource("?sddUri").toString());
+		}
+
+		return list;
+	}
+	
+	
+	/**
+	 * Get all branch names of graph.
+	 * 
+	 * @param graphName the graph name
+	 * @return the array list of all branch names
+	 * @throws IOException 
+	 */
+	public static ArrayList<String> getAllBranchNamesOfGraph(String graphName) throws IOException {
+		logger.info("Get all branch names of graph.");
+		
+		// Result array list
+		ArrayList<String> list = new ArrayList<String>();
+		
+		if (graphName != null) {
+						
+			String query = prefixes + String.format(
+					  "SELECT DISTINCT ?label %n"
+					+ "FROM <%s> %n"
+					+ "WHERE { %n"
+					+ "	?branch a rmo:Branch ; %n"
+					+ "		rdfs:label ?label . %n"
+					+ "	?rev rmo:revisionOfBranch ?branch ;"
+					+ "		rmo:revisionOf <%s> . %n"
+					+ "} %n"
+					+ "ORDER BY ?label", Config.r43ples_revision_graph, graphName);
+	
+			String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
+			logger.debug(result);
+			
+			// Iterate over all labels
+			ResultSet resultSet = ResultSetFactory.fromXML(result);
+			while (resultSet.hasNext()) {
+				QuerySolution qs = resultSet.next();
+				list.add(qs.getLiteral("?label").toString());
+			}
+		}
+		return list;
+	}
+	
+	
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## Graph.                                                                                                                                                     ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */	
+	
+	
+	/**
+	 * Get the dot graph.
+	 * 
+	 * @param graphName the graph name 
+	 * @return the dot graph
+	 * @throws IOException
+	 * @throws HttpException
+	 */
+	public static Graph getDotGraph(String graphName) throws IOException, HttpException {
+		// Create a new graph
+		Graph graph =  new Graph("Revision graph of " + graphName);
+		graph.setAttribute(Attribute.RANKDIR_ATTR, "LR");
+		
+		String query_branches = prefixes + String.format(
+				  "SELECT ?branchURI ?branch %n"
+				+ "FROM <%s> %n"
+				+ "WHERE { %n"
+				+ "	?branchURI a rmo:Branch ; %n"
+				+ "		rdfs:label ?branch ; %n"
+				+ "		rmo:references ?revisionURI . %n"
+				+ "	?revisionURI a rmo:Revision ; %n"
+				+ "		rmo:revisionOf <%s> . %n"
+				+ "}", Config.r43ples_revision_graph, graphName);
+		
+		String result_branches = TripleStoreInterface.executeQueryWithoutAuthorization(query_branches, "text/xml");
+		ResultSet resultSet_brances = ResultSetFactory.fromXML(result_branches);
+		while (resultSet_brances.hasNext()) {
+			QuerySolution qs_branches = resultSet_brances.next();
+			String branchURI = qs_branches.getResource("branchURI").toString();
+			String branchName = qs_branches.getLiteral("branch").toString();
+			
+			// Create new sub graph
+			Subgraph subGraph = new Subgraph(graph, "Branch: " + branchName);
+			
+			// Get all nodes (revisions)
+			String query_nodes = prefixes + String.format(
+					  "SELECT DISTINCT ?revision ?number %n"
+					+ "FROM <%s> %n"
+					+ "WHERE { %n"
+					+ " ?revision a rmo:Revision ; %n"
+					+ "		rmo:revisionOf <%s> ; %n"
+					+ "		rmo:revisionOfBranch <%s> ; %n"
+					+ "		rmo:revisionNumber ?number . %n"
+					+ "}", Config.r43ples_revision_graph, graphName, branchURI);
+			
+			String result_nodes = TripleStoreInterface.executeQueryWithoutAuthorization(query_nodes, "text/xml");
+			ResultSet resultSet_nodes = ResultSetFactory.fromXML(result_nodes);
+			while (resultSet_nodes.hasNext()) {
+				QuerySolution qs_nodes = resultSet_nodes.next();
+				String rev = qs_nodes.getResource("revision").toString();
+				String name = qs_nodes.getLiteral("number").toString();
+				Node newNode = new Node(graph, rev);
+
+				// Check if revision is referenced
+				String query_reference = prefixes + String.format(
+						  "SELECT ?label %n"
+						+ "FROM <%s> %n"
+						+ "WHERE { %n"
+						+ "	?reference a rmo:Reference ; %n"
+						+ "		rmo:references <%s> ; %n"
+						+ "		rdfs:label ?label . %n"
+						+ "}", Config.r43ples_revision_graph, rev);
+				
+				String result_reference = TripleStoreInterface.executeQueryWithoutAuthorization(query_reference, "text/xml");
+				ResultSet resultSet_reference = ResultSetFactory.fromXML(result_reference);
+				if (resultSet_reference.hasNext()) {
+					QuerySolution qs = resultSet_reference.next();
+					String reference = qs.getLiteral("label").toString();
+					name = name + " | " + reference;					
+				}
+				
+				newNode.setAttribute(Attribute.LABEL_ATTR, name);
+				newNode.setAttribute(Attribute.SHAPE_ATTR, Attribute.RECORD_SHAPE);
+				subGraph.addNode(newNode);
+				
+			}
+		}
+		
+		// Create the directed edges between the revisions
+		String query_edges = prefixes + String.format(""
+				+ "SELECT DISTINCT ?revision ?next_revision "
+				+ "FROM <%s> "
+				+ "WHERE {"
+				+ " ?revision a rmo:Revision;"
+				+ "		rmo:revisionOf <%s>."
+				+ "	?next_revision a rmo:Revision;"
+				+ "		prov:wasDerivedFrom ?revision."
+				+ "}", Config.r43ples_revision_graph, graphName);
+		
+		String result_edges = TripleStoreInterface.executeQueryWithoutAuthorization(query_edges, "text/xml");
+		ResultSet resultSet_edges = ResultSetFactory.fromXML(result_edges);
+		while (resultSet_edges.hasNext()) {
+			QuerySolution qs_edges = resultSet_edges.next();
+			String rev = qs_edges.getResource("revision").toString();
+			String next = qs_edges.getResource("next_revision").toString();
+			Node newNode = graph.findNodeByName(rev);
+			Node nextNode = graph.findNodeByName(next);
+			graph.addEdge(new Edge(graph, newNode, nextNode));
+		}
+
+		return graph;
+	}
+	
+	
+	/**
+	 * Highlight a node in the specified graph.
+	 * 
+	 * @param graph the graph which contains the nodes
+	 * @param nodeName the name of the node to highlight (revision URI)
+	 * @param color the highlight color
+	 * @return true when node was highlighted elsewhere false when the graph does not contain the specified node
+	 */
+	public static boolean highlightNode(Graph graph, String nodeName, Color color) {
+		if (graph.findNodeByName(nodeName) != null) {		
+			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
+			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, color);	
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Remove the highlighting of a node in the specified graph.
+	 * 
+	 * @param graph the graph which contains the nodes
+	 * @param nodeName the name of the node where the highlighting should be removed (revision URI)
+	 * @return true when the highlighting of the node was removed elsewhere false when the graph does not contain the specified graph
+	 */
+	public static boolean removeHighlighting(Graph graph, String nodeName) {
+		if (graph.findNodeByName(nodeName) != null) {		
+			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
+			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, Color.WHITE);	
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## Difference tree.                                                                                                                                                     ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */	
+	
+	
+	/**
+	 * Create the differences tree root node.
+	 * 
+	 * @param differenceModel the differences model to use
+	 * @return the root node
+	 */
+	public static DefaultMutableTreeNode createDifferencesTree(DifferenceModel differenceModel) {
+		
+		// Create the root node
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeNodeObject("All", ResolutionState.CONFLICT, null));		
+		
+		// Create group of conflicting difference groups
+		DefaultMutableTreeNode conflictsNode = new DefaultMutableTreeNode(new TreeNodeObject("Conflicts", ResolutionState.CONFLICT, null));
+		
+		ArrayList<DifferenceGroup> conflicting = getAllConflictingDifferenceGroups(differenceModel);
+		
+		Iterator<DifferenceGroup> iteConflicting = conflicting.iterator();
+		while (iteConflicting.hasNext()) {
+			DifferenceGroup differenceGroup = iteConflicting.next();
+			
+			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA().toString() + "-" + differenceGroup.getTripleStateB().toString(), ResolutionState.CONFLICT, differenceGroup));
+			
+			// Add all differences
+			// Sort by key
+			Map<String, Difference> sortedMap = new TreeMap<String, Difference>(differenceGroup.getDifferences());
+			Iterator<Difference> iteDifferences = sortedMap.values().iterator();
+			while (iteDifferences.hasNext()) {
+				Difference difference = iteDifferences.next();
+				
+				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.CONFLICT, difference));
+				// Check filter
+				if (Controller.getActivatedFilters().contains(difference.getTriple().getPredicate())) {
+					differenceGroupNode.add(differenceNode);
+				}
+			}
+			
+			conflictsNode.add(differenceGroupNode);
+
+		}
+		
+		root.add(conflictsNode);
+		
+		// Create group of non conflicting difference groups
+		DefaultMutableTreeNode differencesNode = new DefaultMutableTreeNode(new TreeNodeObject("Differences", ResolutionState.DIFFERENCE, null));
+		
+		ArrayList<DifferenceGroup> nonConflicting = getAllNonConflictingDifferenceGroups(differenceModel);
+		
+		Iterator<DifferenceGroup> iteNonConflicting = nonConflicting.iterator();
+		while (iteNonConflicting.hasNext()) {
+			DifferenceGroup differenceGroup = iteNonConflicting.next();
+			
+			DefaultMutableTreeNode differenceGroupNode = new DefaultMutableTreeNode(new TreeNodeObject(differenceGroup.getTripleStateA() + "-" + differenceGroup.getTripleStateB(), ResolutionState.DIFFERENCE, differenceGroup));
+			
+			// Add all differences
+			// Sort by key
+			Map<String, Difference> sortedMap = new TreeMap<String, Difference>(differenceGroup.getDifferences());
+			Iterator<Difference> iteDifferences = sortedMap.values().iterator();
+			while (iteDifferences.hasNext()) {
+				Difference difference = iteDifferences.next();
+				
+				DefaultMutableTreeNode differenceNode = new DefaultMutableTreeNode(new TreeNodeObject(tripleToString(difference.getTriple()), ResolutionState.DIFFERENCE, difference));
+				// Check filter
+				if (Controller.getActivatedFilters().contains(difference.getTriple().getPredicate())) {
+					differenceGroupNode.add(differenceNode);
+				}
+			}
+			
+			differencesNode.add(differenceGroupNode);
+
+		}
+		
+		root.add(differencesNode);
+		
+		refreshParentNodeStateDifferencesTree(root);
+		
+		return root;
+	}
+	
+	
+	/**
+	 * Refresh the parent node states by current child states of the difference tree.
+	 * 
+	 * @param rootNode the root node of tree
+	 */
+	public static ResolutionState refreshParentNodeStateDifferencesTree(DefaultMutableTreeNode rootNode) {
+		
+		if (!rootNode.isLeaf()) {
+			ResolutionState rootNodeState = ResolutionState.RESOLVED;
+			
+			for (int i=0; i<rootNode.getChildCount(); i++) {
+				ResolutionState childState = refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) rootNode.getChildAt(i));
+				if (childState.compareTo(rootNodeState) > 0) {
+					rootNodeState = childState;
+				}
+			}
+			((TreeNodeObject) rootNode.getUserObject()).setResolutionState(rootNodeState);
+			return rootNodeState;
+		} else {
+			return ((TreeNodeObject) rootNode.getUserObject()).getResolutionState();
+		}
+	}
+	
+	
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## Resolution triples.                                                                                                                                                  ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */	
+
+
+	/**
+	 * Create the row data for resolution triples.
+	 * 
+	 * @param difference the difference
+	 * @param differenceGroup the difference group
+	 * @return the row data
+	 * @throws IOException 
+	 */
+	public static Object[] createRowDataResolutionTriples(Difference difference, DifferenceGroup differenceGroup) throws IOException {
+		Object[] rowData = new Object[7];
+		
+		rowData[0] = getSubject(difference.getTriple());
+		rowData[1] = getPredicate(difference.getTriple());
+		rowData[2] = getObject(difference.getTriple());
+		
+		// Get the revision number if available
+		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString();
+		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else {
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString();
+		}
+		
+		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
+
+		rowData[6] = difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED);
+		
+		return rowData;
+	}
+	
+	
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## Summary report.                                                                                                                                                      ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */	
+		
+	
+	/**
+	 * Create the summary report table content.
+	 * 
+	 * @param table the table reference
+	 * @param differenceModel the difference model
+	 * @return the report creation result
+	 */
+	public static ReportResult createReportTable(JTable table, DifferenceModel differenceModel) {
+		
+		ReportResult result = new ReportResult();
+		
+		// Remove all entries
+		((TableModelSummaryReport) table.getModel()).removeAllElements();
+		
+		// Differ between conflicting and non conflicting difference groups
+		ArrayList<DifferenceGroup> conflictingDifferenceGroups = new ArrayList<DifferenceGroup>();
+		ArrayList<DifferenceGroup> nonconflictingDifferenceGroups = new ArrayList<DifferenceGroup>();
+		
+		Iterator<String> iteDifferenceGroupNames = differenceModel.getDifferenceGroups().keySet().iterator();
+		while (iteDifferenceGroupNames.hasNext()) {
+			String differenceGroupName = iteDifferenceGroupNames.next();
+			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupName);
+			if (differenceGroup.isConflicting()) {
+				conflictingDifferenceGroups.add(differenceGroup);
+			} else {
+				nonconflictingDifferenceGroups.add(differenceGroup);
+			}
+		}
+		
+		// Check if all conflicts were approved
+		Iterator<DifferenceGroup> iteConflictingDifferenceGroups = conflictingDifferenceGroups.iterator();
+		while (iteConflictingDifferenceGroups.hasNext()) {
+			DifferenceGroup differenceGroup = iteConflictingDifferenceGroups.next();
+			
+			Iterator<String> iteDifferenceNames = differenceGroup.getDifferences().keySet().iterator();
+			while (iteDifferenceNames.hasNext()) {
+				String currentDifferenceName = iteDifferenceNames.next();
+				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
+				
+				Color color = Color.GREEN;
+				if (!difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+					color = Color.RED;
+					result.incrementCounterConflictsNotApproved();
+				}
+				
+				// Create new table entry
+				((TableModelSummaryReport) table.getModel()).addRow(new TableEntrySummaryReport(difference, color, createRowDataSummaryReport(difference, differenceGroup)));
+
+			}
+		}
+		
+		// Check if the resolution state of differences was changed manually
+		Iterator<DifferenceGroup> iteNonConflictingDifferenceGroups = nonconflictingDifferenceGroups.iterator();
+		while (iteNonConflictingDifferenceGroups.hasNext()) {
+			DifferenceGroup differenceGroup = iteNonConflictingDifferenceGroups.next();
+			
+			Iterator<String> iteDifferenceNames = differenceGroup.getDifferences().keySet().iterator();
+			while (iteDifferenceNames.hasNext()) {
+				String currentDifferenceName = iteDifferenceNames.next();
+				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
+				
+				Color color = Color.GREEN;
+				if (!difference.getTripleResolutionState().equals(differenceGroup.getAutomaticResolutionState())) {
+					color = Color.ORANGE;
+					result.incrementCounterDifferencesResolutionChanged();;
+				}
+				
+				// Create new table entry
+				((TableModelSummaryReport) table.getModel()).addRow(new TableEntrySummaryReport(difference, color, createRowDataSummaryReport(difference, differenceGroup)));
+
+			}
+		}
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Create the row data for summary report.
+	 * 
+	 * @param difference the difference
+	 * @param differenceGroup the difference group
+	 * @return the row data
+	 */
+	public static Object[] createRowDataSummaryReport(Difference difference, DifferenceGroup differenceGroup) {
+		Object[] rowData = new Object[9];
+		
+		rowData[0] = getSubject(difference.getTriple());
+		rowData[1] = getPredicate(difference.getTriple());
+		rowData[2] = getObject(difference.getTriple());
+			
+		// Get the revision number if available
+		if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() == null)) {
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString();
+		} else if ((difference.getReferencedRevisionA() == null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else if ((difference.getReferencedRevisionA() != null) && (difference.getReferencedRevisionB() != null)) {
+			rowData[3] = differenceGroup.getTripleStateA().toString() + " (" + difference.getReferencedRevisionLabelA() + ")";
+			rowData[4] = differenceGroup.getTripleStateB().toString() + " (" + difference.getReferencedRevisionLabelB() + ")";
+		} else {
+			rowData[3] = differenceGroup.getTripleStateA().toString();
+			rowData[4] = differenceGroup.getTripleStateB().toString();
+		}
+
+		rowData[5] = Boolean.toString(differenceGroup.isConflicting()).toUpperCase();
+		
+		rowData[6] = differenceGroup.getAutomaticResolutionState().toString().toUpperCase();
+		
+		rowData[7] = difference.getTripleResolutionState().toString().toUpperCase();
+		
+		rowData[8] = Boolean.toString(difference.getResolutionState().equals(ResolutionState.RESOLVED)).toUpperCase();
+		
+		return rowData;
+	}
+
+	
+	/**
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 * ##                                                                                                                                                                      ##
+	 * ## Semantic enrichment - individuals.                                                                                                                                   ##
+	 * ##                                                                                                                                                                      ##
+	 * ##########################################################################################################################################################################
+	 * ##########################################################################################################################################################################
+	 */	
+
+	
+	/**
 	 * Get all individuals of specified revision.
 	 * 
 	 * @param graphName the graph name
@@ -1384,29 +1570,43 @@ public class Management {
 	
 	
 	/**
-	 * Get difference by triple. If the difference model does not contain the triple null will be returned.
+	 * Get the highest resolution state of table entry of semantic enrichment all individuals table.
 	 * 
-	 * @param triple the triple to look for
-	 * @param differenceModel the difference model
-	 * @return the difference or null if triple is not included in difference model
+	 * @param individualStructureA the individual structure A
+	 * @param individualStructureB the individual structure B
+	 * @return the highest resolution state
 	 */
-	public static Difference getDifferenceByTriple(Triple triple, DifferenceModel differenceModel) {
-		String tripleIdentifier = tripleToString(triple);
-		
-		// Iterate over all difference groups
-		Iterator<String> iteDifferenceGroupNames = differenceModel.getDifferenceGroups().keySet().iterator();
-		while (iteDifferenceGroupNames.hasNext()) {
-			String differenceGroupName = iteDifferenceGroupNames.next();
-			DifferenceGroup differenceGroup = differenceModel.getDifferenceGroups().get(differenceGroupName);
-			// Check if the hash map contains the triple
-			if (differenceGroup.getDifferences().containsKey(tripleIdentifier)) {
-				return differenceGroup.getDifferences().get(tripleIdentifier);
-			};
+	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(IndividualStructure individualStructureA, IndividualStructure individualStructureB) {
+		// The result resolution state
+		ResolutionState resolutionState = ResolutionState.RESOLVED;
+		// Check individual structure A
+		Iterator<String> iteTriplesA = individualStructureA.getTriples().keySet().iterator();
+		while (iteTriplesA.hasNext()) {
+			String currentTripleKey = iteTriplesA.next();
+			TripleIndividualStructure currentTripleIndividualStructure = individualStructureA.getTriples().get(currentTripleKey);
+			Difference currentDifference = currentTripleIndividualStructure.getDifference();
+			if (currentDifference != null) {
+				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
+					resolutionState = currentDifference.getResolutionState();
+				}
+			}
 		}
-
-		return null;
+		// Check individual structure B
+		Iterator<String> iteTriplesB = individualStructureB.getTriples().keySet().iterator();
+		while (iteTriplesB.hasNext()) {
+			String currentTripleKey = iteTriplesB.next();
+			TripleIndividualStructure currentTripleIndividualStructure = individualStructureB.getTriples().get(currentTripleKey);
+			Difference currentDifference = currentTripleIndividualStructure.getDifference();
+			if (currentDifference != null) {
+				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
+					resolutionState = currentDifference.getResolutionState();
+				}
+			}
+		}
+		
+		return resolutionState;
 	}
-	
+
 	
 	/**
 	 * Create the row data for semantic enrichment individual triples.
@@ -1471,146 +1671,7 @@ public class Management {
 		
 		return rowData;
 	}
-	
-	
-	/**
-	 * Converts a triple string to a string in which URIs are replaced by prefixes which were specified in the configuration.
-	 * If no prefix was found or if input string is a literal the input string will be returned.
-	 * 
-	 * @param tripleString the triple string (subject or predicate or object) to convert
-	 * @return the converted triple string or input string
-	 */
-	public static String convertTripleStringToPrefixTripleString(String tripleString) {
-		if (tripleString.contains("<") && tripleString.contains(">")) {
-			String tripleStringConverted = tripleString.trim().replaceAll("<", "").replaceAll(">", "");
-			int lastIndexSlash = tripleStringConverted.lastIndexOf("/");
-			int lastIndexHash = tripleStringConverted.lastIndexOf("#");
-			if ((lastIndexSlash == -1) && (lastIndexHash == -1)) {
-				return tripleString;
-			} else {
-				int index = 0;
-				if (lastIndexSlash > lastIndexHash) {
-					// Slash separator found
-					index = lastIndexSlash + 1;
-				} else {
-					// Hash separator found
-					index = lastIndexHash + 1;
-				}
-				String subString = tripleStringConverted.substring(0, index);
-				// Try to find the prefix
-				if (Config.prefixMappings.containsKey(subString)) {
-					return Config.prefixMappings.get(subString) + ":" + tripleStringConverted.substring(index, tripleStringConverted.length());
-				}
-			}
-		}
-		return tripleString;
-	}
-	
-	
-	/**
-	 * Get all properties of specified revision.
-	 * 
-	 * @param graphName the graph name
-	 * @param branchNameA the branch name A
-	 * @param branchNameB the branch name B
-	 * @return the array list of property URIs
-	 * @throws IOException 
-	 */
-	public static ArrayList<String> getPropertiesOfRevision(String graphName, String branchNameA, String branchNameB) throws IOException {
-		logger.info("Get all properties of branches.");
-		
-		// Result array list
-		ArrayList<String> list = new ArrayList<String>();
 
-    	// Query all properties (DISTINCT because there can be multiple property occurrences)
-		String query = String.format(
-				  "OPTION r43ples:SPARQL_JOIN %n"
-				+ "SELECT DISTINCT ?propertyUri %n"
-				+ "FROM <%s> REVISION \"%s\" %n"
-				+ "FROM <%s> REVISION \"%s\" %n"
-				+ "WHERE { %n"
-				+ "	?subject ?propertyUri ?object . %n"
-				+ "} %n"
-				+ "ORDER BY ?propertyUri", graphName, branchNameA, graphName, branchNameB);
-		logger.debug(query);
-		
-		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
-		logger.debug(result);
-		
-		// Iterate over all properties
-		ResultSet resultSet = ResultSetFactory.fromXML(result);
-		while (resultSet.hasNext()) {
-			QuerySolution qs = resultSet.next();
-			list.add(qs.getResource("?propertyUri").toString());
-		}
-
-		return list;
-	}
-	
-	
-	/**
-	 * Get the revision number of a given reference name.
-	 * 
-	 * @param graphName the graph name
-	 * @param referenceName the reference name
-	 * @return the revision number of given reference name
-	 * @throws IOException
-	 */
-	public static String getRevisionNumber(final String graphName, final String referenceName) throws IOException {
-		String query = prefixes
-				+ String.format(
-						"SELECT ?revNumber WHERE { GRAPH <%s> {"
-								+ "	?rev a rmo:Revision; rmo:revisionNumber ?revNumber; rmo:revisionOf <%s>."
-								+ "	{?rev rmo:revisionNumber \"%s\".} UNION {?ref a rmo:Reference; rmo:references ?rev; rdfs:label \"%s\".}"
-								+ "} }", Config.r43ples_revision_graph, graphName, referenceName, referenceName);
-		String result = TripleStoreInterface.executeQueryWithoutAuthorization(query, "text/xml");
-		ResultSet resultSet = ResultSetFactory.fromXML(result);
-		if (resultSet.hasNext()) {
-			QuerySolution qs = resultSet.next();
-			return qs.getLiteral("?revNumber").toString();
-		}
-		return referenceName;
-	}
-	
-	
-	/**
-	 * Get the highest resolution state of table entry of semantic enrichment all individuals table.
-	 * 
-	 * @param individualStructureA the individual structure A
-	 * @param individualStructureB the individual structure B
-	 * @return the highest resolution state
-	 */
-	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(IndividualStructure individualStructureA, IndividualStructure individualStructureB) {
-		// The result resolution state
-		ResolutionState resolutionState = ResolutionState.RESOLVED;
-		// Check individual structure A
-		Iterator<String> iteTriplesA = individualStructureA.getTriples().keySet().iterator();
-		while (iteTriplesA.hasNext()) {
-			String currentTripleKey = iteTriplesA.next();
-			TripleIndividualStructure currentTripleIndividualStructure = individualStructureA.getTriples().get(currentTripleKey);
-			Difference currentDifference = currentTripleIndividualStructure.getDifference();
-			if (currentDifference != null) {
-				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
-					resolutionState = currentDifference.getResolutionState();
-				}
-			}
-		}
-		// Check individual structure B
-		Iterator<String> iteTriplesB = individualStructureB.getTriples().keySet().iterator();
-		while (iteTriplesB.hasNext()) {
-			String currentTripleKey = iteTriplesB.next();
-			TripleIndividualStructure currentTripleIndividualStructure = individualStructureB.getTriples().get(currentTripleKey);
-			Difference currentDifference = currentTripleIndividualStructure.getDifference();
-			if (currentDifference != null) {
-				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
-					resolutionState = currentDifference.getResolutionState();
-				}
-			}
-		}
-		
-		return resolutionState;
-	}
-	
 	
 	/**
 	 * ##########################################################################################################################################################################
