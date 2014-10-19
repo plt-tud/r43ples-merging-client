@@ -42,7 +42,7 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 		
 		// Get the table entry
 		TableEntry tableEntry =  tableModel.getTableEntry(row);
-				
+		
 		// Get the difference
 		Difference difference = tableEntry.getDifference();
 		
@@ -61,7 +61,7 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 				color = Color.GREEN;
 			} else {
 				// Entry resolution changed old is approved
-				color = Color.LIGHT_GRAY;
+				color = Color.ORANGE;
 			}
 		} else {
 			DifferenceGroup differenceGroup = Controller.getDifferenceGroupOfDifference(difference);
@@ -71,7 +71,7 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 				color = table.getBackground();
 			} else {
 				// Entry is changed but not approved
-				color = Color.ORANGE;
+				color = Color.LIGHT_GRAY;
 			}
 		}
 		
@@ -81,7 +81,7 @@ public class TableCellRendererResolutionTriples extends DefaultTableCellRenderer
 		} else {
 			cellComponent.setBackground(Color.BLACK);
 			cellComponent.setForeground(color);
-		}		
+		}
 
 		// Replace URI by prefix if available
 		if (column == 0) {

@@ -514,6 +514,25 @@ public class ApplicationUI {
 		tableResolutionHighLevelChanges.setRowHeight(25);
 		tableResolutionHighLevelChanges.getTableHeader().setReorderingAllowed(false);
 		tableResolutionHighLevelChanges.setModel(tableModelResolutionHighLevelChanges);
+		tableModelResolutionHighLevelChanges.addTableModelListener(new TableModelListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
+			 */
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				 SwingUtilities.invokeLater(new Runnable() {
+					
+					/* (non-Javadoc)
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						tableResolutionHighLevelChanges.updateUI();
+					}
+				});
+			}
+		});
 		tableResolutionHighLevelChanges.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			/* (non-Javadoc)

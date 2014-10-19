@@ -65,7 +65,7 @@ public class TableCellCheckBoxRendererResolutionTriples extends JCheckBox implem
 				color = Color.GREEN;
 			} else {
 				// Entry resolution changed old is approved
-				color = Color.LIGHT_GRAY;
+				color = Color.ORANGE;
 			}
 		} else {
 			DifferenceGroup differenceGroup = Controller.getDifferenceGroupOfDifference(difference);
@@ -75,7 +75,7 @@ public class TableCellCheckBoxRendererResolutionTriples extends JCheckBox implem
 				color = table.getBackground();
 			} else {
 				// Entry is changed but not approved
-				color = Color.ORANGE;
+				color = Color.LIGHT_GRAY;
 			}
 		}
 		
