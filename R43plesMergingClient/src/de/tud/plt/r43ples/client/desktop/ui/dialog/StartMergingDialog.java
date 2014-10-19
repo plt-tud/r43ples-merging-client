@@ -1,35 +1,31 @@
 package de.tud.plt.r43ples.client.desktop.ui.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.LineBorder;
-
-import java.awt.Color;
-import java.awt.GridLayout;
-
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.combobox.ComboBoxRendererStartMergingDialogGraph;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.combobox.ComboBoxRendererStartMergingDialogSDD;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
-
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
 
 /**
  * The start merging dialog. Creates the MERGE query.
@@ -37,10 +33,10 @@ import javax.swing.JTextArea;
  * @author Stephan Hensel
  *
  */
-public class StartMergingDialog extends JDialog {
+public class StartMergingDialog {
 
-	/** The default serial version UID. **/
-	private static final long serialVersionUID = 1L;
+	/** The start merging dialog. **/
+	public static JDialog dialog;
 	/** The content panel. **/
 	private final JPanel contentPanel = new JPanel();
 	/** The button group of the radio buttons for selection of the merging method. **/
@@ -70,11 +66,12 @@ public class StartMergingDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public StartMergingDialog() {
-		setTitle("Start Merging");
-		setBounds(100, 100, 450, 380);
-		getContentPane().setLayout(new BorderLayout());
+		dialog = new JDialog();
+		dialog.setTitle("Start Merging");
+		dialog.setBounds(100, 100, 450, 380);
+		dialog.getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		
 		JPanel panelMergingMethod = new JPanel();
@@ -112,7 +109,7 @@ public class StartMergingDialog extends JDialog {
 				try {
 					Controller.updateRevisionComboBoxes();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
+					Controller.showIOExceptionDialog(dialog);
 					e1.printStackTrace();
 				}
 			}
@@ -171,7 +168,7 @@ public class StartMergingDialog extends JDialog {
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			dialog.getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
@@ -183,14 +180,14 @@ public class StartMergingDialog extends JDialog {
 						try {
 							Controller.startNewMergeProcess();
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
+							Controller.showIOExceptionDialog(dialog);
 							e.printStackTrace();
 						}
 					}
 				});
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				dialog.getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
@@ -200,7 +197,7 @@ public class StartMergingDialog extends JDialog {
 					 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 					 */
 					public void actionPerformed(ActionEvent e) {
-						setVisible(false);
+						dialog.setVisible(false);
 					}
 				});
 				cancelButton.setActionCommand("Cancel");

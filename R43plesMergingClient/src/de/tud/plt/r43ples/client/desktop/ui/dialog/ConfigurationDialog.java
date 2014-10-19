@@ -31,10 +31,10 @@ import java.awt.event.ActionEvent;
  * @author Stephan Hensel
  *
  */
-public class ConfigurationDialog extends JDialog {
+public class ConfigurationDialog {
 
-	/** The default serial version. **/
-	private static final long serialVersionUID = 1L;
+	/** The configuration dialog. **/
+	public static JDialog dialog;
 	/** The content panel. **/
 	private final JPanel contentPanel = new JPanel();
 	/** The R43ples SPARQL endpoint text field. **/
@@ -53,12 +53,13 @@ public class ConfigurationDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public ConfigurationDialog() {
-		setTitle("Properties configuration");
-		setResizable(false);
-		setBounds(100, 100, 521, 551);
-		getContentPane().setLayout(new BorderLayout());
+		dialog = new JDialog();
+		dialog.setTitle("Properties configuration");
+		dialog.setResizable(false);
+		dialog.setBounds(100, 100, 521, 551);
+		dialog.getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(null);
 		
 		JPanel panelRemote = new JPanel();
@@ -142,7 +143,7 @@ public class ConfigurationDialog extends JDialog {
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			dialog.getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
@@ -154,14 +155,14 @@ public class ConfigurationDialog extends JDialog {
 						try {
 							Controller.writeConfigurationToFile();
 						} catch (ConfigurationException e1) {
-							// TODO Auto-generated catch block
+							Controller.showConfigurationExceptionDialog(dialog);
 							e1.printStackTrace();
 						}
 					}
 				});
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				dialog.getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");

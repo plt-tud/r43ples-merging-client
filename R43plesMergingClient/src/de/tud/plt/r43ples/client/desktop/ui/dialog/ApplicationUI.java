@@ -135,7 +135,7 @@ public class ApplicationUI {
 				try {
 					Controller.showStartMergingDialog();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
 					e.printStackTrace();
 				}
 			}
@@ -170,7 +170,7 @@ public class ApplicationUI {
 				try {
 					Controller.showStartMergingDialog();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
 					e.printStackTrace();
 				}
 			}
@@ -313,7 +313,7 @@ public class ApplicationUI {
 				try {
 					Controller.selectionChangedDifferencesTree();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
 					e1.printStackTrace();
 				}
 			}
@@ -446,7 +446,7 @@ public class ApplicationUI {
 				try {
 					Controller.updateTableModelSemanticEnrichmentTriples();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
 					e1.printStackTrace();
 				}				
 			}

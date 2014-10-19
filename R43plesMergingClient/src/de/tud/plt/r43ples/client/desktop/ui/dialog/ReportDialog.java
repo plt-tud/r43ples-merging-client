@@ -30,10 +30,10 @@ import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSummaryRepo
  * @author Stephan Hensel
  *
  */
-public class ReportDialog extends JDialog {
+public class ReportDialog {
 
-	/** The default serial version UID. **/
-	private static final long serialVersionUID = 1L;
+	/** The summary report dialog. **/
+	public static JDialog dialog;
 	/** The content panel. **/
 	private final JPanel contentPanel = new JPanel();
 	/** The graph text field. **/
@@ -60,11 +60,12 @@ public class ReportDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public ReportDialog() {
-		setTitle("Summary Report");
-		setBounds(100, 100, 887, 758);
-		getContentPane().setLayout(new BorderLayout());
+		dialog = new JDialog();
+		dialog.setTitle("Summary Report");
+		dialog.setBounds(100, 100, 887, 758);
+		dialog.getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);
 		contentPanel.setLayout(new BorderLayout(0, 0));
 		{
 			JPanel panelQuerySummary = new JPanel();
@@ -147,7 +148,7 @@ public class ReportDialog extends JDialog {
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			dialog.getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				okButton = new JButton("Push");
 				okButton.addActionListener(new ActionListener() {
@@ -166,7 +167,7 @@ public class ReportDialog extends JDialog {
 				});
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
-				getRootPane().setDefaultButton(okButton);
+				dialog.getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");

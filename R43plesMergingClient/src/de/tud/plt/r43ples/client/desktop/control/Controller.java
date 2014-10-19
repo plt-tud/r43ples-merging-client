@@ -1,6 +1,7 @@
 package de.tud.plt.r43ples.client.desktop.control;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -79,10 +80,6 @@ public class Controller {
 
 	/** The logger. */
 	private static Logger logger = Logger.getLogger(Controller.class);
-	/** The configuration dialog. **/
-	private static ConfigurationDialog configDialog = new ConfigurationDialog();
-	/** The start merging dialog instance. **/
-	private static StartMergingDialog dialog = new StartMergingDialog();
 	/** The revision number of the branch A. **/
 	private static String revisionNumberBranchA;
 	/** The revision number of the branch B. **/
@@ -95,8 +92,6 @@ public class Controller {
 	private static ClassModel classModelBranchA;
 	/** The class model of branch B. **/
 	private static ClassModel classModelBranchB;
-	/** The summary report dialog instance. **/
-	private static ReportDialog report = new ReportDialog();
 	/** The grappa graph which contains the revision tree. **/
 	private static Graph graph;
 	/** The grappa panel which holds the visualization of the graph. **/
@@ -148,10 +143,10 @@ public class Controller {
 			StartMergingDialog.getcBModelSDD().addElement(iteElementsSDD.next());
 		}
 		
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
-		dialog.setModal(true);
-		dialog.setVisible(true);
+		StartMergingDialog.dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		StartMergingDialog.dialog.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
+		StartMergingDialog.dialog.setModal(true);
+		StartMergingDialog.dialog.setVisible(true);
 		ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
 	}
 
@@ -162,7 +157,7 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void updateRevisionComboBoxes() throws IOException {
-		dialog.setCursor(waitCursor);
+		StartMergingDialog.dialog.setCursor(waitCursor);
 		// Get the selected graph
 		String graphName = (String) StartMergingDialog.getcBModelGraph().getSelectedItem();
 		// Get all branch names
@@ -177,7 +172,7 @@ public class Controller {
 			StartMergingDialog.getcBModelRevisionA().addElement(currentElement);
 			StartMergingDialog.getcBModelRevisionB().addElement(currentElement);
 		}
-		dialog.setCursor(defaultCursor);
+		StartMergingDialog.dialog.setCursor(defaultCursor);
 	}
 
 
@@ -189,16 +184,16 @@ public class Controller {
 	public static void startNewMergeProcess() throws IOException {
 		if (StartMergingDialog.getcBModelRevisionA().getSelectedItem().equals(StartMergingDialog.getcBModelRevisionB().getSelectedItem())) {
 			// Show error message dialog when selected branches are equal
-			JOptionPane.showMessageDialog(dialog, "The selected branches must be different!", "Error: Selected branches are equal.", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(StartMergingDialog.dialog, "The selected branches must be different!", "Error: Selected branches are equal.", JOptionPane.ERROR_MESSAGE);
 		} else if (StartMergingDialog.getTfUser().getText().equals("")) {
 			// Show error message when no user was specified
-			JOptionPane.showMessageDialog(dialog, "A user must be specified!", "Error: No user specified.", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(StartMergingDialog.dialog, "A user must be specified!", "Error: No user specified.", JOptionPane.ERROR_MESSAGE);
 		} else if (StartMergingDialog.getTextAreaMessage().getText().equals("")) {
 			// Show error message when no message was specified allowed
-			JOptionPane.showMessageDialog(dialog, "An empty message is not allowed!", "Error: No message specified.", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(StartMergingDialog.dialog, "An empty message is not allowed!", "Error: No message specified.", JOptionPane.ERROR_MESSAGE);
 		} else {
 			// Start new merging process
-			dialog.setCursor(waitCursor);
+			StartMergingDialog.dialog.setCursor(waitCursor);
 			// Get the selected graph
 			String graphName = (String) StartMergingDialog.getcBModelGraph().getSelectedItem();
 			String sdd = (String) StartMergingDialog.getcBModelSDD().getSelectedItem();
@@ -271,7 +266,7 @@ public class Controller {
 				// Create the property list of revisions
 				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
 				
-				dialog.setCursor(defaultCursor);
+				StartMergingDialog.dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				// There was no conflict merged revision was created
@@ -292,7 +287,7 @@ public class Controller {
 				// Get the revision number
 				String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
 				
-				dialog.setCursor(defaultCursor);
+				StartMergingDialog.dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				// Error occurred
@@ -310,12 +305,12 @@ public class Controller {
 				ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
 				ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
 				
-				dialog.setCursor(defaultCursor);
+				StartMergingDialog.dialog.setCursor(defaultCursor);
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Undefined error occurred", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
 			// Close dialog after execution and update UI
-			dialog.setVisible(false);
+			StartMergingDialog.dialog.setVisible(false);
 			ApplicationUI.frmRplesMergingClient.setCursor(waitCursor);
 			// Set the cell renderer
 			TableCellRendererResolutionTriples renderer = new TableCellRendererResolutionTriples();
@@ -640,10 +635,10 @@ public class Controller {
 		// Show message dialog
 		JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, String.format(message), header, messageLevel);
 		
-		report.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		report.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
-		report.setModal(true);
-		report.setVisible(true);
+		ReportDialog.dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		ReportDialog.dialog.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
+		ReportDialog.dialog.setModal(true);
+		ReportDialog.dialog.setVisible(true);
 	}
 	
 	
@@ -725,7 +720,7 @@ public class Controller {
 	 * Close the summary report.
 	 */
 	public static void closeSummaryReport() {
-		report.setVisible(false);
+		ReportDialog.dialog.setVisible(false);
 	}
 	
 	
@@ -735,7 +730,7 @@ public class Controller {
 	 * @throws IOException 
 	 */
 	public static void pushToRemoteRepository() throws IOException {
-		report.setCursor(waitCursor);
+		ReportDialog.dialog.setCursor(waitCursor);
 		if (reportResult != null) {
 			if (reportResult.getConflictsNotApproved() == 0) {
 				// Get the definitions
@@ -780,22 +775,22 @@ public class Controller {
 					// Execute MERGE WITH query
 					response = Management.executeMergeQuery(graphName, sdd, user, message, MergeQueryTypeEnum.WITH, revisionNumberBranchA, revisionNumberBranchB, triples, differenceModel);
 				}
-				report.setCursor(defaultCursor);
-				report.setVisible(false);
+				ReportDialog.dialog.setCursor(defaultCursor);
+				ReportDialog.dialog.setVisible(false);
 				
 				// Show message dialog
 				if ((response != null) && (response.getStatusCode() == HttpURLConnection.HTTP_CREATED)) {
 					logger.info("Merge query successfully executed.");
 					String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
 					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
-					report.setCursor(waitCursor);
+					ReportDialog.dialog.setCursor(waitCursor);
 					// Create empty difference model
 					differenceModel = new DifferenceModel();
 					// Update application UI
 					updateDifferencesTree();
 					// Create the revision graph
 					createGraph(graphName);
-					report.setCursor(defaultCursor);
+					ReportDialog.dialog.setCursor(defaultCursor);
 				} else {
 					logger.error("Merge query could not be executed.");
 					JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Maybe another user committed changes to one of the branches to merge.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1022,10 +1017,10 @@ public class Controller {
 		// Update the local table
 		updateTableModelConfigurationPrefixMapping();
 		
-		configDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		configDialog.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
-		configDialog.setModal(true);
-		configDialog.setVisible(true);
+		ConfigurationDialog.dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		ConfigurationDialog.dialog.setLocationRelativeTo(ApplicationUI.frmRplesMergingClient);
+		ConfigurationDialog.dialog.setModal(true);
+		ConfigurationDialog.dialog.setVisible(true);
 	}
 
 
@@ -1086,7 +1081,7 @@ public class Controller {
 		ApplicationUI.getTableResolutionSemanticEnrichmentClassTriples().updateUI();
 		ApplicationUI.getTableFilter().updateUI();
 		
-		configDialog.setVisible(false);
+		ConfigurationDialog.dialog.setVisible(false);
 	}
 
 
@@ -1094,7 +1089,7 @@ public class Controller {
 	 * Close configuration dialog without changes.
 	 */
 	public static void closeConfigurationDialog() {
-		configDialog.setVisible(false);
+		ConfigurationDialog.dialog.setVisible(false);
 	}
 	
 	
@@ -1298,6 +1293,40 @@ public class Controller {
 	 */
 	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(ClassStructure classStructureA, ClassStructure classStructureB) {
 		return Management.getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(classStructureA, classStructureB);
+	}
+	
+	
+	/**
+	 * Show IO exception dialog.
+	 * 
+	 * @param parentComponent the parent component
+	 */
+	public static void showIOExceptionDialog(Component parentComponent) {
+		if (ApplicationUI.frmRplesMergingClient != null)
+			ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
+		if (StartMergingDialog.dialog != null)
+			StartMergingDialog.dialog.setCursor(defaultCursor);
+		if (ReportDialog.dialog != null)
+			ReportDialog.dialog.setCursor(defaultCursor);
+		if (ConfigurationDialog.dialog != null)
+			ConfigurationDialog.dialog.setCursor(defaultCursor);
+		
+		JOptionPane.showMessageDialog(parentComponent, "Server is currently not available. Please check your connection!", "IOException occurred.", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	
+	/**
+	 * Show configuration exception dialog.
+	 * 
+	 * @param parentComponent the parent component
+	 */
+	public static void showConfigurationExceptionDialog(Component parentComponent) {
+		ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
+		StartMergingDialog.dialog.setCursor(defaultCursor);
+		ReportDialog.dialog.setCursor(defaultCursor);
+		ConfigurationDialog.dialog.setCursor(defaultCursor);
+		
+		JOptionPane.showMessageDialog(parentComponent, "Configuration is not writeable!", "ConfigurationException occurred.", JOptionPane.ERROR_MESSAGE);
 	}
 
 
