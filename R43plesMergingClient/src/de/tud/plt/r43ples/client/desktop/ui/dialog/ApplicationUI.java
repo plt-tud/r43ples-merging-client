@@ -464,6 +464,25 @@ public class ApplicationUI {
 		tableResolutionSemanticEnrichmentClassTriples.setRowHeight(25);
 		tableResolutionSemanticEnrichmentClassTriples.getTableHeader().setReorderingAllowed(false);
 		tableResolutionSemanticEnrichmentClassTriples.setModel(tableModelSemanticEnrichmentClassTriples);
+		tableModelSemanticEnrichmentClassTriples.addTableModelListener(new TableModelListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
+			 */
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				 SwingUtilities.invokeLater(new Runnable() {
+					
+					/* (non-Javadoc)
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						tableResolutionSemanticEnrichmentClassTriples.updateUI();
+					}
+				});
+			}
+		});
 		tableResolutionSemanticEnrichmentClassTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			/* (non-Javadoc)

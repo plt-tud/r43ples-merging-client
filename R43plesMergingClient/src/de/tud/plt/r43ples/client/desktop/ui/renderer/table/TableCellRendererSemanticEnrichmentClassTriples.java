@@ -11,7 +11,10 @@ import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.Controller;
+import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
+import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
+import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
 import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentClassTriples;
@@ -41,9 +44,47 @@ public class TableCellRendererSemanticEnrichmentClassTriples extends DefaultTabl
 		// Get the table entry
 		TableEntrySemanticEnrichmentClassTriples tableEntry =  tableModel.getTableEntry(row);
 		
-		// Get the triple
+		// Check if difference exists
 		if (tableEntry.getDifference() != null) {
-			Triple triple = tableEntry.getDifference().getTriple();
+			// Get the difference
+			Difference difference = tableEntry.getDifference();
+			
+			// Get the triple			
+			Triple triple = difference.getTriple();
+			
+			// Set the background color of the row
+			Color color = Color.BLACK;
+			// Get the selected option
+			int selectedOption = tableEntry.getSelectedSemanticResolutionOption();
+			if (difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+				if (((selectedOption == 1) && difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED)) || 
+						(!(selectedOption == 1) && difference.getTripleResolutionState().equals(SDDTripleStateEnum.DELETED))) {
+					// Entry is resolved and approved
+					color = Color.GREEN;
+				} else {
+					// Entry resolution changed old is approved
+					color = Color.ORANGE;
+				}
+			} else {
+				DifferenceGroup differenceGroup = Controller.getDifferenceGroupOfDifference(difference);
+				if (((selectedOption == 1) && differenceGroup.getAutomaticResolutionState().equals(SDDTripleStateEnum.ADDED)) || 
+						(!(selectedOption == 1) && differenceGroup.getAutomaticResolutionState().equals(SDDTripleStateEnum.DELETED))) {
+					// Entry is not changed and not approved
+					color = table.getBackground();
+				} else {
+					// Entry is changed but not approved
+					color = Color.LIGHT_GRAY;
+				}
+			}
+			
+			if (!isSelected) {
+				cellComponent.setBackground(color);
+				cellComponent.setForeground(Color.BLACK);
+			} else {
+				cellComponent.setBackground(Color.BLACK);
+				cellComponent.setForeground(color);
+			}
+
 			
 			// Replace URI by prefix if available
 			if (column == 0) {

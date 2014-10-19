@@ -64,6 +64,7 @@ import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellComboBoxRend
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererFilter;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentAllClasses;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentClassTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellCheckBoxRendererResolutionTriples;
@@ -309,6 +310,11 @@ public class Controller {
 				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
 			}
 			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCellCheckBoxRendererResolutionTriples());
+			
+			TableCellRendererSemanticEnrichmentAllClasses rendererSemanticIndividuals = new TableCellRendererSemanticEnrichmentAllClasses();
+			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentAllClasses().getColumnCount(); i++) {
+				ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticIndividuals);
+			}
 			
 			TableCellRendererSemanticEnrichmentClassTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentClassTriples();
 			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentClassTriples().getColumnCount() - 1; i++) {
@@ -1144,6 +1150,8 @@ public class Controller {
 		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
 		
 		ApplicationUI.getTreeDifferencesDivision().updateUI();
+		
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllClasses().updateUI();
 	}
 	
 	
@@ -1265,6 +1273,18 @@ public class Controller {
 	 */
 	public static DifferenceGroup getDifferenceGroupOfDifference(Difference difference) {
 		return Management.getDifferenceGroupOfDifference(difference, differenceModel);
+	}
+	
+	
+	/**
+	 * Get the highest resolution state of table entry of semantic enrichment all individuals table.
+	 * 
+	 * @param classStructureA the class structure A
+	 * @param classStructureB the class structure B
+	 * @return the highest resolution state
+	 */
+	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(ClassStructure classStructureA, ClassStructure classStructureB) {
+		return Management.getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(classStructureA, classStructureB);
 	}
 
 

@@ -1574,6 +1574,45 @@ public class Management {
 	
 	
 	/**
+	 * Get the highest resolution state of table entry of semantic enrichment all individuals table.
+	 * 
+	 * @param classStructureA the class structure A
+	 * @param classStructureB the class structure B
+	 * @return the highest resolution state
+	 */
+	public static ResolutionState getResolutionStateOfTableEntrySemanticEnrichmentAllIndividuals(ClassStructure classStructureA, ClassStructure classStructureB) {
+		// The result resolution state
+		ResolutionState resolutionState = ResolutionState.RESOLVED;
+		// Check class structure A
+		Iterator<String> iteTriplesA = classStructureA.getTriples().keySet().iterator();
+		while (iteTriplesA.hasNext()) {
+			String currentTripleKey = iteTriplesA.next();
+			TripleClassStructure currentTripleClassStructure = classStructureA.getTriples().get(currentTripleKey);
+			Difference currentDifference = currentTripleClassStructure.getDifference();
+			if (currentDifference != null) {
+				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
+					resolutionState = currentDifference.getResolutionState();
+				}
+			}
+		}
+		// Check class structure B
+		Iterator<String> iteTriplesB = classStructureB.getTriples().keySet().iterator();
+		while (iteTriplesB.hasNext()) {
+			String currentTripleKey = iteTriplesB.next();
+			TripleClassStructure currentTripleClassStructure = classStructureB.getTriples().get(currentTripleKey);
+			Difference currentDifference = currentTripleClassStructure.getDifference();
+			if (currentDifference != null) {
+				if (currentDifference.getResolutionState().compareTo(resolutionState) > 0) {
+					resolutionState = currentDifference.getResolutionState();
+				}
+			}
+		}
+		
+		return resolutionState;
+	}
+	
+	
+	/**
 	 * ##########################################################################################################################################################################
 	 * ##########################################################################################################################################################################
 	 * ##                                                                                                                                                                      ##
