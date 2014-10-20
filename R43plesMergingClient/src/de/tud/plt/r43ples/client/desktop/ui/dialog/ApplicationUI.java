@@ -5,6 +5,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -21,6 +27,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
@@ -29,8 +36,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -46,15 +51,6 @@ import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionT
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentAllIndividuals;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnrichmentIndividualTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.tree.TreeCellRendererDifferences;
-
-import javax.swing.ListSelectionModel;
-
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * The application UI of the merging client.
@@ -307,13 +303,13 @@ public class ApplicationUI {
 		treeDifferencesDivision.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 		treeDifferencesDivision.setModel(treeModelDifferencesDivision);
 		treeDifferencesDivision.setCellRenderer(new TreeCellRendererDifferences());
-		treeDifferencesDivision.addTreeSelectionListener(new TreeSelectionListener() {
+		treeDifferencesDivision.addKeyListener(new KeyAdapter() {
 			
 			/* (non-Javadoc)
-			 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
+			 * @see java.awt.event.KeyAdapter#keyPressed(java.awt.event.KeyEvent)
 			 */
 			@Override
-			public void valueChanged(TreeSelectionEvent e) {
+			public void keyPressed(KeyEvent arg0) {
 				try {
 					Controller.selectionChangedDifferencesTree();
 				} catch (IOException e1) {
@@ -321,7 +317,48 @@ public class ApplicationUI {
 					e1.printStackTrace();
 				}
 			}
-		});	
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.KeyAdapter#keyReleased(java.awt.event.KeyEvent)
+			 */
+			@Override
+			public void keyReleased(KeyEvent e) {
+				try {
+					Controller.selectionChangedDifferencesTree();
+				} catch (IOException e2) {
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
+					e2.printStackTrace();
+				}
+			}
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.KeyAdapter#keyTyped(java.awt.event.KeyEvent)
+			 */
+			@Override
+			public void keyTyped(KeyEvent e) {
+				try {
+					Controller.selectionChangedDifferencesTree();
+				} catch (IOException e3) {
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
+					e3.printStackTrace();
+				}
+			}
+		});
+		treeDifferencesDivision.addMouseListener(new MouseAdapter() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+			 */
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				try {
+					Controller.selectionChangedDifferencesTree();
+				} catch (IOException e) {
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
+					e.printStackTrace();
+				}
+			}
+		});
 		scrollPaneDifferencesDivision.setViewportView(treeDifferencesDivision);
 		
 		JSplitPane splitPaneResolution = new JSplitPane();

@@ -102,10 +102,6 @@ public class Controller {
 	private static String highlightedNodeNameB = null;
 	/** The report result. **/
 	private static ReportResult reportResult = null;
-	/** The update table flag. Recursively used for updating the table. **/
-	private static boolean updateTableFlag = false;
-	/** The global update table flag. When set to true the table will be updated when the selection of the tree changed. **/
-	private static boolean globalTableUpdateFlag = true;
 	/** The properties array list. **/
 	private static ArrayList<String> propertyList;
 	/** The wait cursor. **/
@@ -120,7 +116,7 @@ public class Controller {
 	 * ##########################################################################################################################################################################
 	 * ##########################################################################################################################################################################
 	 * ##                                                                                                                                                                      ##
-	 * ## General0     .                                                                                                                                                       ##
+	 * ## General.                                                                                                                                                             ##
 	 * ##                                                                                                                                                                      ##
 	 * ##########################################################################################################################################################################
 	 * ##########################################################################################################################################################################
@@ -528,18 +524,25 @@ public class Controller {
 			}
 			
 			// Set the column headers
+			ApplicationUI.getTableModelResolutionTriples().removeAllElements();
 			ApplicationUI.getTableResolutionTriples().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
 			ApplicationUI.getTableResolutionTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
 			ApplicationUI.getTableResolutionTriples().updateUI();
 			
+			ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals().removeAllElements();
 			ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Individuals of " + branchNameA);
 			ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getTableHeader().getColumnModel().getColumn(1).setHeaderValue("Individuals of " + branchNameB);
 			ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
 			
+			ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().removeAllElements();
 			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
 			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
 			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
 			
+			ApplicationUI.getTableModelResolutionHighLevelChanges().removeAllElements();
+			ApplicationUI.getTableResolutionHighLevelChanges().updateUI();
+			
+			ReportDialog.getTableModel().removeAllElements();
 			ReportDialog.getTable().getTableHeader().getColumnModel().getColumn(3).setHeaderValue("State " + branchNameA + " (Revision)");
 			ReportDialog.getTable().getTableHeader().getColumnModel().getColumn(4).setHeaderValue("State " + branchNameB + " (Revision)");
 			ReportDialog.getTable().updateUI();
@@ -756,51 +759,76 @@ public class Controller {
 		ApplicationUI.getTreeDifferencesDivision().updateUI();		
 	}
 
-
+	
 	/**
 	 * Selection of differences tree was changed.
 	 * 
 	 * @throws IOException 
 	 */
 	public static void selectionChangedDifferencesTree() throws IOException {
-		if (globalTableUpdateFlag) {
-			// Set the update flag
-			updateTableFlag = true;
-			
-			// Hash map which stores all selected tree node objects and the corresponding tree paths
-			HashMap<TreeNodeObject, TreePath> map = new HashMap<TreeNodeObject, TreePath>();
-			
-			// Get the selected nodes
-			TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
-			if (treePaths != null) {
-				for (TreePath treePath : treePaths) {
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
-					if (node.isLeaf()) {
-						TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
-						map.put(treeNodeObject, treePath);
-					} else {
-						// Select the sub nodes
-						for (int i = 0; i < node.getChildCount(); i++) {
-							DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
-							ApplicationUI.getTreeDifferencesDivision().addSelectionPath(new TreePath(child.getPath()));
-						}
-						// Remove selection of parent node
-						ApplicationUI.getTreeDifferencesDivision().removeSelectionPath(new TreePath(node.getPath()));
-						// Set the update flag
-						updateTableFlag = false;
-					}
+		// Select sub nodes
+		// Get the selected nodes
+		TreePath[] treePaths = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
+		if (treePaths != null) {
+			for (TreePath treePath : treePaths) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+				if (!node.isLeaf()) {
+					selectSubNodes(node);
 				}
 			}
-			
-			if (updateTableFlag) {
-				// Update the triple table
-				updateTableResolutionTriples(map);
-				ApplicationUI.getTableResolutionTriples().clearSelection();
-				tableResolutionTriplesSelectionChanged();
+		}
+		// Show leafs in table
+		// Hash map which stores all selected tree node objects and the corresponding tree paths
+		HashMap<TreeNodeObject, TreePath> map = new HashMap<TreeNodeObject, TreePath>();
+		
+		// Get the selected nodes
+		TreePath[] treePaths1 = ApplicationUI.getTreeDifferencesDivision().getSelectionPaths();
+		if (treePaths1 != null) {
+			for (TreePath treePath : treePaths1) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+				if (node.isLeaf()) {
+					TreeNodeObject treeNodeObject = (TreeNodeObject) node.getUserObject();
+					map.put(treeNodeObject, treePath);
+				}
 			}
+		}
+		// Update the triple table
+		updateTableResolutionTriples(map);
+		ApplicationUI.getTableResolutionTriples().clearSelection();
+		tableResolutionTriplesSelectionChanged();
+	}
+	
+	
+	/**
+	 * Selects recursively all sub nodes of current node.
+	 * 
+	 * @param node the start node
+	 */
+	public static void selectSubNodes(DefaultMutableTreeNode node) {
+		for (int i = 0; i < node.getChildCount(); i++) {
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+			ApplicationUI.getTreeDifferencesDivision().addSelectionPath(new TreePath(child.getPath()));
+			selectSubNodes(child);
+			ApplicationUI.getTreeDifferencesDivision().updateUI();
 		}
 	}
 	
+	
+	/**
+	 * Remove the node selection by tree path. Updates parent nodes.
+	 * 
+	 * @param treePath the tree path
+	 */
+	public static void removeNodeSelection(TreePath treePath) {
+		ApplicationUI.getTreeDifferencesDivision().removeSelectionPath(treePath);
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) treePath.getLastPathComponent();
+		if (node.getParent() != null) {
+			DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
+			TreePath parentTreePath = new TreePath(parentNode.getPath());
+			removeNodeSelection(parentTreePath);
+		}
+	}
+		
 	
 	/**
 	 * ##########################################################################################################################################################################
@@ -831,7 +859,7 @@ public class Controller {
 			if (nodeObject.getObject() != null) {
 				if (nodeObject.getObject().getClass().equals(DifferenceGroup.class)) {
 					// Difference group found
-					// Currently do nothing
+					// Currently do nothing					
 				} else if (nodeObject.getObject().getClass().equals(Difference.class)) {
 					// Difference found
 					Difference difference = (Difference) nodeObject.getObject();
@@ -858,8 +886,6 @@ public class Controller {
 		// Sort the array
 		Arrays.sort(selectedRows);
 		
-		TreePath [] treePaths = new TreePath[selectedRows.length];
-		
 		for (int i = selectedRows.length - 1; i >= 0; i--) {
 			int selectedRow = ApplicationUI.getTableResolutionTriples().convertRowIndexToModel(selectedRows[i]);
 			ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().setResolutionState(ResolutionState.RESOLVED);
@@ -874,23 +900,22 @@ public class Controller {
 					
 			// Remove selection of the approved row in the tree
 			TableEntry entry = ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow);
-			treePaths[i] = entry.getTreePath();
-
+			removeNodeSelection(entry.getTreePath());
+			
 			// Remove the approved row
 			ApplicationUI.getTableModelResolutionTriples().removeRow(selectedRow);
 		}
 		ApplicationUI.getTableResolutionTriples().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().clearSelection();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
+		ApplicationUI.getTableResolutionHighLevelChanges().updateUI();
 		
 		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
 		
-		// Update the tree selection
-		globalTableUpdateFlag = false;
-		ApplicationUI.getTreeDifferencesDivision().removeSelectionPaths(treePaths);
-		globalTableUpdateFlag = true;
-		
 		ApplicationUI.getTreeDifferencesDivision().updateUI();
 	}
-	
+
 	
 	/**
 	 * The table resolution triples selection changed.
@@ -1010,35 +1035,70 @@ public class Controller {
 		// Clear the table model
 		tableModel.removeAllElements();
 		
-		// Get the currently selected table entry	
-		TableEntrySemanticEnrichmentAllIndividuals currentTableEntry = ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals().getTableEntry(ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getSelectedRow());
-		String currentIndividualUriA = currentTableEntry.getIndividualStructureA().getIndividualUri();
-		String currentIndividualUriB = currentTableEntry.getIndividualStructureB().getIndividualUri();
+		if (ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getSelectedRow() != -1) {
 		
-		// Triple key set lists of both branches
-		ArrayList<String> keySetTriplesBranchA = new ArrayList<String>();
-		ArrayList<String> keySetTriplesBranchB = new ArrayList<String>();
-
-		String individualUri = null;
-		if (currentIndividualUriA != null) {
-			individualUri = currentIndividualUriA;
-			keySetTriplesBranchA = new ArrayList<String>(individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().keySet());
-			if (currentIndividualUriB != null) {
+			// Get the currently selected table entry	
+			TableEntrySemanticEnrichmentAllIndividuals currentTableEntry = ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals().getTableEntry(ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getSelectedRow());
+			String currentIndividualUriA = currentTableEntry.getIndividualStructureA().getIndividualUri();
+			String currentIndividualUriB = currentTableEntry.getIndividualStructureB().getIndividualUri();
+			
+			// Triple key set lists of both branches
+			ArrayList<String> keySetTriplesBranchA = new ArrayList<String>();
+			ArrayList<String> keySetTriplesBranchB = new ArrayList<String>();
+	
+			String individualUri = null;
+			if (currentIndividualUriA != null) {
+				individualUri = currentIndividualUriA;
+				keySetTriplesBranchA = new ArrayList<String>(individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().keySet());
+				if (currentIndividualUriB != null) {
+					keySetTriplesBranchB = new ArrayList<String>(individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().keySet());
+				}
+			} else {
+				individualUri = currentIndividualUriB;
 				keySetTriplesBranchB = new ArrayList<String>(individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().keySet());
 			}
-		} else {
-			individualUri = currentIndividualUriB;
-			keySetTriplesBranchB = new ArrayList<String>(individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().keySet());
-		}
-		
-		// Iterate over all triples of branch A
-		@SuppressWarnings("unchecked")
-		Iterator<String> iteKeySetTriplesBranchA = ((ArrayList<String>) keySetTriplesBranchA.clone()).iterator();
-		while (iteKeySetTriplesBranchA.hasNext()) {
-			String currentKeyBranchA = iteKeySetTriplesBranchA.next();
 			
-			// Add all triples to table model which are in both branches
-			if (keySetTriplesBranchB.contains(currentKeyBranchA)) {
+			// Iterate over all triples of branch A
+			@SuppressWarnings("unchecked")
+			Iterator<String> iteKeySetTriplesBranchA = ((ArrayList<String>) keySetTriplesBranchA.clone()).iterator();
+			while (iteKeySetTriplesBranchA.hasNext()) {
+				String currentKeyBranchA = iteKeySetTriplesBranchA.next();
+				
+				// Add all triples to table model which are in both branches
+				if (keySetTriplesBranchB.contains(currentKeyBranchA)) {
+					TripleIndividualStructure currentTriple = individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchA);
+					Difference difference = currentTriple.getDifference();
+					if (difference != null) {
+						DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
+						SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
+						TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(
+																						difference,
+																						semanticDefinitionResult.getSemanticDescription(),
+																						semanticDefinitionResult.getSemanticResolutionOptions(),
+																						semanticDefinitionResult.getSelectedSemanticResolutionOption(),
+																						Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
+						tableModel.addRow(tableEntry);
+						// Remove key from branch A key set copy
+						keySetTriplesBranchA.remove(currentKeyBranchA);
+						// Remove key from branch B key set copy
+						keySetTriplesBranchB.remove(currentKeyBranchA);
+					} else {
+						// No difference is specified for current triple
+						TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
+																						Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
+						tableModel.addRow(tableEntry);
+						// Remove key from branch A key set copy
+						keySetTriplesBranchA.remove(currentKeyBranchA);
+						// Remove key from branch B key set copy
+						keySetTriplesBranchB.remove(currentKeyBranchA);
+					}
+				}
+			}
+			
+			// Iterate over all triples of branch A (will only contain the triples which are not in B)
+			Iterator<String> iteKeySetTriplesBranchAOnly = keySetTriplesBranchA.iterator();
+			while (iteKeySetTriplesBranchAOnly.hasNext()) {
+				String currentKeyBranchA = iteKeySetTriplesBranchAOnly.next();
 				TripleIndividualStructure currentTriple = individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchA);
 				Difference difference = currentTriple.getDifference();
 				if (difference != null) {
@@ -1051,73 +1111,41 @@ public class Controller {
 																					semanticDefinitionResult.getSelectedSemanticResolutionOption(),
 																					Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
 					tableModel.addRow(tableEntry);
-					// Remove key from branch A key set copy
-					keySetTriplesBranchA.remove(currentKeyBranchA);
-					// Remove key from branch B key set copy
-					keySetTriplesBranchB.remove(currentKeyBranchA);
 				} else {
 					// No difference is specified for current triple
 					TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
 																					Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
 					tableModel.addRow(tableEntry);
-					// Remove key from branch A key set copy
-					keySetTriplesBranchA.remove(currentKeyBranchA);
-					// Remove key from branch B key set copy
-					keySetTriplesBranchB.remove(currentKeyBranchA);
 				}
 			}
-		}
-		
-		// Iterate over all triples of branch A (will only contain the triples which are not in B)
-		Iterator<String> iteKeySetTriplesBranchAOnly = keySetTriplesBranchA.iterator();
-		while (iteKeySetTriplesBranchAOnly.hasNext()) {
-			String currentKeyBranchA = iteKeySetTriplesBranchAOnly.next();
-			TripleIndividualStructure currentTriple = individualModelBranchA.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchA);
-			Difference difference = currentTriple.getDifference();
-			if (difference != null) {
-				DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
-				SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
-				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(
-																				difference,
-																				semanticDefinitionResult.getSemanticDescription(),
-																				semanticDefinitionResult.getSemanticResolutionOptions(),
-																				semanticDefinitionResult.getSelectedSemanticResolutionOption(),
-																				Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
-				tableModel.addRow(tableEntry);
-			} else {
-				// No difference is specified for current triple
-				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
-																				Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
-				tableModel.addRow(tableEntry);
+			
+			// Iterate over all triples of branch B (will only contain the triples which are not in A)
+			Iterator<String> iteKeySetTriplesBranchBOnly = keySetTriplesBranchB.iterator();
+			while (iteKeySetTriplesBranchBOnly.hasNext()) {
+				String currentKeyBranchB = iteKeySetTriplesBranchBOnly.next();
+				TripleIndividualStructure currentTriple = individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchB);
+				Difference difference = currentTriple.getDifference();
+				if (difference != null) {
+					DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
+					SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
+					TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(
+																					difference,
+																					semanticDefinitionResult.getSemanticDescription(),
+																					semanticDefinitionResult.getSemanticResolutionOptions(),
+																					semanticDefinitionResult.getSelectedSemanticResolutionOption(),
+																					Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
+					tableModel.addRow(tableEntry);
+				} else {
+					// No difference is specified for current triple
+					TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
+																					Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
+					tableModel.addRow(tableEntry);
+				}
 			}
+	
+			// Clear selection
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getSelectionModel().clearSelection();
 		}
-		
-		// Iterate over all triples of branch B (will only contain the triples which are not in A)
-		Iterator<String> iteKeySetTriplesBranchBOnly = keySetTriplesBranchB.iterator();
-		while (iteKeySetTriplesBranchBOnly.hasNext()) {
-			String currentKeyBranchB = iteKeySetTriplesBranchBOnly.next();
-			TripleIndividualStructure currentTriple = individualModelBranchB.getIndividualStructures().get(individualUri).getTriples().get(currentKeyBranchB);
-			Difference difference = currentTriple.getDifference();
-			if (difference != null) {
-				DifferenceGroup differenceGroup = Management.getDifferenceGroupOfDifference(difference, differenceModel);
-				SemanticDefinitionResult semanticDefinitionResult = SemanticDefinitions.getSemanticDefinitionResult(difference, differenceGroup);
-				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(
-																				difference,
-																				semanticDefinitionResult.getSemanticDescription(),
-																				semanticDefinitionResult.getSemanticResolutionOptions(),
-																				semanticDefinitionResult.getSelectedSemanticResolutionOption(),
-																				Management.createRowDataSemanticEnrichmentIndividualTriples(difference, differenceGroup, semanticDefinitionResult.getSemanticDescription()));
-				tableModel.addRow(tableEntry);
-			} else {
-				// No difference is specified for current triple
-				TableEntrySemanticEnrichmentIndividualTriples tableEntry = new TableEntrySemanticEnrichmentIndividualTriples(null, "", new ArrayList<String>(), -1, 
-																				Management.createRowDataSemanticEnrichmentIndividualTriplesWithoutDifference(currentTriple.getTriple()));
-				tableModel.addRow(tableEntry);
-			}
-		}
-
-		// Clear selection
-		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getSelectionModel().clearSelection();
 		
 		// Update triples table
 		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
@@ -1184,7 +1212,10 @@ public class Controller {
 				difference.setTripleResolutionState(SDDTripleStateEnum.DELETED);
 			}
 		}
+		ApplicationUI.getTableResolutionTriples().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
 		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
+		ApplicationUI.getTableResolutionHighLevelChanges().updateUI();
 		
 		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());
 		
@@ -1301,6 +1332,10 @@ public class Controller {
 				differenceDel.setTripleResolutionState(SDDTripleStateEnum.ADDED);
 			}
 		}
+		ApplicationUI.getTableResolutionTriples().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().clearSelection();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().updateUI();
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().updateUI();
 		ApplicationUI.getTableResolutionHighLevelChanges().updateUI();
 		
 		Management.refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) ApplicationUI.getTreeModelDifferencesDivision().getRoot());

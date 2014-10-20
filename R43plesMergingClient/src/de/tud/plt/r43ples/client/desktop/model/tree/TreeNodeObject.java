@@ -17,7 +17,7 @@ public class TreeNodeObject {
 	private ResolutionState resolutionState;
 	/** The object which stores all information. **/
 	private Object object;
-	
+	private boolean selected = false;
 	
 	/**
 	 * The constructor.
@@ -100,6 +100,22 @@ public class TreeNodeObject {
 	 */
 	public void setObject(Object object) {
 		this.object = object;
+	}
+
+
+	/**
+	 * @return the selected
+	 */
+	public boolean isSelected() {
+		return selected;
+	}
+
+
+	/**
+	 * @param selected the selected to set
+	 */
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 	
 }
