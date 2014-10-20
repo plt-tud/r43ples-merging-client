@@ -6,6 +6,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -78,7 +80,7 @@ public class TripleStoreInterface {
 	
 	
 	/**
-	 * Executes a SPARQL-query against the triple store without authorization.
+	 * Executes a SPARQL-query against the triple store without authorization using HTTP-GET.
 	 * 
 	 * @param query the SPARQL query
 	 * @param format the format of the result (e.g. HTML, xml/rdf, JSON, ...)
@@ -107,6 +109,53 @@ public class TripleStoreInterface {
 
 		// Return the response
 		return new HttpResponse(http.getResponseCode(), http.getHeaderFields(), body);
+	}
+	
+	
+	/**
+	 * Executes a SPARQL-query against the triple store without authorization using HTTP-POST.
+	 * 
+	 * @param query the SPARQL query
+	 * @param format the format of the result (e.g. HTML, xml/rdf, JSON, ...)
+	 * @return the response
+	 * @throws IOException 
+	 */
+	public static HttpResponse executeQueryWithoutAuthorizationPostResponse(String query, String format) throws IOException {
+		URL url = new URL(endpoint + "/r43ples/sparql");
+		Map<String,Object> params = new LinkedHashMap<>();
+		params.put("query", query);
+		params.put("format", format);
+		params.put("timeout", 0);
+				
+		StringBuilder postData = new StringBuilder();
+		for (Map.Entry<String,Object> param : params.entrySet()) {
+			if (postData.length() != 0) postData.append('&');
+			postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+			postData.append('=');
+			postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+			}
+		byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+		logger.debug(postData.toString());
+		HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+		conn.setRequestMethod("POST");
+		conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+		conn.setDoOutput(true);
+		conn.getOutputStream().write(postDataBytes);
+		
+		InputStream in;
+		if (conn.getResponseCode() >= 400) {
+			in = conn.getErrorStream();
+		} else {
+			in = conn.getInputStream();
+		}
+
+		String encoding = conn.getContentEncoding();
+		encoding = (encoding == null) ? "UTF-8" : encoding;
+		String body = IOUtils.toString(in, encoding);
+
+		// Return the response
+		return new HttpResponse(conn.getResponseCode(), conn.getHeaderFields(), body);
 	}
 	
 }

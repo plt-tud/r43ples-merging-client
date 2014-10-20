@@ -142,16 +142,16 @@ public class Management {
 
 		if (type.equals(MergeQueryTypeEnum.COMMON)) {
 			String query = String.format(queryTemplateCommon, user, commitMessage, graphName, sdd, branchNameA, branchNameB);
-			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+			return TripleStoreInterface.executeQueryWithoutAuthorizationPostResponse(query, "HTML");
 		} else if (type.equals(MergeQueryTypeEnum.WITH)) {
 			String query = String.format(queryTemplateWith, user, commitMessage, graphName, sdd, branchNameA, branchNameB, triples);
-			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+			return TripleStoreInterface.executeQueryWithoutAuthorizationPostResponse(query, "HTML");
 		} else if (type.equals(MergeQueryTypeEnum.AUTO)) {
 			String query = String.format(queryTemplateAuto, user, commitMessage, graphName, sdd, branchNameA, branchNameB);
-			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+			return TripleStoreInterface.executeQueryWithoutAuthorizationPostResponse(query, "HTML");
 		} else if (type.equals(MergeQueryTypeEnum.MANUAL)) {
 			String query = String.format(queryTemplateManual, user, commitMessage, graphName, sdd, branchNameA, branchNameB, triples);
-			return TripleStoreInterface.executeQueryWithoutAuthorizationGetResponse(query, "HTML");
+			return TripleStoreInterface.executeQueryWithoutAuthorizationPostResponse(query, "HTML");
 		}
 		
 		return null;
