@@ -19,9 +19,7 @@ public class TableEntryHighLevelChanges {
 	/**
 	 * The constructor.
 	 * 
-	 * @param difference the difference
-	 * @param nodeObject the node object
-	 * @param treePath the tree path
+	 * @param highLevelChangeRenaming the high level change (renaming)
 	 * @param rowData the row data
 	 */
 	public TableEntryHighLevelChanges(HighLevelChangeRenaming highLevelChangeRenaming, Object[] rowData) {

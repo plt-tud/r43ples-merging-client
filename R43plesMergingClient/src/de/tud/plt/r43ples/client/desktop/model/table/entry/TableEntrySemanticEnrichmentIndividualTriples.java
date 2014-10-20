@@ -30,7 +30,6 @@ public class TableEntrySemanticEnrichmentIndividualTriples {
 	 * @param difference the difference
 	 * @param semanticDescription the semantic description
 	 * @param semanticResolutionOptions the semantic resolution options
-	 * @param defaultSemanticResolutionOption the default semantic resolution option
 	 * @param selectedSemanticResolutionOption the selected semantic resolution option
 	 * @param rowData the row data
 	 */
