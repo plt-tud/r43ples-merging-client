@@ -592,7 +592,12 @@ public class Controller {
 				// Enable the push button
 				ApplicationUI.getBtnPush().setEnabled(true);
 				
+				
+				// Close dialog after execution and update UI
+				initializeCompleteUI(graphName);
+				StartMergingDialog.dialog.setVisible(false);
 				StartMergingDialog.dialog.setCursor(defaultCursor);
+				
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query produced conflicts. Please resolve conflicts manually.", "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else if (response.getStatusCode() == HttpURLConnection.HTTP_CREATED) {
 				// There was no conflict merged revision was created
@@ -613,7 +618,11 @@ public class Controller {
 				// Get the revision number
 				String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
 				
+				// Close dialog after execution and update UI
+				initializeCompleteUI(graphName);
+				StartMergingDialog.dialog.setVisible(false);
 				StartMergingDialog.dialog.setCursor(defaultCursor);
+				
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query successfully executed. Revision number of merged revision: " + newRevisionNumber, "Info", JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				// Error occurred
@@ -631,66 +640,78 @@ public class Controller {
 				ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
 				ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
 				
+				// Close dialog after execution and update UI
+				initializeCompleteUI(graphName);
+				StartMergingDialog.dialog.setVisible(false);
 				StartMergingDialog.dialog.setCursor(defaultCursor);
+				
 				JOptionPane.showMessageDialog(ApplicationUI.frmRplesMergingClient, "Merge query could not be executed. Undefined error occurred", "Error", JOptionPane.ERROR_MESSAGE);
 			}
-			
-			// Close dialog after execution and update UI
-			StartMergingDialog.dialog.setVisible(false);
-			ApplicationUI.frmRplesMergingClient.setCursor(waitCursor);
-			// Set the cell renderer
-			TableCellRendererResolutionTriples renderer = new TableCellRendererResolutionTriples();
-			for (int i = 0; i < ApplicationUI.getTableModelResolutionTriples().getColumnCount() - 1; i++) {
-				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
-			}
-			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCellCheckBoxRendererResolutionTriples());
-			
-			TableCellRendererSemanticEnrichmentAllIndividuals rendererSemanticIndividuals = new TableCellRendererSemanticEnrichmentAllIndividuals();
-			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals().getColumnCount(); i++) {
-				ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticIndividuals);
-			}
-			
-			TableCellRendererSemanticEnrichmentIndividualTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentIndividualTriples();
-			for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getColumnCount() - 1; i++) {
-				ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
-			}
-			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentIndividualTriples());
-			
-			TableCellRendererResolutionHighLevelChanges rendererHighLevelChanges = new TableCellRendererResolutionHighLevelChanges();
-			for (int i = 0; i < ApplicationUI.getTableModelResolutionHighLevelChanges().getColumnCount() - 1; i++) {
-				ApplicationUI.getTableResolutionHighLevelChanges().getColumnModel().getColumn(i).setCellRenderer(rendererHighLevelChanges);
-			}
-			ApplicationUI.getTableResolutionHighLevelChanges().getColumnModel().getColumn(4).setCellRenderer(new TableCellCheckBoxRendererResolutionHighLevelChanges());
-			
-			TableCellRendererFilter rendererFilter = new TableCellRendererFilter();
-			ApplicationUI.getTableFilter().getColumnModel().getColumn(0).setCellRenderer(rendererFilter);
-			
-			// Set the cell editor
-			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(7).setCellEditor(new CustomComboBoxEditor());
-		
-			// Update filter table
-			updateTableModelFilter();
-			
-			// Update application UI
-			updateDifferencesTree();
-			
-			// Create the revision graph
-			createGraph(graphName);
-			
-			/** The semantic definitions **/
-			new SemanticDefinitions();
-			
-			// Update the semantic enrichment
-			updateTableModelSemanticEnrichmentAllIndividuals();
-			
-			// Update the high level change table
-			updateTableModelHighLevelChanges();
-			
-			ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
 		}
 	}
 	
 	
+	/**
+	 * Initializes the complete UI after creation of a new merge prozess.
+	 * 
+	 * @param graphName the graph name
+	 * @throws IOException 
+	 * @throws HttpException 
+	 */
+	private static void initializeCompleteUI(String graphName) throws HttpException, IOException {
+		ApplicationUI.frmRplesMergingClient.setCursor(waitCursor);
+		// Set the cell renderer
+		TableCellRendererResolutionTriples renderer = new TableCellRendererResolutionTriples();
+		for (int i = 0; i < ApplicationUI.getTableModelResolutionTriples().getColumnCount() - 1; i++) {
+			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
+		}
+		ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCellCheckBoxRendererResolutionTriples());
+		
+		TableCellRendererSemanticEnrichmentAllIndividuals rendererSemanticIndividuals = new TableCellRendererSemanticEnrichmentAllIndividuals();
+		for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals().getColumnCount(); i++) {
+			ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticIndividuals);
+		}
+		
+		TableCellRendererSemanticEnrichmentIndividualTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentIndividualTriples();
+		for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getColumnCount() - 1; i++) {
+			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
+		}
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentIndividualTriples());
+		
+		TableCellRendererResolutionHighLevelChanges rendererHighLevelChanges = new TableCellRendererResolutionHighLevelChanges();
+		for (int i = 0; i < ApplicationUI.getTableModelResolutionHighLevelChanges().getColumnCount() - 1; i++) {
+			ApplicationUI.getTableResolutionHighLevelChanges().getColumnModel().getColumn(i).setCellRenderer(rendererHighLevelChanges);
+		}
+		ApplicationUI.getTableResolutionHighLevelChanges().getColumnModel().getColumn(4).setCellRenderer(new TableCellCheckBoxRendererResolutionHighLevelChanges());
+		
+		TableCellRendererFilter rendererFilter = new TableCellRendererFilter();
+		ApplicationUI.getTableFilter().getColumnModel().getColumn(0).setCellRenderer(rendererFilter);
+		
+		// Set the cell editor
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(7).setCellEditor(new CustomComboBoxEditor());
+	
+		// Update filter table
+		updateTableModelFilter();
+		
+		// Update application UI
+		updateDifferencesTree();
+		
+		// Create the revision graph
+		createGraph(graphName);
+		
+		/** The semantic definitions **/
+		new SemanticDefinitions();
+		
+		// Update the semantic enrichment
+		updateTableModelSemanticEnrichmentAllIndividuals();
+		
+		// Update the high level change table
+		updateTableModelHighLevelChanges();
+		
+		ApplicationUI.frmRplesMergingClient.setCursor(defaultCursor);
+	}
+	
+
 	/**
 	 * ##########################################################################################################################################################################
 	 * ##########################################################################################################################################################################
