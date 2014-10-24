@@ -291,6 +291,7 @@ public class Controller {
 	public static void showConfigurationDialog() {
 		// Update the remote text fields
 		ConfigurationDialog.getTfR43plesSparqlEndpoint().setText(Config.r43ples_sparql_endpoint);
+		ConfigurationDialog.getTfR43plesJsonRevisedGraphs().setText(Config.r43ples_json_revisedgraphs);
 		ConfigurationDialog.getTfR43plesRevisionGraph().setText(Config.r43ples_revision_graph);
 		ConfigurationDialog.getTfR43plesSddGraph().setText(Config.r43ples_sdd_graph);		
 		// Update the local table
@@ -337,6 +338,7 @@ public class Controller {
 	public static void writeConfigurationToFile() throws ConfigurationException {
 		// Store the current configuration properties
 		Config.r43ples_sparql_endpoint = ConfigurationDialog.getTfR43plesSparqlEndpoint().getText();
+		Config.r43ples_json_revisedgraphs = ConfigurationDialog.getTfR43plesJsonRevisedGraphs().getText();
 		Config.r43ples_revision_graph = ConfigurationDialog.getTfR43plesRevisionGraph().getText();
 		Config.r43ples_sdd_graph = ConfigurationDialog.getTfR43plesSddGraph().getText();
 		// Convert table model to hash map

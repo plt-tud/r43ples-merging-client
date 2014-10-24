@@ -39,6 +39,8 @@ public class ConfigurationDialog {
 	private final JPanel contentPanel = new JPanel();
 	/** The R43ples SPARQL endpoint text field. **/
 	private static JTextField tfR43plesSparqlEndpoint;
+	/** The R43ples JSON HTTP-GET interface to get all revised graphs text field. **/
+	private static JTextField tfR43plesJsonRevisedGraphs;
 	/** The R43ples revision graph text field. **/
 	private static JTextField tfR43plesRevisionGraph;
 	/** The R43ples SDD graph text field. **/
@@ -64,7 +66,7 @@ public class ConfigurationDialog {
 		dialog = new JDialog();
 		dialog.setTitle("Properties configuration");
 		dialog.setResizable(false);
-		dialog.setBounds(100, 100, 521, 551);
+		dialog.setBounds(100, 100, 521, 607);
 		dialog.getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -72,7 +74,7 @@ public class ConfigurationDialog {
 		
 		JPanel panelRemote = new JPanel();
 		panelRemote.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Remote", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelRemote.setBounds(10, 11, 494, 170);
+		panelRemote.setBounds(10, 11, 494, 224);
 		contentPanel.add(panelRemote);
 		panelRemote.setLayout(null);
 		
@@ -85,27 +87,36 @@ public class ConfigurationDialog {
 		panelRemote.add(tfR43plesSparqlEndpoint);
 		tfR43plesSparqlEndpoint.setColumns(10);
 		
+		JLabel lblR43plesJsonRevisedGraphs = new JLabel("R43ples JSON HTTP-GET interface to get all revised graphs");
+		lblR43plesJsonRevisedGraphs.setBounds(10, 71, 474, 14);
+		panelRemote.add(lblR43plesJsonRevisedGraphs);		
+		
+		tfR43plesJsonRevisedGraphs = new JTextField();
+		tfR43plesJsonRevisedGraphs.setColumns(10);
+		tfR43plesJsonRevisedGraphs.setBounds(10, 89, 474, 20);
+		panelRemote.add(tfR43plesJsonRevisedGraphs);
+
 		JLabel lblR43plesRevisionGraph = new JLabel("R43ples revision graph");
-		lblR43plesRevisionGraph.setBounds(10, 71, 474, 14);
+		lblR43plesRevisionGraph.setBounds(10, 120, 474, 14);
 		panelRemote.add(lblR43plesRevisionGraph);
 		
 		tfR43plesRevisionGraph = new JTextField();
 		tfR43plesRevisionGraph.setColumns(10);
-		tfR43plesRevisionGraph.setBounds(10, 89, 474, 20);
+		tfR43plesRevisionGraph.setBounds(10, 138, 474, 20);
 		panelRemote.add(tfR43plesRevisionGraph);
 		
 		JLabel lblR43plesSddGraph = new JLabel("R43ples SDD graph");
-		lblR43plesSddGraph.setBounds(10, 120, 474, 14);
+		lblR43plesSddGraph.setBounds(10, 169, 474, 14);
 		panelRemote.add(lblR43plesSddGraph);
 		
 		tfR43plesSddGraph = new JTextField();
 		tfR43plesSddGraph.setColumns(10);
-		tfR43plesSddGraph.setBounds(10, 138, 474, 20);
+		tfR43plesSddGraph.setBounds(10, 187, 474, 20);
 		panelRemote.add(tfR43plesSddGraph);
 		
 		JPanel panelLocal = new JPanel();
 		panelLocal.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0)), "Local", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panelLocal.setBounds(10, 192, 494, 288);
+		panelLocal.setBounds(10, 246, 494, 288);
 		contentPanel.add(panelLocal);
 		panelLocal.setLayout(null);
 		
@@ -211,6 +222,26 @@ public class ConfigurationDialog {
 
 
 	/**
+	 * Get the R43ples JSON HTTP-GET interface to get all revised graphs text field.
+	 * 
+	 * @return the R43ples JSON HTTP-GET interface to get all revised graphs text field
+	 */
+	public static JTextField getTfR43plesJsonRevisedGraphs() {
+		return tfR43plesJsonRevisedGraphs;
+	}
+
+
+	/**
+	 * Set the R43ples JSON HTTP-GET interface to get all revised graphs text field.
+	 * 
+	 * @param tfR43plesJsonRevisedGraphs the R43ples JSON HTTP-GET interface to get all revised graphs text field to set
+	 */
+	public static void setTfR43plesJsonRevisedGraphs(JTextField tfR43plesJsonRevisedGraphs) {
+		ConfigurationDialog.tfR43plesJsonRevisedGraphs = tfR43plesJsonRevisedGraphs;
+	}
+
+
+	/**
 	 * Get the R43ples revision graph text field.
 	 * 
 	 * @return the R43ples revision graph text field
@@ -288,5 +319,4 @@ public class ConfigurationDialog {
 	public static void setTableModelPrefixMappings(DefaultTableModel tableModelPrefixMappings) {
 		ConfigurationDialog.tableModelPrefixMappings = tableModelPrefixMappings;
 	}
-	
 }

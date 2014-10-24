@@ -897,7 +897,7 @@ public class Management {
 		ArrayList<String> list = new ArrayList<String>();
 		
 		// Get the revised graphs (result format is JSON)
-		String revisedGraphs = TripleStoreInterface.executeHttpGet("/r43ples/getRevisedGraphs");
+		String revisedGraphs = TripleStoreInterface.executeHttpGet(Config.r43ples_json_revisedgraphs);
 		logger.debug(revisedGraphs);
 		
 		JsonParser parser = new JsonParser();

@@ -39,7 +39,7 @@ public class TripleStoreInterface {
 	public static String executeQueryWithoutAuthorization(String query, String format) throws IOException {
 		URL url = null;
 		
-		url = new URL(endpoint + "/r43ples/sparql?query=" + URLEncoder.encode(query, "UTF-8") + "&format=" + URLEncoder.encode(format, "UTF-8") + "&timeout=0");
+		url = new URL(endpoint + "?query=" + URLEncoder.encode(query, "UTF-8") + "&format=" + URLEncoder.encode(format, "UTF-8") + "&timeout=0");
 		logger.debug(url.toString());
 
 		URLConnection con = null;
@@ -57,14 +57,14 @@ public class TripleStoreInterface {
 	/**
 	 * Executes a HTTP-GET.
 	 * 
-	 * @param path the path
+	 * @param urlString the URL
 	 * @return the result of the query
 	 * @throws IOException 
 	 */
-	public static String executeHttpGet(String path) throws IOException {
+	public static String executeHttpGet(String urlString) throws IOException {
 		URL url = null;
 		
-		url = new URL(endpoint + path);
+		url = new URL(urlString);
 		logger.debug(url.toString());
 
 		URLConnection con = null;
@@ -90,7 +90,7 @@ public class TripleStoreInterface {
 	public static HttpResponse executeQueryWithoutAuthorizationGetResponse(String query, String format) throws IOException {
 		URL url = null;
 		
-		url = new URL(endpoint + "/r43ples/sparql?query=" + URLEncoder.encode(query, "UTF-8") + "&format=" + URLEncoder.encode(format, "UTF-8") + "&timeout=0");
+		url = new URL(endpoint + "?query=" + URLEncoder.encode(query, "UTF-8") + "&format=" + URLEncoder.encode(format, "UTF-8") + "&timeout=0");
 		logger.debug(url.toString());
 
 
@@ -121,7 +121,7 @@ public class TripleStoreInterface {
 	 * @throws IOException 
 	 */
 	public static HttpResponse executeQueryWithoutAuthorizationPostResponse(String query, String format) throws IOException {
-		URL url = new URL(endpoint + "/r43ples/sparql");
+		URL url = new URL(endpoint);
 		Map<String,Object> params = new LinkedHashMap<>();
 		params.put("query", query);
 		params.put("format", format);

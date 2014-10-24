@@ -19,6 +19,8 @@ public class Config {
 	private static PropertiesConfiguration config;
 	/** The R43ples SPARQL endpoint. **/
 	public static String r43ples_sparql_endpoint;
+	/** The R43ples JSON HTTP-GET interface to get all revised graphs. **/
+	public static String r43ples_json_revisedgraphs;
 	/** The R43ples revision graph. **/
 	public static String r43ples_revision_graph;
 	/** The R43ples SDD graph. **/
@@ -36,6 +38,7 @@ public class Config {
 	public static void readConfig(final String configFilePath) throws ConfigurationException{
 		config = new PropertiesConfiguration(configFilePath);
 		r43ples_sparql_endpoint = config.getString("r43ples.sparql.endpoint");
+		r43ples_json_revisedgraphs = config.getString("r43ples.json.revisedgraphs");
 		r43ples_revision_graph = config.getString("r43ples.revision.graph");
 		r43ples_sdd_graph = config.getString("r43ples.sdd.graph");
 		String[] prefixMappingsArray = config.getStringArray("client.prefixmapping");
@@ -56,6 +59,10 @@ public class Config {
 	 * @throws ConfigurationException
 	 */
 	public static void writeConfig(final String configFilePath) throws ConfigurationException {
+		config.setProperty("r43ples.sparql.endpoint", r43ples_sparql_endpoint);
+		config.setProperty("r43ples.json.revisedgraphs", r43ples_json_revisedgraphs);
+		config.setProperty("r43ples.revision.graph", r43ples_revision_graph);
+		config.setProperty("r43ples.sdd.graph", r43ples_sdd_graph);
 		// Generate array of prefix mappings
 		String[] prefixMappingsArray = new String[prefixMappings.size()];
 		int index = 0;
