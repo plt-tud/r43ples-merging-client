@@ -5,11 +5,14 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
 
+import de.tud.plt.r43ples.client.desktop.control.ColorDefinitions;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
@@ -50,6 +53,14 @@ public class TableCellComboBoxRendererSemanticEnrichmentIndividualTriples extend
 		// Get the table entry
 		TableEntrySemanticEnrichmentIndividualTriples tableEntry =  tableModel.getTableEntry(row);
 		
+		if (!isSelected) {
+			setBackground(table.getBackground());
+			setForeground(table.getForeground());
+		} else {
+			setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			setForeground(Color.WHITE);
+		}
+		
 		// Check if difference exists
 		if (tableEntry.getDifference() != null) {
 			// Get the difference
@@ -63,20 +74,24 @@ public class TableCellComboBoxRendererSemanticEnrichmentIndividualTriples extend
 				if (((selectedOption == 1) && difference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED)) || 
 						(!(selectedOption == 1) && difference.getTripleResolutionState().equals(SDDTripleStateEnum.DELETED))) {
 					// Entry is resolved and approved
-					color = Color.GREEN;
+					color = ColorDefinitions.approvedRowColor;
 				} else {
 					// Entry resolution changed old is approved
-					color = Color.ORANGE;
+					color = ColorDefinitions.approvedButChangedRowColor;
 				}
 			} else {
 				DifferenceGroup differenceGroup = Controller.getDifferenceGroupOfDifference(difference);
 				if (((selectedOption == 1) && differenceGroup.getAutomaticResolutionState().equals(SDDTripleStateEnum.ADDED)) || 
 						(!(selectedOption == 1) && differenceGroup.getAutomaticResolutionState().equals(SDDTripleStateEnum.DELETED))) {
 					// Entry is not changed and not approved
-					color = table.getBackground();
+					if (differenceGroup.isConflicting()) {
+						color = ColorDefinitions.conflictingRowColor;
+					} else {
+						color = ColorDefinitions.nonConflictingRowColor;
+					}
 				} else {
 					// Entry is changed but not approved
-					color = Color.LIGHT_GRAY;
+					color = ColorDefinitions.notApprovedButChangedRowColor;
 				}
 			}
 			
@@ -84,7 +99,7 @@ public class TableCellComboBoxRendererSemanticEnrichmentIndividualTriples extend
 				setBackground(color);
 				setForeground(Color.BLACK);
 			} else {
-				setBackground(Color.BLACK);
+				setBackground(ColorDefinitions.backgroundColorSelectedRow);
 				setForeground(color);
 			}
 		}
@@ -107,6 +122,68 @@ public class TableCellComboBoxRendererSemanticEnrichmentIndividualTriples extend
 			}
 			comboBox.setSelectedIndex(tableEntry.getSelectedSemanticResolutionOption());
 		}
+		
+		// Border definitions
+		int top = 0;
+		int left = 0;
+		int bottom = 0;
+		int right = 0;
+		
+		// Set the border between conflicting differences and non conflicting differences
+		if (row > 0) {
+			if (!tableModel.getValueAt(row, 5).equals(tableModel.getValueAt(row - 1, 5))) {
+				// Create top border
+				top = 1;
+			}
+		}
+		if (row != tableModel.getRowCount() - 1) {
+			if (!tableModel.getValueAt(row, 5).equals(tableModel.getValueAt(row + 1, 5))) {
+				// Create bottom border
+				bottom = 1;
+			}
+		}
+		
+		// Set border right to object column
+		if (column == 2) {
+			right = 1;
+		}
+		if (column == 3) {
+			left = 1;
+		}
+		
+		// Set border right to conflicting column
+		if (column == 6) {
+			right = 1;
+		}
+		if (column == 7) {
+			left = 1;
+		}
+		
+		Border border = BorderFactory.createCompoundBorder();
+
+        border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.BLACK));
+        
+		// Set border
+		if (!isSelected) {
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.BLACK));
+		} else {
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.WHITE));
+			if (column == 0) {
+				left = 1;
+			} else { 
+				left = 0;
+			}
+			if (column == tableModel.getColumnCount() - 1) {
+				right = 1;
+			} else {
+				right = 0;
+			}
+			
+			top = 1;
+			bottom = 1;			
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, ColorDefinitions.borderColorSelectedRow));
+		}
+		setBorder(border);
 
 		return comboBox;
     }

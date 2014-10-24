@@ -8,6 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import de.tud.plt.r43ples.client.desktop.control.ColorDefinitions;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntrySemanticEnrichmentAllIndividuals;
@@ -43,11 +44,11 @@ public class TableCellRendererSemanticEnrichmentAllIndividuals extends DefaultTa
 		// Set the background color of the row
 		Color color = Color.BLACK;
 		if (resolutionState.equals(ResolutionState.RESOLVED)) {
-			color = Color.GREEN;
+			color = ColorDefinitions.approvedRowColor;
 		} else if (resolutionState.equals(ResolutionState.DIFFERENCE)) {
-			color = Color.ORANGE;
+			color = ColorDefinitions.nonConflictingRowColor;
 		} else if (resolutionState.equals(ResolutionState.CONFLICT)) {
-			color = Color.RED;
+			color = ColorDefinitions.conflictingRowColor;
 		} else {
 			color = table.getBackground();
 		}
@@ -56,7 +57,7 @@ public class TableCellRendererSemanticEnrichmentAllIndividuals extends DefaultTa
 			cellComponent.setBackground(color);
 			cellComponent.setForeground(Color.BLACK);
 		} else {
-			cellComponent.setBackground(Color.BLACK);
+			cellComponent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
 			cellComponent.setForeground(color);
 		}
 
@@ -66,6 +67,7 @@ public class TableCellRendererSemanticEnrichmentAllIndividuals extends DefaultTa
 			setValue(Controller.convertTripleStringToPrefixTripleString("<" + (String) value + ">"));
 		}
 		
+		// Horizontal alignment
 		setHorizontalAlignment(JLabel.CENTER);
 		
 		return cellComponent;

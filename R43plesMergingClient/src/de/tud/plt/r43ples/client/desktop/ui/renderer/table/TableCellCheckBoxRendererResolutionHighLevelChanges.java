@@ -3,12 +3,14 @@ package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.border.MatteBorder;
+import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
 
+import de.tud.plt.r43ples.client.desktop.control.ColorDefinitions;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
@@ -65,10 +67,10 @@ public class TableCellCheckBoxRendererResolutionHighLevelChanges extends JCheckB
 			if ((checkBoxStateBool.booleanValue() && deletionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.DELETED) && additionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED)) || 
 					(!checkBoxStateBool.booleanValue() && deletionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED) && additionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.DELETED))) {
 				// Entry is resolved and approved
-				color = Color.GREEN;
+				color = ColorDefinitions.approvedRowColor;
 			} else {
 				// Entry resolution changed old is approved
-				color = Color.ORANGE;
+				color = ColorDefinitions.approvedButChangedRowColor;
 			}
 		} else {
 			DifferenceGroup differenceGroup = Controller.getDifferenceGroupOfDifference(additionDifference);
@@ -78,7 +80,7 @@ public class TableCellCheckBoxRendererResolutionHighLevelChanges extends JCheckB
 				color = table.getBackground();
 			} else {
 				// Entry is changed but not approved
-				color = Color.LIGHT_GRAY;
+				color = ColorDefinitions.notApprovedButChangedRowColor;
 			}
 		}
 		
@@ -86,7 +88,7 @@ public class TableCellCheckBoxRendererResolutionHighLevelChanges extends JCheckB
 			setBackground(color);
 			setForeground(Color.BLACK);
 		} else {
-			setBackground(Color.BLACK);
+			setBackground(ColorDefinitions.backgroundColorSelectedRow);
 			setForeground(color);
 		}
 		
@@ -96,12 +98,47 @@ public class TableCellCheckBoxRendererResolutionHighLevelChanges extends JCheckB
 		int bottom = 0;
 		int right = 0;
 		
+		// Set border right to predicate column
+		if (column == 1) {
+			right = 1;
+		}
+		if (column == 2) {
+			left = 1;
+		}
+		
+		// Set border right to renaming column
+		if (column == 3) {
+			right = 1;
+		}
+		if (column == 4) {
+			left = 1;
+		}
+		
+		Border border = BorderFactory.createCompoundBorder();
+
+        border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.BLACK));
+        
 		// Set border
 		if (!isSelected) {
-			setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.BLACK));
 		} else {
-			setBorder(new MatteBorder(top, left, bottom, right, Color.WHITE));
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.WHITE));
+			if (column == 0) {
+				left = 1;
+			} else { 
+				left = 0;
+			}
+			if (column == tableModel.getColumnCount() - 1) {
+				right = 1;
+			} else {
+				right = 0;
+			}
+			
+			top = 1;
+			bottom = 1;			
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, ColorDefinitions.borderColorSelectedRow));
 		}
+		setBorder(border);
 		
 		return this;
     }

@@ -62,13 +62,16 @@ import de.tud.plt.r43ples.client.desktop.ui.dialog.StartMergingDialog;
 import de.tud.plt.r43ples.client.desktop.ui.editor.table.CustomComboBoxEditor;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellCheckBoxRendererResolutionHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellComboBoxRendererSemanticEnrichmentIndividualTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellPanelRendererResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellPanelRendererSemanticEnrichmentIndividualTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererFilter;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionHighLevelChanges;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererResolutionTriples;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentAllIndividuals;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSemanticEnrichmentIndividualTriples;
-import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellPanelRendererSummaryReport;
 import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellCheckBoxRendererResolutionTriples;
+import de.tud.plt.r43ples.client.desktop.ui.renderer.table.TableCellRendererSummaryReport;
 
 /**
  * The controller.
@@ -662,9 +665,14 @@ public class Controller {
 		ApplicationUI.frmRplesMergingClient.setCursor(waitCursor);
 		// Set the cell renderer
 		TableCellRendererResolutionTriples renderer = new TableCellRendererResolutionTriples();
+		TableCellPanelRendererResolutionTriples rendererPanel = new TableCellPanelRendererResolutionTriples();
 		for (int i = 0; i < ApplicationUI.getTableModelResolutionTriples().getColumnCount() - 1; i++) {
-			ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
+			if ((i != 3) && (i != 4)) {
+				ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(i).setCellRenderer(renderer);
+			}
 		}
+		ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(3).setCellRenderer(rendererPanel);
+		ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(4).setCellRenderer(rendererPanel);
 		ApplicationUI.getTableResolutionTriples().getColumnModel().getColumn(6).setCellRenderer(new TableCellCheckBoxRendererResolutionTriples());
 		
 		TableCellRendererSemanticEnrichmentAllIndividuals rendererSemanticIndividuals = new TableCellRendererSemanticEnrichmentAllIndividuals();
@@ -674,8 +682,12 @@ public class Controller {
 		
 		TableCellRendererSemanticEnrichmentIndividualTriples rendererSemanticTriples = new TableCellRendererSemanticEnrichmentIndividualTriples();
 		for (int i = 0; i < ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples().getColumnCount() - 1; i++) {
-			ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
+			if ((i != 3) && (i != 4)) {
+				ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(i).setCellRenderer(rendererSemanticTriples);
+			}
 		}
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(3).setCellRenderer(new TableCellPanelRendererSemanticEnrichmentIndividualTriples());
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(4).setCellRenderer(new TableCellPanelRendererSemanticEnrichmentIndividualTriples());
 		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getColumnModel().getColumn(7).setCellRenderer(new TableCellComboBoxRendererSemanticEnrichmentIndividualTriples());
 		
 		TableCellRendererResolutionHighLevelChanges rendererHighLevelChanges = new TableCellRendererResolutionHighLevelChanges();
@@ -920,13 +932,14 @@ public class Controller {
 			} else {
 				((Difference) ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow).getNodeObject().getObject()).setTripleResolutionState(SDDTripleStateEnum.DELETED);
 			}
-					
-			// Remove selection of the approved row in the tree
-			TableEntry entry = ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow);
-			removeNodeSelection(entry.getTreePath());
 			
-			// Remove the approved row
-			ApplicationUI.getTableModelResolutionTriples().removeRow(selectedRow);
+//			Do not remove the approved entry from table and tree selection
+//			// Remove selection of the approved row in the tree
+//			TableEntry entry = ApplicationUI.getTableModelResolutionTriples().getTableEntry(selectedRow);
+//			removeNodeSelection(entry.getTreePath());
+//			
+//			// Remove the approved row
+//			ApplicationUI.getTableModelResolutionTriples().removeRow(selectedRow);
 		}
 		ApplicationUI.getTableResolutionTriples().updateUI();
 		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().clearSelection();
@@ -1402,9 +1415,14 @@ public class Controller {
 		
 		// Set the cell renderer
 		TableCellRendererSummaryReport renderer = new TableCellRendererSummaryReport();
+		TableCellPanelRendererSummaryReport rendererPanel = new TableCellPanelRendererSummaryReport();
 		for (int i = 0; i < ReportDialog.getTableModel().getColumnCount(); i++) {
-			ReportDialog.getTable().getColumnModel().getColumn(i).setCellRenderer(renderer);
+			if ((i != 3) && (i != 4)) {
+				ReportDialog.getTable().getColumnModel().getColumn(i).setCellRenderer(renderer);
+			}
 		}
+		ReportDialog.getTable().getColumnModel().getColumn(3).setCellRenderer(rendererPanel);
+		ReportDialog.getTable().getColumnModel().getColumn(4).setCellRenderer(rendererPanel);
 
 		// Create table content		
 		reportResult = Management.createReportTable(ReportDialog.getTable(), differenceModel);

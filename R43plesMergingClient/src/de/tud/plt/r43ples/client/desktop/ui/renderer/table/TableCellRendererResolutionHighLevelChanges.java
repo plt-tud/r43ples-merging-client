@@ -3,11 +3,13 @@ package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JTable;
-import javax.swing.border.MatteBorder;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 
+import de.tud.plt.r43ples.client.desktop.control.ColorDefinitions;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
 import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
@@ -59,10 +61,10 @@ public class TableCellRendererResolutionHighLevelChanges extends DefaultTableCel
 			if ((checkBoxStateBool.booleanValue() && deletionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.DELETED) && additionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED)) || 
 					(!checkBoxStateBool.booleanValue() && deletionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.ADDED) && additionDifference.getTripleResolutionState().equals(SDDTripleStateEnum.DELETED))) {
 				// Entry is resolved and approved
-				color = Color.GREEN;
+				color = ColorDefinitions.approvedRowColor;
 			} else {
 				// Entry resolution changed old is approved
-				color = Color.ORANGE;
+				color = ColorDefinitions.approvedButChangedRowColor;
 			}
 		} else {
 			DifferenceGroup differenceGroup = Controller.getDifferenceGroupOfDifference(additionDifference);
@@ -72,7 +74,7 @@ public class TableCellRendererResolutionHighLevelChanges extends DefaultTableCel
 				color = table.getBackground();
 			} else {
 				// Entry is changed but not approved
-				color = Color.LIGHT_GRAY;
+				color = ColorDefinitions.notApprovedButChangedRowColor;
 			}
 		}
 		
@@ -80,7 +82,7 @@ public class TableCellRendererResolutionHighLevelChanges extends DefaultTableCel
 			cellComponent.setBackground(color);
 			cellComponent.setForeground(Color.BLACK);
 		} else {
-			cellComponent.setBackground(Color.BLACK);
+			cellComponent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
 			cellComponent.setForeground(color);
 		}
 		
@@ -101,20 +103,45 @@ public class TableCellRendererResolutionHighLevelChanges extends DefaultTableCel
 		
 		// Set border right to predicate column
 		if (column == 1) {
-			right = 2;
+			right = 1;
+		}
+		if (column == 2) {
+			left = 1;
 		}
 		
 		// Set border right to renaming column
 		if (column == 3) {
-			right = 2;
+			right = 1;
+		}
+		if (column == 4) {
+			left = 1;
 		}
 		
+		Border border = BorderFactory.createCompoundBorder();
+
+        border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.BLACK));
+        
 		// Set border
 		if (!isSelected) {
-			cellComponent.setBorder(new MatteBorder(top, left, bottom, right, Color.BLACK));
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.BLACK));
 		} else {
-			cellComponent.setBorder(new MatteBorder(top, left, bottom, right, Color.WHITE));
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, Color.WHITE));
+			if (column == 0) {
+				left = 1;
+			} else { 
+				left = 0;
+			}
+			if (column == tableModel.getColumnCount() - 1) {
+				right = 1;
+			} else {
+				right = 0;
+			}
+			
+			top = 1;
+			bottom = 1;			
+			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, ColorDefinitions.borderColorSelectedRow));
 		}
+		cellComponent.setBorder(border);
 		
 		return cellComponent;
 	}

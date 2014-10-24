@@ -1,15 +1,17 @@
 package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.ColorDefinitions;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
@@ -20,22 +22,53 @@ import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSummaryRepo
 
 /**
  * The table cell renderer for summary report table.
+ * Only columns 3 and 4 - will return a panel.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableCellRendererSummaryReport extends DefaultTableCellRenderer {
+public class TableCellPanelRendererSummaryReport implements TableCellRenderer {
 
-	/** The default serial version. **/
-	private static final long serialVersionUID = 1L;
+	/** The table cell panel. **/
+	private static JPanel panel;
+	/** The space panel. **/
+	private static JPanel panelSpace;
+	/** The content panel. **/
+	private static JPanel panelContent;
+	/** The icon label. **/
+	private static JLabel lblIcon;
+	/** The text label. **/
+	private static JLabel lblText;
+	
+	
+	/**
+	 * The constructor.
+	 */
+	public TableCellPanelRendererSummaryReport() {
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 0));
+
+		panelSpace = new JPanel();
+		panel.add(panelSpace, BorderLayout.WEST);
 		
+		panelContent = new JPanel();
+		panelContent.setLayout(new BorderLayout(0, 0));
+		panel.add(panelContent, BorderLayout.CENTER);
+		
+		lblIcon = new JLabel();
+		lblIcon.setHorizontalAlignment(SwingConstants.LEFT);
+		panelContent.add(lblIcon, BorderLayout.WEST);
+		
+		lblText = new JLabel();
+		lblText.setHorizontalAlignment(SwingConstants.CENTER);
+		panelContent.add(lblText, BorderLayout.CENTER);
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
 	 */
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		JComponent cellComponent = (JComponent) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-		
 		// Get the table model
 		TableModelSummaryReport tableModel = (TableModelSummaryReport) table.getModel();
 		
@@ -44,11 +77,15 @@ public class TableCellRendererSummaryReport extends DefaultTableCellRenderer {
 				
 		// Set the background color of the row
 		if (!isSelected) {
-			cellComponent.setBackground(tableEntry.getColor());
-			cellComponent.setForeground(Color.BLACK);
+			panel.setBackground(tableEntry.getColor());
+			panelSpace.setBackground(tableEntry.getColor());
+			panelContent.setBackground(tableEntry.getColor());
+			lblText.setForeground(Color.BLACK);
 		} else {
-			cellComponent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
-			cellComponent.setForeground(tableEntry.getColor());
+			panel.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			panelSpace.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			panelContent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			lblText.setForeground(tableEntry.getColor());
 		}
 		
 		// Get the triple
@@ -57,62 +94,59 @@ public class TableCellRendererSummaryReport extends DefaultTableCellRenderer {
 		// Replace URI by prefix if available
 		if (column == 0) {
 			// Subject
-			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
+			lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
 		} else if (column == 1) {
 			// Predicate
-			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
+			lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
 		} else if (column == 2) {
 			// Object
-			setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
+			lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 		}
 		
 		// Set the icon
 		if ((column == 3) || (column == 4)) {
 			String text = (String) value;
 			if (text.startsWith(SDDTripleStateEnum.ADDED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Added.png"));
-				setText(text.substring(text.indexOf("("), text.length()));
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Added.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
 			} else if (text.startsWith(SDDTripleStateEnum.DELETED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Deleted.png"));
-				setText(text.substring(text.indexOf("("), text.length()));
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Deleted.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
 			} else if (text.startsWith(SDDTripleStateEnum.NOTINCLUDED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/NotIncluded.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/NotIncluded.png"));
+				lblText.setText("");
 			} else if (text.startsWith(SDDTripleStateEnum.ORIGINAL.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Original.png"));
-				setText(text.substring(text.indexOf("("), text.length()));
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Original.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
 			}
 		} else if (column == 5) {
 			if (((String) value).equals("TRUE")) {
-				setIcon(new ImageIcon("images/icons/table/Conflict.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Conflict.png"));
+				lblText.setText("");
 			} else {
-				setIcon(new ImageIcon("images/icons/table/NoConflict.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/NoConflict.png"));
+				lblText.setText("");
 			}
 		} else if ((column == 6) || (column == 7)) {
 			String text = (String) value;
 			if (text.startsWith(SDDTripleStateEnum.ADDED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Added.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Added.png"));
+				lblText.setText("");
 			} else if (text.startsWith(SDDTripleStateEnum.DELETED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Deleted.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Deleted.png"));
+				lblText.setText("");
 			}
 		} else if (column == 8) {
 			if (((String) value).equals("TRUE")) {
-				setIcon(new ImageIcon("images/icons/table/Approved.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Approved.png"));
+				lblText.setText("");
 			} else {
-				setIcon(new ImageIcon("images/icons/table/NotApproved.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/NotApproved.png"));
+				lblText.setText("");
 			}
 		} else {
-			setIcon(null);
+			lblIcon.setIcon(null);
 		}
-		
-		// Horizontal alignment
-		setHorizontalAlignment(JLabel.CENTER);
 		
 		// Border definitions
 		int top = 0;
@@ -174,9 +208,9 @@ public class TableCellRendererSummaryReport extends DefaultTableCellRenderer {
 			bottom = 1;			
 			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, ColorDefinitions.borderColorSelectedRow));
 		}
-		cellComponent.setBorder(border);
+		panel.setBorder(border);
 
-		return cellComponent;
+		return panel;
 	}
 
 }

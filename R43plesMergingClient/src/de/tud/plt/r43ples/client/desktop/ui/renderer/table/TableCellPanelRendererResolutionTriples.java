@@ -1,12 +1,15 @@
 package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
 
@@ -16,44 +19,70 @@ import de.tud.plt.r43ples.client.desktop.control.enums.ResolutionState;
 import de.tud.plt.r43ples.client.desktop.control.enums.SDDTripleStateEnum;
 import de.tud.plt.r43ples.client.desktop.model.structure.Difference;
 import de.tud.plt.r43ples.client.desktop.model.structure.DifferenceGroup;
+import de.tud.plt.r43ples.client.desktop.model.structure.Triple;
 import de.tud.plt.r43ples.client.desktop.model.table.entry.TableEntry;
 import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelResolutionTriples;
 
 /**
- * The table cell check box renderer of resolution triples table.
+ * The table cell renderer for resolution triples table.
+ * Only columns 3 and 4 - will return a panel.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableCellCheckBoxRendererResolutionTriples extends JCheckBox implements TableCellRenderer {
+public class TableCellPanelRendererResolutionTriples implements TableCellRenderer {
 
-	/** The default serial version. **/
-	private static final long serialVersionUID = 1L;
-
+	/** The table cell panel. **/
+	private static JPanel panel;
+	/** The space panel. **/
+	private static JPanel panelSpace;
+	/** The content panel. **/
+	private static JPanel panelContent;
+	/** The icon label. **/
+	private static JLabel lblIcon;
+	/** The text label. **/
+	private static JLabel lblText;
+	
 	
 	/**
 	 * The constructor.
 	 */
-	public TableCellCheckBoxRendererResolutionTriples() {
-		setHorizontalAlignment(JLabel.CENTER);
-		setBorderPainted(true);
+	public TableCellPanelRendererResolutionTriples() {
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 0));
+
+		panelSpace = new JPanel();
+		panel.add(panelSpace, BorderLayout.WEST);
+		
+		panelContent = new JPanel();
+		panelContent.setLayout(new BorderLayout(0, 0));
+		panel.add(panelContent, BorderLayout.CENTER);
+		
+		lblIcon = new JLabel();
+		lblIcon.setHorizontalAlignment(SwingConstants.LEFT);
+		panelContent.add(lblIcon, BorderLayout.WEST);
+		
+		lblText = new JLabel();
+		lblText.setHorizontalAlignment(SwingConstants.CENTER);
+		panelContent.add(lblText, BorderLayout.CENTER);
 	}
-
-
+		
+	
 	/* (non-Javadoc)
-	 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
 	 */
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		setSelected((value != null && ((Boolean) value).booleanValue()));
-		
 		// Get the table model
 		TableModelResolutionTriples tableModel = (TableModelResolutionTriples) table.getModel();
 		
 		// Get the table entry
 		TableEntry tableEntry =  tableModel.getTableEntry(row);
-				
+		
 		// Get the difference
 		Difference difference = tableEntry.getDifference();
+		
+		// Get the triple
+		Triple triple = difference.getTriple();
 		
 		// Get the current check box state
 		Boolean checkBoxStateBool = (Boolean) tableModel.getTableEntry(row).getRowData()[6];
@@ -86,13 +115,57 @@ public class TableCellCheckBoxRendererResolutionTriples extends JCheckBox implem
 		}
 		
 		if (!isSelected) {
-			setBackground(color);
-			setForeground(Color.BLACK);
+			panel.setBackground(color);
+			panelSpace.setBackground(color);
+			panelContent.setBackground(color);
+			lblText.setForeground(Color.BLACK);
 		} else {
-			setBackground(ColorDefinitions.backgroundColorSelectedRow);
-			setForeground(color);
+			panel.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			panelSpace.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			panelContent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			lblText.setForeground(color);
+		}
+
+		// Replace URI by prefix if available
+		if (column == 0) {
+			// Subject
+			lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
+		} else if (column == 1) {
+			// Predicate
+			lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
+		} else if (column == 2) {
+			// Object
+			lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 		}
 		
+		// Set the icon
+		if ((column == 3) || (column == 4)) {
+			String text = (String) value;
+			if (text.startsWith(SDDTripleStateEnum.ADDED.toString())) {
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Added.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
+			} else if (text.startsWith(SDDTripleStateEnum.DELETED.toString())) {
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Deleted.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
+			} else if (text.startsWith(SDDTripleStateEnum.NOTINCLUDED.toString())) {
+				lblIcon.setIcon(new ImageIcon("images/icons/table/NotIncluded.png"));
+				lblText.setText("");
+			} else if (text.startsWith(SDDTripleStateEnum.ORIGINAL.toString())) {
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Original.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
+			}
+		} else if (column == 5) {
+			if (((String) value).equals("TRUE")) {
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Conflict.png"));
+				lblText.setText("");
+			} else {
+				lblIcon.setIcon(new ImageIcon("images/icons/table/NoConflict.png"));
+				lblText.setText("");
+			}
+		} else {
+			lblIcon.setIcon(null);
+		}
+
 		// Border definitions
 		int top = 0;
 		int left = 0;
@@ -153,8 +226,9 @@ public class TableCellCheckBoxRendererResolutionTriples extends JCheckBox implem
 			bottom = 1;			
 			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, ColorDefinitions.borderColorSelectedRow));
 		}
-		setBorder(border);
+		panel.setBorder(border);
 		
-		return this;
-    }
+		return panel;
+	}
+
 }

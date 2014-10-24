@@ -1,15 +1,17 @@
 package de.tud.plt.r43ples.client.desktop.ui.renderer.table;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import de.tud.plt.r43ples.client.desktop.control.ColorDefinitions;
 import de.tud.plt.r43ples.client.desktop.control.Controller;
@@ -23,14 +25,47 @@ import de.tud.plt.r43ples.client.desktop.model.table.model.TableModelSemanticEnr
 
 /**
  * The table renderer of semantic enrichment individual triples table.
+ * Only columns 3 and 4 - will return a panel.
  * 
  * @author Stephan Hensel
  *
  */
-public class TableCellRendererSemanticEnrichmentIndividualTriples extends DefaultTableCellRenderer  {
+public class TableCellPanelRendererSemanticEnrichmentIndividualTriples implements TableCellRenderer {
 
-	/** The default serial version. **/
-	private static final long serialVersionUID = 1L;
+	/** The table cell panel. **/
+	private static JPanel panel;
+	/** The space panel. **/
+	private static JPanel panelSpace;
+	/** The content panel. **/
+	private static JPanel panelContent;
+	/** The icon label. **/
+	private static JLabel lblIcon;
+	/** The text label. **/
+	private static JLabel lblText;
+	
+	
+	/**
+	 * The constructor.
+	 */
+	public TableCellPanelRendererSemanticEnrichmentIndividualTriples() {
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 0));
+
+		panelSpace = new JPanel();
+		panel.add(panelSpace, BorderLayout.WEST);
+		
+		panelContent = new JPanel();
+		panelContent.setLayout(new BorderLayout(0, 0));
+		panel.add(panelContent, BorderLayout.CENTER);
+		
+		lblIcon = new JLabel();
+		lblIcon.setHorizontalAlignment(SwingConstants.LEFT);
+		panelContent.add(lblIcon, BorderLayout.WEST);
+		
+		lblText = new JLabel();
+		lblText.setHorizontalAlignment(SwingConstants.CENTER);
+		panelContent.add(lblText, BorderLayout.CENTER);
+	}
 	
 
 	/* (non-Javadoc)
@@ -38,8 +73,6 @@ public class TableCellRendererSemanticEnrichmentIndividualTriples extends Defaul
 	 */
 	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		JComponent cellComponent = (JComponent) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-		
 		// Get the table model
 		TableModelSemanticEnrichmentIndividualTriples tableModel = (TableModelSemanticEnrichmentIndividualTriples) table.getModel();
 		
@@ -47,11 +80,13 @@ public class TableCellRendererSemanticEnrichmentIndividualTriples extends Defaul
 		TableEntrySemanticEnrichmentIndividualTriples tableEntry =  tableModel.getTableEntry(row);
 		
 		if (!isSelected) {
-			cellComponent.setBackground(table.getBackground());
-			cellComponent.setForeground(table.getForeground());
+			panel.setBackground(table.getBackground());
+			panelSpace.setBackground(table.getBackground());
+			panelContent.setBackground(table.getBackground());
 		} else {
-			cellComponent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
-			cellComponent.setForeground(Color.WHITE);
+			panel.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			panelSpace.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+			panelContent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
 		}
 		
 		// Check if difference exists
@@ -92,23 +127,27 @@ public class TableCellRendererSemanticEnrichmentIndividualTriples extends Defaul
 			}
 			
 			if (!isSelected) {
-				cellComponent.setBackground(color);
-				cellComponent.setForeground(Color.BLACK);
+				panel.setBackground(color);
+				panelSpace.setBackground(color);
+				panelContent.setBackground(color);
+				lblText.setForeground(Color.BLACK);
 			} else {
-				cellComponent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
-				cellComponent.setForeground(color);
+				panel.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+				panelSpace.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+				panelContent.setBackground(ColorDefinitions.backgroundColorSelectedRow);
+				lblText.setForeground(color);
 			}
 			
 			// Replace URI by prefix if available
 			if (column == 0) {
 				// Subject
-				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
+				lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getSubject(triple)));
 			} else if (column == 1) {
 				// Predicate
-				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
+				lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getPredicate(triple)));
 			} else if (column == 2) {
 				// Object
-				setValue(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
+				lblText.setText(Controller.convertTripleStringToPrefixTripleString(Controller.getObject(triple)));
 			}
 		}
 		
@@ -116,34 +155,36 @@ public class TableCellRendererSemanticEnrichmentIndividualTriples extends Defaul
 		if ((column == 3) || (column == 4)) {
 			String text = (String) value;
 			if (text.startsWith(SDDTripleStateEnum.ADDED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Added.png"));
-				setText(text.substring(text.indexOf("("), text.length()));
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Added.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
 			} else if (text.startsWith(SDDTripleStateEnum.DELETED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Deleted.png"));
-				setText(text.substring(text.indexOf("("), text.length()));
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Deleted.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
 			} else if (text.startsWith(SDDTripleStateEnum.NOTINCLUDED.toString())) {
-				setIcon(new ImageIcon("images/icons/table/NotIncluded.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/NotIncluded.png"));
+				lblText.setText("");
 			} else if (text.startsWith(SDDTripleStateEnum.ORIGINAL.toString())) {
-				setIcon(new ImageIcon("images/icons/table/Original.png"));
-				setText(text.substring(text.indexOf("("), text.length()));
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Original.png"));
+				lblText.setText(text.substring(text.indexOf("("), text.length()));
+			} else {
+				lblIcon.setIcon(null);
+				lblText.setText("");
 			}
 		} else if (column == 5) {
 			if (((String) value).equals("TRUE")) {
-				setIcon(new ImageIcon("images/icons/table/Conflict.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/Conflict.png"));
+				lblText.setText("");
 			} else if (((String) value).equals("FALSE")) {
-				setIcon(new ImageIcon("images/icons/table/NoConflict.png"));
-				setText("");
+				lblIcon.setIcon(new ImageIcon("images/icons/table/NoConflict.png"));
+				lblText.setText("");
 			} else {
-				setIcon(null);
+				lblIcon.setIcon(null);
+				lblText.setText("");
 			}
 		} else {
-			setIcon(null);
+			lblIcon.setIcon(null);
+			lblText.setText("");
 		}
-		
-		// Horizontal alignment
-		setHorizontalAlignment(JLabel.CENTER);
 		
 		// Border definitions
 		int top = 0;
@@ -205,9 +246,9 @@ public class TableCellRendererSemanticEnrichmentIndividualTriples extends Defaul
 			bottom = 1;			
 			border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(top, left, bottom, right, ColorDefinitions.borderColorSelectedRow));
 		}
-		cellComponent.setBorder(border);
+		panel.setBorder(border);
 		
-		return cellComponent;
+		return panel;
     }
 
 }

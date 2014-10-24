@@ -1354,9 +1354,9 @@ public class Management {
 				String currentDifferenceName = iteDifferenceNames.next();
 				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
 				
-				Color color = Color.GREEN;
+				Color color = ColorDefinitions.approvedRowColor;
 				if (!difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
-					color = Color.RED;
+					color = ColorDefinitions.conflictingRowColor;
 					result.incrementCounterConflictsNotApproved();
 				}
 				
@@ -1376,10 +1376,12 @@ public class Management {
 				String currentDifferenceName = iteDifferenceNames.next();
 				Difference difference = differenceGroup.getDifferences().get(currentDifferenceName);
 				
-				Color color = Color.GREEN;
+				Color color = ColorDefinitions.approvedRowColor;
 				if (!difference.getTripleResolutionState().equals(differenceGroup.getAutomaticResolutionState())) {
-					color = Color.ORANGE;
-					result.incrementCounterDifferencesResolutionChanged();;
+					result.incrementCounterDifferencesResolutionChanged();
+				}
+				if (!difference.getResolutionState().equals(ResolutionState.RESOLVED)) {
+					color = ColorDefinitions.nonConflictingRowColor;
 				}
 				
 				// Create new table entry
@@ -1661,8 +1663,8 @@ public class Management {
 		rowData[2] = getObject(triple);
 		
 		rowData[3] = "";
-		
 		rowData[4] = "";
+		
 		rowData[5] = "";
 
 		rowData[6] = "";
