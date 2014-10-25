@@ -62,16 +62,18 @@ public class ApplicationUI {
 
 	/** The application frame. **/
 	public static JFrame frmRplesMergingClient;
+	/** The application tabbed pane. **/
+	private static JTabbedPane tabbedPaneApplication;
 	/** The differences tree (division). **/
 	private static JTree treeDifferencesDivision;
 	/** The differences tree model (division). **/
 	private static DefaultTreeModel treeModelDifferencesDivision = new DefaultTreeModel(null);
 	/** The graph scroll pane. **/
 	private static JScrollPane scrollPaneGraph;
-	/** The graph panel. **/
-	private static JPanel panelGraph;
-	/** The resolution tabbed pane. **/
-	private static JTabbedPane tabbedPaneResolution;	
+	/** The graph scroll pane of semantic enrichment pane. **/
+	private static JScrollPane scrollPaneGraphSemanticEnrichment;
+	/** The graph scroll pane of high level changes pane. **/
+	private static JScrollPane scrollPaneGraphHighLevelChanges;
 	/** The resolution triples table. **/
 	private static JTable tableResolutionTriples;
 	/** The resolution triples table model. **/
@@ -93,7 +95,7 @@ public class ApplicationUI {
 	/** The filter table model. **/
 	private static TableModelFilter tableModelFilter = new TableModelFilter(new ArrayList<TableEntryFilter>());
 	/** The application split pane. **/
-	private static JSplitPane splitPaneApplication;
+	private static JSplitPane splitPaneTriples;
 	/** The preferences split pane. **/
 	private static JSplitPane splitPanePreferences;
 	/** The push button. **/
@@ -156,42 +158,17 @@ public class ApplicationUI {
 		});
 		mnEdit.add(mntmProperties);
 		
-		JToolBar toolBar = new JToolBar();
-		frmRplesMergingClient.getContentPane().add(toolBar, BorderLayout.NORTH);
+		tabbedPaneApplication = new JTabbedPane(JTabbedPane.BOTTOM);
+		frmRplesMergingClient.getContentPane().add(tabbedPaneApplication, BorderLayout.CENTER);
 		
-		JButton btnNewMerge = new JButton("New MERGE");
-		btnNewMerge.addActionListener(new ActionListener() {
-			
-			/* (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					Controller.showStartMergingDialog();
-				} catch (IOException e) {
-					Controller.showIOExceptionDialog(frmRplesMergingClient);
-					e.printStackTrace();
-				}
-			}
-		});
-		toolBar.add(btnNewMerge);
+		JPanel panelResolutionTriples = new JPanel();
+		tabbedPaneApplication.addTab("Triple view", null, panelResolutionTriples, null);
+		panelResolutionTriples.setLayout(new BorderLayout(0, 0));
 		
-		btnPush = new JButton("Push");
-		btnPush.setEnabled(false);
-		btnPush.addActionListener(new ActionListener() {
-			
-			/* (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			public void actionPerformed(ActionEvent arg0) {
-				Controller.executePush();
-			}
-		});
-		toolBar.add(btnPush);
-		
-		splitPaneApplication = new JSplitPane();
-		splitPaneApplication.setResizeWeight(0.3);
-		splitPaneApplication.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+		splitPaneTriples = new JSplitPane();
+		panelResolutionTriples.add(splitPaneTriples);
+		splitPaneTriples.setResizeWeight(0.3);
+		splitPaneTriples.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			
 			/* (non-Javadoc)
 			 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
@@ -201,12 +178,11 @@ public class ApplicationUI {
 				Controller.splitPaneApplicationDividerLocationChanged();
 			}
 		});
-		frmRplesMergingClient.getContentPane().add(splitPaneApplication, BorderLayout.CENTER);
 		
 		splitPanePreferences = new JSplitPane();
 		splitPanePreferences.setResizeWeight(0.5);
 		splitPanePreferences.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		splitPaneApplication.setLeftComponent(splitPanePreferences);
+		splitPaneTriples.setLeftComponent(splitPanePreferences);
 		
 		JPanel panelFilter = new JPanel();
 		splitPanePreferences.setRightComponent(panelFilter);
@@ -364,7 +340,7 @@ public class ApplicationUI {
 		JSplitPane splitPaneResolution = new JSplitPane();
 		splitPaneResolution.setResizeWeight(0.5);
 		splitPaneResolution.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		splitPaneApplication.setRightComponent(splitPaneResolution);
+		splitPaneTriples.setRightComponent(splitPaneResolution);
 		
 		JPanel panelResolution = new JPanel();
 		splitPaneResolution.setRightComponent(panelResolution);
@@ -378,49 +354,17 @@ public class ApplicationUI {
 		JLabel lblResolutionHeader = new JLabel(" Resolution");
 		panelResolutionHeader.add(lblResolutionHeader, BorderLayout.NORTH);
 		
-		tabbedPaneResolution = new JTabbedPane(JTabbedPane.BOTTOM);
-		tabbedPaneResolution.addChangeListener(new ChangeListener() {
-			
-			/* (non-Javadoc)
-			 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
-			 */
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				Controller.resolutionTabSelectionChanged();
-			}
-		});
-		panelResolution.add(tabbedPaneResolution, BorderLayout.CENTER);
-		
-		JPanel panelResolutionTriples = new JPanel();
-		tabbedPaneResolution.addTab("Triples", null, panelResolutionTriples, null);
-		panelResolutionTriples.setLayout(new BorderLayout(0, 0));
+		JPanel panelResolutionTriplesContent = new JPanel();
+		panelResolution.add(panelResolutionTriplesContent, BorderLayout.CENTER);
+		panelResolutionTriplesContent.setLayout(new BorderLayout(0, 0));
 		
 		JScrollPane scrollPaneResolutionTriples = new JScrollPane();
-		panelResolutionTriples.add(scrollPaneResolutionTriples, BorderLayout.CENTER);
+		panelResolutionTriplesContent.add(scrollPaneResolutionTriples, BorderLayout.CENTER);
 		
 		tableResolutionTriples = new JTable();
 		tableResolutionTriples.setRowHeight(25);
 		tableResolutionTriples.getTableHeader().setReorderingAllowed(false);
 		tableResolutionTriples.setModel(tableModelResolutionTriples);
-		tableModelResolutionTriples.addTableModelListener(new TableModelListener() {
-			
-			/* (non-Javadoc)
-			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
-			 */
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				 SwingUtilities.invokeLater(new Runnable() {
-					
-					/* (non-Javadoc)
-					 * @see java.lang.Runnable#run()
-					 */
-					@Override
-					public void run() {
-						tableResolutionTriples.updateUI();
-					}
-				});
-			}
-		});
 		tableResolutionTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			/* (non-Javadoc)
@@ -434,7 +378,7 @@ public class ApplicationUI {
 		scrollPaneResolutionTriples.setViewportView(tableResolutionTriples);
 		
 		JToolBar toolBarResolutionTriples = new JToolBar();
-		panelResolutionTriples.add(toolBarResolutionTriples, BorderLayout.NORTH);
+		panelResolutionTriplesContent.add(toolBarResolutionTriples, BorderLayout.NORTH);
 		
 		JButton btnResolutionTriplesApproveSelected = new JButton("Approve selected");
 		btnResolutionTriplesApproveSelected.addActionListener(new ActionListener() {
@@ -460,12 +404,54 @@ public class ApplicationUI {
 		});
 		toolBarResolutionTriples.add(btnResolutionTriplesSelectAll);
 		
+		JPanel panelRevisionGraph = new JPanel();
+		splitPaneResolution.setLeftComponent(panelRevisionGraph);
+		panelRevisionGraph.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelRevisionGraphHeader = new JPanel();
+		panelRevisionGraphHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panelRevisionGraph.add(panelRevisionGraphHeader, BorderLayout.NORTH);
+		panelRevisionGraphHeader.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblRevisionGraphHeader = new JLabel(" Revision graph");
+		panelRevisionGraphHeader.add(lblRevisionGraphHeader);
+		
+		scrollPaneGraph = new JScrollPane();
+		scrollPaneGraph.setPreferredSize(new Dimension(2, 100));
+		panelRevisionGraph.add(scrollPaneGraph, BorderLayout.CENTER);
+		splitPaneResolution.setDividerLocation(300);
+		
 		JPanel panelResolutionSemanticEnrichment = new JPanel();
-		tabbedPaneResolution.addTab("Semantic Enrichment", null, panelResolutionSemanticEnrichment, null);
+		tabbedPaneApplication.addTab("Individual view", null, panelResolutionSemanticEnrichment, null);
 		panelResolutionSemanticEnrichment.setLayout(new BorderLayout(0, 0));
 		
+		JSplitPane splitPaneResolutionSemanticEnrichment = new JSplitPane();
+		splitPaneResolutionSemanticEnrichment.setResizeWeight(0.5);
+		splitPaneResolutionSemanticEnrichment.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		panelResolutionSemanticEnrichment.add(splitPaneResolutionSemanticEnrichment);
+		
+		JPanel panelRevisionGraphSemanticEnrichment = new JPanel();
+		splitPaneResolutionSemanticEnrichment.setLeftComponent(panelRevisionGraphSemanticEnrichment);
+		panelRevisionGraphSemanticEnrichment.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelRevisionGraphSemanticEnrichmentHeader = new JPanel();
+		panelRevisionGraphSemanticEnrichmentHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panelRevisionGraphSemanticEnrichment.add(panelRevisionGraphSemanticEnrichmentHeader, BorderLayout.NORTH);
+		panelRevisionGraphSemanticEnrichmentHeader.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblRevisionGraphSemanticEnrichmentHeader = new JLabel(" Revision graph");
+		panelRevisionGraphSemanticEnrichmentHeader.add(lblRevisionGraphSemanticEnrichmentHeader, BorderLayout.NORTH);
+		
+		scrollPaneGraphSemanticEnrichment = new JScrollPane();
+		scrollPaneGraphSemanticEnrichment.setPreferredSize(new Dimension(2, 100));
+		panelRevisionGraphSemanticEnrichment.add(scrollPaneGraphSemanticEnrichment, BorderLayout.CENTER);
+		
+		JPanel panelResolutionSemanticEnrichmentContent = new JPanel();
+		splitPaneResolutionSemanticEnrichment.setRightComponent(panelResolutionSemanticEnrichmentContent);
+		panelResolutionSemanticEnrichmentContent.setLayout(new BorderLayout(0, 0));
+		
 		JPanel panelResolutionSemanticEnrichmentAllIndividuals = new JPanel();
-		panelResolutionSemanticEnrichment.add(panelResolutionSemanticEnrichmentAllIndividuals, BorderLayout.NORTH);
+		panelResolutionSemanticEnrichmentContent.add(panelResolutionSemanticEnrichmentAllIndividuals, BorderLayout.NORTH);
 		panelResolutionSemanticEnrichmentAllIndividuals.setLayout(new BorderLayout(0, 0));
 		
 		JScrollPane scrollPaneResolutionSemanticEnrichmentAllIndividuals = new JScrollPane();
@@ -495,7 +481,7 @@ public class ApplicationUI {
 		scrollPaneResolutionSemanticEnrichmentAllIndividuals.setViewportView(tableResolutionSemanticEnrichmentAllIndividuals);
 		
 		JPanel panelResolutionSemanticEnrichmentIndividualTriples = new JPanel();
-		panelResolutionSemanticEnrichment.add(panelResolutionSemanticEnrichmentIndividualTriples, BorderLayout.CENTER);
+		panelResolutionSemanticEnrichmentContent.add(panelResolutionSemanticEnrichmentIndividualTriples, BorderLayout.CENTER);
 		panelResolutionSemanticEnrichmentIndividualTriples.setLayout(new BorderLayout(0, 0));
 		
 		JScrollPane scrollPaneResolutionSemanticEnrichmentIndividualTriples = new JScrollPane();
@@ -505,25 +491,6 @@ public class ApplicationUI {
 		tableResolutionSemanticEnrichmentIndividualTriples.setRowHeight(25);
 		tableResolutionSemanticEnrichmentIndividualTriples.getTableHeader().setReorderingAllowed(false);
 		tableResolutionSemanticEnrichmentIndividualTriples.setModel(tableModelSemanticEnrichmentIndividualTriples);
-		tableModelSemanticEnrichmentIndividualTriples.addTableModelListener(new TableModelListener() {
-			
-			/* (non-Javadoc)
-			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
-			 */
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				 SwingUtilities.invokeLater(new Runnable() {
-					
-					/* (non-Javadoc)
-					 * @see java.lang.Runnable#run()
-					 */
-					@Override
-					public void run() {
-						tableResolutionSemanticEnrichmentIndividualTriples.updateUI();
-					}
-				});
-			}
-		});
 		tableResolutionSemanticEnrichmentIndividualTriples.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			/* (non-Javadoc)
@@ -562,37 +529,44 @@ public class ApplicationUI {
 			}
 		});
 		toolBarResolutionSemanticEnrichmentIndividualTriples.add(btnResolutionSemanticEnrichmentIndividualTriplesSelectAll);
+		splitPaneResolutionSemanticEnrichment.setDividerLocation(300);
 		
 		JPanel panelResolutionHighLevelChanges = new JPanel();
-		tabbedPaneResolution.addTab("High level changes", null, panelResolutionHighLevelChanges, null);
+		tabbedPaneApplication.addTab("High level changes", null, panelResolutionHighLevelChanges, null);
 		panelResolutionHighLevelChanges.setLayout(new BorderLayout(0, 0));
 		
+		JSplitPane splitPaneResolutionHighLevelChanges = new JSplitPane();
+		splitPaneResolutionHighLevelChanges.setResizeWeight(0.5);
+		splitPaneResolutionHighLevelChanges.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		panelResolutionHighLevelChanges.add(splitPaneResolutionHighLevelChanges, BorderLayout.CENTER);
+		
+		JPanel panelRevisionGraphHighLevelChanges = new JPanel();
+		splitPaneResolutionHighLevelChanges.setLeftComponent(panelRevisionGraphHighLevelChanges);
+		panelRevisionGraphHighLevelChanges.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelRevisionGraphHighLevelChangesHeader = new JPanel();
+		panelRevisionGraphHighLevelChangesHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panelRevisionGraphHighLevelChanges.add(panelRevisionGraphHighLevelChangesHeader, BorderLayout.NORTH);
+		panelRevisionGraphHighLevelChangesHeader.setLayout(new BorderLayout(0, 0));
+		
+		JLabel lblRevisionGraphHighLevelChangesHeader = new JLabel(" Revision graph");
+		panelRevisionGraphHighLevelChangesHeader.add(lblRevisionGraphHighLevelChangesHeader, BorderLayout.NORTH);
+		
+		scrollPaneGraphHighLevelChanges = new JScrollPane();
+		scrollPaneGraphHighLevelChanges.setPreferredSize(new Dimension(2, 100));
+		panelRevisionGraphHighLevelChanges.add(scrollPaneGraphHighLevelChanges);
+		
+		JPanel panelResolutionHighLevelChangesContent = new JPanel();
+		splitPaneResolutionHighLevelChanges.setRightComponent(panelResolutionHighLevelChangesContent);
+		panelResolutionHighLevelChangesContent.setLayout(new BorderLayout(0, 0));
+		
 		JScrollPane scrollPaneResolutionHighLevelChanges = new JScrollPane();
-		panelResolutionHighLevelChanges.add(scrollPaneResolutionHighLevelChanges, BorderLayout.CENTER);
+		panelResolutionHighLevelChangesContent.add(scrollPaneResolutionHighLevelChanges);
 		
 		tableResolutionHighLevelChanges = new JTable();
 		tableResolutionHighLevelChanges.setRowHeight(25);
 		tableResolutionHighLevelChanges.getTableHeader().setReorderingAllowed(false);
 		tableResolutionHighLevelChanges.setModel(tableModelResolutionHighLevelChanges);
-		tableModelResolutionHighLevelChanges.addTableModelListener(new TableModelListener() {
-			
-			/* (non-Javadoc)
-			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
-			 */
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				 SwingUtilities.invokeLater(new Runnable() {
-					
-					/* (non-Javadoc)
-					 * @see java.lang.Runnable#run()
-					 */
-					@Override
-					public void run() {
-						tableResolutionHighLevelChanges.updateUI();
-					}
-				});
-			}
-		});
 		tableResolutionHighLevelChanges.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			/* (non-Javadoc)
@@ -606,7 +580,7 @@ public class ApplicationUI {
 		scrollPaneResolutionHighLevelChanges.setViewportView(tableResolutionHighLevelChanges);
 		
 		JToolBar toolBarResolutionHighLevelChanges = new JToolBar();
-		panelResolutionHighLevelChanges.add(toolBarResolutionHighLevelChanges, BorderLayout.NORTH);
+		panelResolutionHighLevelChangesContent.add(toolBarResolutionHighLevelChanges, BorderLayout.NORTH);
 		
 		JButton btnResolutionHighLevelChangesApproveSelected = new JButton("Approve selected");
 		btnResolutionHighLevelChangesApproveSelected.addActionListener(new ActionListener() {
@@ -631,25 +605,108 @@ public class ApplicationUI {
 			}
 		});
 		toolBarResolutionHighLevelChanges.add(btnResolutionHighLevelChangesSelectAll);
+		splitPaneResolutionHighLevelChanges.setDividerLocation(300);
 		
-		JPanel panelRevisionGraph = new JPanel();
-		splitPaneResolution.setLeftComponent(panelRevisionGraph);
-		panelRevisionGraph.setLayout(new BorderLayout(0, 0));
+		JToolBar toolBar = new JToolBar();
+		frmRplesMergingClient.getContentPane().add(toolBar, BorderLayout.NORTH);
 		
-		JPanel panelRevisionGraphHeader = new JPanel();
-		panelRevisionGraphHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panelRevisionGraph.add(panelRevisionGraphHeader, BorderLayout.NORTH);
-		panelRevisionGraphHeader.setLayout(new BorderLayout(0, 0));
+		JButton btnNewMerge = new JButton("New MERGE");
+		btnNewMerge.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Controller.showStartMergingDialog();
+				} catch (IOException e) {
+					Controller.showIOExceptionDialog(frmRplesMergingClient);
+					e.printStackTrace();
+				}
+			}
+		});
+		toolBar.add(btnNewMerge);
 		
-		JLabel lblRevisionGraphHeader = new JLabel(" Revision graph");
-		panelRevisionGraphHeader.add(lblRevisionGraphHeader);
+		btnPush = new JButton("Push");
+		btnPush.setEnabled(false);
+		btnPush.addActionListener(new ActionListener() {
+			
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			public void actionPerformed(ActionEvent arg0) {
+				Controller.executePush();
+			}
+		});
+		toolBar.add(btnPush);
+		tableModelResolutionTriples.addTableModelListener(new TableModelListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
+			 */
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				 SwingUtilities.invokeLater(new Runnable() {
+					
+					/* (non-Javadoc)
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						tableResolutionTriples.updateUI();
+					}
+				});
+			}
+		});
+		tableModelSemanticEnrichmentIndividualTriples.addTableModelListener(new TableModelListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
+			 */
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				 SwingUtilities.invokeLater(new Runnable() {
+					
+					/* (non-Javadoc)
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						tableResolutionSemanticEnrichmentIndividualTriples.updateUI();
+					}
+				});
+			}
+		});
+		tableModelResolutionHighLevelChanges.addTableModelListener(new TableModelListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.TableModelListener#tableChanged(javax.swing.event.TableModelEvent)
+			 */
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				 SwingUtilities.invokeLater(new Runnable() {
+					
+					/* (non-Javadoc)
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						tableResolutionHighLevelChanges.updateUI();
+					}
+				});
+			}
+		});
 		
-		scrollPaneGraph = new JScrollPane();
-		scrollPaneGraph.setPreferredSize(new Dimension(2, 100));
-		panelRevisionGraph.add(scrollPaneGraph, BorderLayout.CENTER);
-		
-		panelGraph = new JPanel();
-		scrollPaneGraph.setViewportView(panelGraph);
+		tabbedPaneApplication.addChangeListener(new ChangeListener() {
+			
+			/* (non-Javadoc)
+			 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+			 */
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				Controller.applicationTabSelectionChanged();
+			}
+		});
 	}
 
 
@@ -751,45 +808,65 @@ public class ApplicationUI {
 	public static void setScrollPaneGraph(JScrollPane scrollPaneGraph) {
 		ApplicationUI.scrollPaneGraph = scrollPaneGraph;
 	}
-
-
+	
+	
 	/**
-	 * Get the graph panel.
+	 * Get the graph scroll pane of semantic enrichment pane.
 	 * 
-	 * @return the graph panel
+	 * @return the scrollPaneGraphSemanticEnrichment
 	 */
-	public static JPanel getPanelGraph() {
-		return panelGraph;
+	public static JScrollPane getScrollPaneGraphSemanticEnrichment() {
+		return scrollPaneGraphSemanticEnrichment;
 	}
 
 
 	/**
-	 * Set the graph panel.
+	 * Set the graph scroll pane of semantic enrichment pane.
 	 * 
-	 * @param panelGraph the graph panel to set
+	 * @param scrollPaneGraphSemanticEnrichment the graph scroll pane of semantic enrichment pane to set
 	 */
-	public static void setPanelGraph(JPanel panelGraph) {
-		ApplicationUI.panelGraph = panelGraph;
+	public static void setScrollPaneGraphSemanticEnrichment(JScrollPane scrollPaneGraphSemanticEnrichment) {
+		ApplicationUI.scrollPaneGraphSemanticEnrichment = scrollPaneGraphSemanticEnrichment;
+	}
+	
+	
+	/**
+	 * Get the graph scroll pane of high level changes pane.
+	 * 
+	 * @return the scrollPaneGraphHighLevelChanges
+	 */
+	public static JScrollPane getScrollPaneGraphHighLevelChanges() {
+		return scrollPaneGraphHighLevelChanges;
 	}
 
 
 	/**
-	 * Get the resolution tabbed pane.
+	 * Set the graph scroll pane of high level changes pane.
 	 * 
-	 * @return the resolution tabbed pane
+	 * @param scrollPaneGraphHighLevelChanges the graph scroll pane of high level changes pane to set
 	 */
-	public static JTabbedPane getTabbedPaneResolution() {
-		return tabbedPaneResolution;
+	public static void setScrollPaneGraphHighLevelChanges(JScrollPane scrollPaneGraphHighLevelChanges) {
+		ApplicationUI.scrollPaneGraphHighLevelChanges = scrollPaneGraphHighLevelChanges;
 	}
 
 
 	/**
-	 * Set the resolution tabbed pane.
+	 * Get the application tabbed pane.
 	 * 
-	 * @param tabbedPaneResolution the resolution tabbed pane to set
+	 * @return the application tabbed pane
 	 */
-	public static void setTabbedPaneResolution(JTabbedPane tabbedPaneResolution) {
-		ApplicationUI.tabbedPaneResolution = tabbedPaneResolution;
+	public static JTabbedPane getTabbedPaneApplication() {
+		return tabbedPaneApplication;
+	}
+
+
+	/**
+	 * Set the application tabbed pane.
+	 * 
+	 * @param tabbedPaneApplication the application tabbed pane to set
+	 */
+	public static void setTabbedPaneApplication(JTabbedPane tabbedPaneApplication) {
+		ApplicationUI.tabbedPaneApplication = tabbedPaneApplication;
 	}
 
 
@@ -959,7 +1036,7 @@ public class ApplicationUI {
 	 * @return the application split pane
 	 */
 	public static JSplitPane getSplitPaneApplication() {
-		return splitPaneApplication;
+		return splitPaneTriples;
 	}
 	
 	

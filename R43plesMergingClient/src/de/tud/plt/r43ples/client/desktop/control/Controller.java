@@ -99,6 +99,10 @@ public class Controller {
 	private static Graph graph;
 	/** The grappa panel which holds the visualization of the graph. **/
 	private static GrappaPanel gp;
+	/** The grappa panel which holds the visualization of the graph for the semantic enrichment panel. **/
+	private static GrappaPanel gpSemanticEnrichment;
+	/** The grappa panel which holds the visualization of the graph for the high level panel. **/
+	private static GrappaPanel gpHighLevel;
 	/** The currently highlighted node name A in the revision graph. **/
 	private static String highlightedNodeNameA = null;
 	/** The currently highlighted node name B in the revision graph. **/
@@ -172,18 +176,25 @@ public class Controller {
 
 
 	/**
-	 * The resolution tab selection changed. Update corresponding UI - disable tree and filter.
+	 * The application tab selection changed. Update the graphs.
 	 */
-	public static void resolutionTabSelectionChanged() {
-		if (ApplicationUI.getTabbedPaneResolution().getSelectedIndex() == 0) {
-			ApplicationUI.getSplitPaneApplication().setDividerLocation(dividerLocationSplitPaneApplication);
-			ApplicationUI.getSplitPanePreferences().setVisible(true);
-			dividerLocationSplitPaneApplication = -1;
-		} else {
-			ApplicationUI.getSplitPaneApplication().setDividerLocation(0);
-			ApplicationUI.getSplitPanePreferences().setVisible(false);
+	public static void applicationTabSelectionChanged() {
+		switch (ApplicationUI.getTabbedPaneApplication().getSelectedIndex()) {
+		case 0:
+			tableResolutionTriplesSelectionChanged();
+			break;
+		
+		case 1:
+			tableResolutionSemanticEnrichmentIndividualTriplesSelectionChanged();
+			break;
+			
+		case 2:
+			tableResolutionHighLevelChangesSelectionChanged();
+			break;
+
+		default:
+			break;
 		}
-		ApplicationUI.getSplitPanePreferences().updateUI();
 	}
 	
 
@@ -569,26 +580,6 @@ public class Controller {
 				individualModelBranchA = Management.createIndividualModelOfRevision(graphName, branchNameA, differenceModel);
 				individualModelBranchB = Management.createIndividualModelOfRevision(graphName, branchNameB, differenceModel);
 				
-				// Check existence of individuals
-				if (individualModelBranchA.getIndividualStructures().isEmpty() && individualModelBranchB.getIndividualStructures().isEmpty()) {
-					// Disable semantic enrichment individuals tab
-					ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
-					ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
-				} else {
-					// Enable semantic enrichment individuals tab
-					ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, true);
-				}
-				
-				// Check existence of high level changes
-				if (highLevelChangeModel.getHighLevelChangesRenaming().isEmpty()) {
-					// Disable high level changes tab
-					ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
-					ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
-				} else {
-					// Enable high level changes tab
-					ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, true);
-				}
-				
 				// Create the property list of revisions
 				propertyList = Management.getPropertiesOfRevision(graphName, branchNameA, branchNameB);
 				
@@ -598,6 +589,27 @@ public class Controller {
 				
 				// Close dialog after execution and update UI
 				initializeCompleteUI(graphName);
+				
+				// Check existence of individuals
+				if (individualModelBranchA.getIndividualStructures().isEmpty() && individualModelBranchB.getIndividualStructures().isEmpty()) {
+					// Disable semantic enrichment individuals tab
+					ApplicationUI.getTabbedPaneApplication().setSelectedIndex(0);
+					ApplicationUI.getTabbedPaneApplication().setEnabledAt(1, false);
+				} else {
+					// Enable semantic enrichment individuals tab
+					ApplicationUI.getTabbedPaneApplication().setEnabledAt(1, true);
+				}
+				
+				// Check existence of high level changes
+				if (highLevelChangeModel.getHighLevelChangesRenaming().isEmpty()) {
+					// Disable high level changes tab
+					ApplicationUI.getTabbedPaneApplication().setSelectedIndex(0);
+					ApplicationUI.getTabbedPaneApplication().setEnabledAt(2, false);
+				} else {
+					// Enable high level changes tab
+					ApplicationUI.getTabbedPaneApplication().setEnabledAt(2, true);
+				}
+				
 				StartMergingDialog.dialog.setVisible(false);
 				StartMergingDialog.dialog.setCursor(defaultCursor);
 				
@@ -614,15 +626,18 @@ public class Controller {
 				highLevelChangeModel = new HighLevelChangeModel();
 				// Create an empty property list
 				propertyList = new ArrayList<String>();
-				// Disable tabs
-				ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
-				ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
-				ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
+				
 				// Get the revision number
 				String newRevisionNumber = Management.getRevisionNumberOfNewRevisionHeaderParameter(response, graphName);
 				
 				// Close dialog after execution and update UI
 				initializeCompleteUI(graphName);
+				
+				// Disable tabs
+				ApplicationUI.getTabbedPaneApplication().setSelectedIndex(0);
+				ApplicationUI.getTabbedPaneApplication().setEnabledAt(1, false);
+				ApplicationUI.getTabbedPaneApplication().setEnabledAt(2, false);
+				
 				StartMergingDialog.dialog.setVisible(false);
 				StartMergingDialog.dialog.setCursor(defaultCursor);
 				
@@ -638,13 +653,15 @@ public class Controller {
 				highLevelChangeModel = new HighLevelChangeModel();
 				// Create an empty property list
 				propertyList = new ArrayList<String>();
-				// Disable tabs
-				ApplicationUI.getTabbedPaneResolution().setSelectedIndex(0);
-				ApplicationUI.getTabbedPaneResolution().setEnabledAt(1, false);
-				ApplicationUI.getTabbedPaneResolution().setEnabledAt(2, false);
-				
+								
 				// Close dialog after execution and update UI
 				initializeCompleteUI(graphName);
+				
+				// Disable tabs
+				ApplicationUI.getTabbedPaneApplication().setSelectedIndex(0);
+				ApplicationUI.getTabbedPaneApplication().setEnabledAt(1, false);
+				ApplicationUI.getTabbedPaneApplication().setEnabledAt(2, false);
+				
 				StartMergingDialog.dialog.setVisible(false);
 				StartMergingDialog.dialog.setCursor(defaultCursor);
 				
@@ -706,6 +723,7 @@ public class Controller {
 		updateTableModelFilter();
 		
 		// Update application UI
+		updateTableResolutionTriples(new HashMap<TreeNodeObject,TreePath>());
 		updateDifferencesTree();
 		
 		// Create the revision graph
@@ -763,11 +781,21 @@ public class Controller {
 		// Create the grappa panel
 		gp = new GrappaPanel(graph);
 		gp.addGrappaListener(new GrappaAdapter());
-		gp.setScaleToFit(false);
+		gp.setScaleToFit(true);
+		gpSemanticEnrichment = new GrappaPanel(graph);
+		gpSemanticEnrichment.addGrappaListener(new GrappaAdapter());
+		gpSemanticEnrichment.setScaleToFit(true);
+		gpHighLevel = new GrappaPanel(graph);
+		gpHighLevel.addGrappaListener(new GrappaAdapter());
+		gpHighLevel.setScaleToFit(true);
 		
 		ApplicationUI.getScrollPaneGraph().setViewportView(gp);
+		ApplicationUI.getScrollPaneGraphSemanticEnrichment().setViewportView(gpSemanticEnrichment);
+		ApplicationUI.getScrollPaneGraphHighLevelChanges().setViewportView(gpHighLevel);
 
 		gp.updateUI();
+		gpSemanticEnrichment.updateUI();
+		gpHighLevel.updateUI();
 	}
 	
 	
@@ -885,6 +913,8 @@ public class Controller {
 	public static void updateTableResolutionTriples(HashMap<TreeNodeObject, TreePath> selectedElements) throws IOException {
 		// Remove the old rows
 		ApplicationUI.getTableModelResolutionTriples().removeAllElements();
+		ApplicationUI.getTableResolutionTriples().getSelectionModel().clearSelection();
+		
 		logger.debug("unsorted map: " + selectedElements);
 		selectedElements = (HashMap<TreeNodeObject, TreePath>) Management.sortMapByValue(selectedElements);
 		logger.debug("sorted map: " + selectedElements);
@@ -988,6 +1018,8 @@ public class Controller {
 		}
 		
 		gp.updateUI();
+		gpSemanticEnrichment.updateUI();
+		gpHighLevel.updateUI();
 	}
 	
 	
@@ -1018,6 +1050,9 @@ public class Controller {
 	public static void updateTableModelSemanticEnrichmentAllIndividuals() {
 		// Get the table model
 		TableModelSemanticEnrichmentAllIndividuals tableModel = ApplicationUI.getTableModelSemanticEnrichmentAllIndividuals();
+		// Remove old entries
+		tableModel.removeAllElements();
+		ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getSelectionModel().clearSelection();
 		
 		// Get key sets
 		ArrayList<String> keySetIndividualModelBranchA = new ArrayList<String>(individualModelBranchA.getIndividualStructures().keySet());
@@ -1070,6 +1105,7 @@ public class Controller {
 		TableModelSemanticEnrichmentIndividualTriples tableModel = ApplicationUI.getTableModelSemanticEnrichmentIndividualTriples();
 		// Clear the table model
 		tableModel.removeAllElements();
+		ApplicationUI.getTableResolutionSemanticEnrichmentIndividualTriples().getSelectionModel().clearSelection();
 		
 		if (ApplicationUI.getTableResolutionSemanticEnrichmentAllIndividuals().getSelectedRow() != -1) {
 		
@@ -1225,6 +1261,8 @@ public class Controller {
 		}
 		
 		gp.updateUI();
+		gpSemanticEnrichment.updateUI();
+		gpHighLevel.updateUI();
 	}
 
 
@@ -1288,6 +1326,7 @@ public class Controller {
 	public static void updateTableModelHighLevelChanges() {
 		// Remove the old rows
 		ApplicationUI.getTableModelResolutionHighLevelChanges().removeAllElements();
+		ApplicationUI.getTableResolutionHighLevelChanges().getSelectionModel().clearSelection();
 		
 		Iterator<String> iteKeys = highLevelChangeModel.getHighLevelChangesRenaming().keySet().iterator();
 		while (iteKeys.hasNext()) {
@@ -1338,7 +1377,9 @@ public class Controller {
 			Management.removeHighlighting(graph, highlightedNodeNameB);
 		}
 		
-		gp.updateUI();		
+		gp.updateUI();
+		gpSemanticEnrichment.updateUI();
+		gpHighLevel.updateUI();
 	}
 
 
