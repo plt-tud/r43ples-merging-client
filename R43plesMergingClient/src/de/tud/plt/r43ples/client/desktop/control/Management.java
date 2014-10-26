@@ -1113,13 +1113,14 @@ public class Management {
 	 * @return true when node was highlighted elsewhere false when the graph does not contain the specified node
 	 */
 	public static boolean highlightNode(Graph graph, String nodeName, Color color) {
-		if (graph.findNodeByName(nodeName) != null) {		
-			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
-			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, color);	
-			return true;
-		} else {
-			return false;
+		if (graph != null) {
+			if (graph.findNodeByName(nodeName) != null) {		
+				graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
+				graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, color);	
+				return true;
+			}
 		}
+		return false;
 	}
 	
 	
@@ -1131,13 +1132,14 @@ public class Management {
 	 * @return true when the highlighting of the node was removed elsewhere false when the graph does not contain the specified graph
 	 */
 	public static boolean removeHighlighting(Graph graph, String nodeName) {
-		if (graph.findNodeByName(nodeName) != null) {		
-			graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
-			graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, Color.WHITE);	
-			return true;
-		} else {
-			return false;
+		if (graph != null) {
+			if (graph.findNodeByName(nodeName) != null) {		
+				graph.findNodeByName(nodeName).setAttribute(Attribute.STYLE_ATTR, "filled");
+				graph.findNodeByName(nodeName).setAttribute(Attribute.COLOR_ATTR, Color.WHITE);	
+				return true;
+			} 
 		}
+		return false;
 	}
 	
 	
@@ -1237,21 +1239,24 @@ public class Management {
 	 * @param rootNode the root node of tree
 	 */
 	public static ResolutionState refreshParentNodeStateDifferencesTree(DefaultMutableTreeNode rootNode) {
-		
-		if (!rootNode.isLeaf()) {
-			ResolutionState rootNodeState = ResolutionState.RESOLVED;
-			
-			for (int i=0; i<rootNode.getChildCount(); i++) {
-				ResolutionState childState = refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) rootNode.getChildAt(i));
-				if (childState.compareTo(rootNodeState) > 0) {
-					rootNodeState = childState;
+		if (rootNode != null) {
+			if (!rootNode.isLeaf()) {
+				ResolutionState rootNodeState = ResolutionState.RESOLVED;
+				
+				for (int i=0; i<rootNode.getChildCount(); i++) {
+					ResolutionState childState = refreshParentNodeStateDifferencesTree((DefaultMutableTreeNode) rootNode.getChildAt(i));
+					if (childState.compareTo(rootNodeState) > 0) {
+						rootNodeState = childState;
+					}
 				}
+				((TreeNodeObject) rootNode.getUserObject()).setResolutionState(rootNodeState);
+				return rootNodeState;
+			} else {
+				return ((TreeNodeObject) rootNode.getUserObject()).getResolutionState();
 			}
-			((TreeNodeObject) rootNode.getUserObject()).setResolutionState(rootNodeState);
-			return rootNodeState;
-		} else {
-			return ((TreeNodeObject) rootNode.getUserObject()).getResolutionState();
 		}
+		
+		return null;
 	}
 	
 	

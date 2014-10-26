@@ -532,7 +532,7 @@ public class ApplicationUI {
 		splitPaneResolutionSemanticEnrichment.setDividerLocation(300);
 		
 		JPanel panelResolutionHighLevelChanges = new JPanel();
-		tabbedPaneApplication.addTab("High level changes", null, panelResolutionHighLevelChanges, null);
+		tabbedPaneApplication.addTab("High level view", null, panelResolutionHighLevelChanges, null);
 		panelResolutionHighLevelChanges.setLayout(new BorderLayout(0, 0));
 		
 		JSplitPane splitPaneResolutionHighLevelChanges = new JSplitPane();
@@ -696,6 +696,10 @@ public class ApplicationUI {
 				});
 			}
 		});
+		
+		tabbedPaneApplication.setSelectedIndex(0);
+		tabbedPaneApplication.setEnabledAt(1, false);
+		tabbedPaneApplication.setEnabledAt(2, false);
 		
 		tabbedPaneApplication.addChangeListener(new ChangeListener() {
 			
