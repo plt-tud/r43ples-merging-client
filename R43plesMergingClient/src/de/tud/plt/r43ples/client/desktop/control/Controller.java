@@ -1614,7 +1614,7 @@ public class Controller {
 				
 				if (reportResult.getDifferencesResolutionChanged() > 0) {
 					// Get the whole dataset
-					Model wholeContentModel = Management.getWholeContentOfRevision(graphName, revisionNumberBranchA);
+					Model wholeContentModel = Management.getWholeContentOfRevision(graphName, revisionNumberBranchB);
 					logger.debug("Whole model as N-Triples: \n" + Management.writeJenaModelToNTriplesString(wholeContentModel));
 			
 					// Update dataset with local data
