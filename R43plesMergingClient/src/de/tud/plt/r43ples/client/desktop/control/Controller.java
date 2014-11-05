@@ -405,7 +405,7 @@ public class Controller {
 	public static void updateTableModelFilter() {
 		// Get the table model
 		TableModelFilter tableModel = ApplicationUI.getTableModelFilter();
-		
+		tableModel.removeAllElements();
 		// Iterate over all property URIs
 		Iterator<String> iteProperties = propertyList.iterator();
 		while (iteProperties.hasNext()) {
